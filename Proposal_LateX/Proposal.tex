@@ -1,0 +1,78 @@
+%*************************************************************************************************************
+% INCLUDE ONLY
+%*************************************************************************************************************
+% Use if you want to include only certain parts of the document, example \includeonly{introduction}
+% in order to speed up compile time when you're focusing on some particular part.
+%\includeonly{}
+
+%*************************************************************************************************************
+% PREAMBLE: Instead of inserting my \usepackage and defined commands here, I keep them in a separate file
+%*************************************************************************************************************
+\include{Tex/myPreamble}
+\begin{document}
+
+\title{Skye's Thesis Proposal Title}
+\author{Skyepaphora Griffith}
+\dept{Department of Mathematics \& Statistics}
+\degree{Masters of Science}
+\copyrightyear{2023}
+
+% OPTIONAL HERE
+% ~~~~~~~~~~~~~
+% \submitdate{month year in which submitted to GPO}
+%        - date LaTeX'd if omitted
+% \copyrightyear{year degree conferred}
+%        - year LaTeX'd if omitted
+%%%%\figurespagetrue
+%or \figurespagefalse
+%        - produce or don't produce a List of Figures page (true by default)
+%%%%\tablespagetrue 
+%or \tablespagefalse
+%        - produce or don't produce a List of Tables page (true by default)
+
+\beforepreface
+\tableofcontents
+%\newpage
+%\listoffigures
+%\newpage
+%\listoftables
+
+% This command can be used to view the page layout for this document
+%s\layout
+
+% tweaking how much space is put above and below floats.
+\setlength{\abovedisplayskip}{3pt plus1pt minus1pt}
+\setlength{\abovedisplayshortskip}{3pt plus1pt minus1pt}
+\setlength{\belowdisplayskip}{3pt plus1pt minus1pt}
+\setlength{\belowdisplayshortskip}{3pt plus1pt minus1pt}
+
+\renewcommand{\thepage}{\arabic{page}}
+
+% Include my chapter texts - kept separated to make editing easier.
+
+\input{Tex/Chapter1}
+\input{Tex/Chapter2}
+\input{Tex/Chapter3}
+\input{Tex/Chapter4}
+\input{Tex/Chapter5}
+% Appendix
+
+
+%***************************************************************************************
+% BIBLIOGRAPHY
+%***************************************************************************************
+%\renewcommand{\thepage}{\arabic{page}}
+
+% quthesis style is plain, but I prefer alpha
+
+%\bibliography{lesson7a1} 
+%\bibliographystyle{ieeetr}
+%\bibliographystyle{plain}
+%\bibliography{./Tex/Collected}
+
+%***************************************************************************************
+% APPENDICES
+%***************************************************************************************
+\appendix
+%\input{Tex/AppendixA}
+\end{document}

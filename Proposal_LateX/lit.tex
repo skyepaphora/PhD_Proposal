@@ -1,0 +1,354 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{AM - connected papers}
+\author{skyegriffith }
+\date{January 2023}
+
+%%%%%%%% SKYEPAPHORA %%%%%%%%
+\usepackage[margin=0.65in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{xcolor}
+\usepackage{cancel}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{enumerate}
+\usepackage{setspace}
+\usepackage{listings}
+\usepackage{multicol}
+\usepackage{textcomp}
+\usepackage{centernot}
+\usepackage{bbm}
+\usepackage{mathrsfs}
+\usepackage{framed}
+
+\definecolor{skaroon}{HTML}{AA0000}
+\definecolor{skoffee}{HTML}{423324}
+\definecolor{skarchment}{HTML}{FAF5F0}
+
+\newcommand{\define}{\ensuremath \stackrel{\text{def}}{=}}
+\newcommand{\CovMat}{\ensuremath \mathbf{\Gamma}}
+\newcommand{\PCovMat}{\ensuremath \mathbf{C}}
+\newcommand{\sCov}{\ensuremath \text{Cov}}
+\newcommand{\Var}{\ensuremath \text{Var}}
+\newcommand{\PCov}{\ensuremath \mathcal{J}}
+\newcommand{\E}{\ensuremath \text{E}}
+
+\setlength{\fboxsep}{10pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+{\section{Azadeh}}
+
+This thesis is concerned with various aspects of stationary and nonstationary time series analysis. In the nonstationary case, we study estimation of the Wold-Cramer evolutionary spectrum, which is a time-dependent analogue of the spectrum of a stationary process. Existing estimators of the Wold-Cramer evolutionary spectrum suffer from several problems, including bias in boundary regions of the time-frequency plane, poor frequency resolution, and an inability to handle the presence of purely harmonic frequencies. We propose techniques to handle all three of these problems. We propose a new estimator of the Wold-Cramer evolutionary spectrum (the BCMTFSE) which mitigates the first problem. Our estimator is based on an extrapolation of the Wold-Cramer evolutionary spectrum in time, using an estimate of its time derivative. We apply our estimator to a set of simulated nonstationary processes with known Wold-Cramer evolutionary spectra to demonstrate its performance. We also propose an estimator of the Wold-Cramer evolutionary spectrum, valid for uniformly modulated processes (UMPs). This estimator mitigates the second problem, by exploiting the structure of UMPs to improve the frequency resolution of the BCMTFSE. We apply this estimator to a simulated UMP with known WoldCramer evolutionary spectrum. To deal with the third problem, one can detect and remove purely harmonic frequencies before applying the BCMTFSE. Doing so requires a consideration of the aliasing problem. We propose a frequency-domain technique to detect and unalias aliased frequencies in bivariate time series, based on the observation that aliasing manifests as nonlinearity in the phase of the complex coherency between a stationary process and a time-delayed version of itself. To illustrate this “unaliasing” technique, we apply it to simulated data and a real-world example of solar noon flux data. i Acknowledgements First and foremost, I would like to thank my supervisors Dr. Glen Takahara and Dr. David J. Thomson for their support, encouragement, and helpful advice during the completion of this thesis. I would also like to thank the people who made my stay in Kingston enjoyable, in particular Amir, Bahman, Davood, Deb, Mohsen, Nazanin, Rebecca, Reza, Saeed, and Shahram. Last but not least, I would like to thank Scott for all of his love, help and support, particularly during the completion of this thesis. \\[10pt]
+
+{\LARGE\section{Prior Works}}
+
+\subsection{Spectrum estimation and harmonic analysis (a.k.a. ``Dave's 1982 paper")\\
+D. Thomson \\
+1982, Proceedings of the IEEE}
+In the choice of an estimator for the spectrum of a stationary time series from a finite sample of the process, the problems of bias control and consistency, or "smoothing," are dominant. In this paper we present a new method based on a "local" eigenexpansion to estimate the spectrum in terms of the solution of an integral equation. Computationally this method is equivalent to using the weishted average of a series of direct-spectrum estimates based on orthogonal data windows (discrete prolate spheroidal sequences) to treat both the bias and smoothing problems. Some of the attractive features of this estimate are: there are no arbitrary windows; it is a small sample theory; it is consistent; it provides an analysis-of-variance test for line components; and it has high resolution. We also show relations of this estimate to maximum-likelihood estimates, show that the estimation capacity of the estimate is high, and show applications to coherence and polyspectrum estimates. \\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Derivation of Slepians as optimal tapers
+    \item intro to multitaper
+    \item \textcolor{skaroon}{CHECK:} I believe harmonic  F-test introduced in this one?
+\end{itemize}
+\end{minipage}
+}
+
+\subsection{Prolate spheroidal wave functions, fourier analysis, and uncertainty \\ \indent - V: the discrete case \\
+D. Slepian \\
+1978, Bell Labs technical journal}
+
+A discrete time series has associated with it an amplitude spectrum which is a periodic function of frequency. This paper investigates the extent to which a time series can be concentrated on a finite index set and also have its spectrum concentrated on a subinterval of the fundamental period of the spectrum. Key to the analysis are certain sequences, called discrete prolate spheroidal sequences, and certain functions of frequency called discrete prolate spheroidal functions. Their mathematical properties are investigated in great detail, and many applications to signal analysis are pointed out.
+
+\subsection{Spectral analysis for physical applications : multitaper and conventional univariate techniques \\
+D. Percival, A. Walden \\
+1996, Technometrics}
+\fbox{
+\begin{minipage}{0.9\linewidth}
+1. Introduction to spectral analysis \\
+2. Stationary stochastic processes \\ 
+3. Deterministic spectral analysis \\
+4. Foundations for stochastic spectral theory \\
+5. Linear time-invariant filters \\
+6. Non-parametric spectral estimation \\
+7. Multiple taper spectral estimation \\
+8. Calculation of discrete prolate spheroidal sequences \\
+9. Parametric spectral estimation \\
+10. Harmonic analysis References Appendix: data and code via e-mail Index.
+\end{minipage}
+}\\
+
+\subsection{Quadratic-inverse spectrum estimates: applications to palaeoclimatology \\
+D. Thomson \\
+1990, Philosophical Transactions of the Royal Society of London Series A Physical and Engineering Sciences}
+This paper describes some new methods for the analysis of time series and their application to find new results in palaeoclimate. The new statistical theory includes a quadratic inverse theory for unbiased estimation of power spectra, an associated test for spectral resolution, maximum-likelihood spectrum estimates, and detailed explanations of some topics in the detection and estimation of periodic components. A new technique for estimating transfer functions is described. This methodology is used to analyse series describing global ice volume over the past 700000 years as recorded by proxy oxygen isotope ratios from deep-sea cores. We find many of the periodic components predicted by the Milankovitch theory. However, systematic departures are found from the predicted frequencies. These are accompanied by phase modulation that can be attributed to changes in the precession constant of the Earth caused by glaciation-induced changes in the Earth’s principal moments. An estimate of the transfer function from ice volume to precession implies that the Earth’s crust requires more than 160000 years to compensate for mass redistribution, and overcompensates with a delay of about 24000 years.\\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Data: Paleaoclimate - Ice volume via Oxygen dating (spectral analysis, obviously)
+    \item Quadratic Inverse theory \textcolor{skaroon}{IN USE}
+    \item New Transfer function estimation? \textcolor{skaroon}{Check what this is?}
+    \item Dealing with phase modulation
+\end{itemize}
+\end{minipage}
+}\\
+
+\subsection{Nonstationary fluctuations in stationary time-series \\
+D. Thomson \\
+1993, Optics \& Photonics}
+In making an estimate of the power spectrum of a process from a short sample the stationarity assumption used to formulate the spectrum estimate is often violated, so that reliable assessment of the error of the estimate is difficult. Here we examine the problems of detecting narrow-band non-stationarity in short data samples and the influence of such non-stationarity on the variance of spectrum estimates. We decompose the covariance matrix of the eigencoefficients used in multiple-window spectrum estimation methods into a series of known basis matrices with scalar coefficients. For a given bandwidth and sample size, we describe simultaneous orthogonal expansions for both the power (time) function and for the eigencoefficient covariance matrix. The limiting power basis functions are eigenfunctions of a narrow band sinc2 kernel while the corresponding basis matrices are trace-orthogonal so that the observable non-stationary is described by a series of quadratic forms. \\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Detecting non-stationarity in small sample time series 
+    \item non-stationarity and spectrum variance
+    \item Methodology: decompose e.coef Cov matrix and power function into trace-orthogonal basis matrices
+\end{itemize}
+\end{minipage}
+}\\
+
+\subsection{CONTRIBUTIONS TO EVOLUTIONARY SPECTRAL THEORY \\
+G. Mélard, A. D. Schutter \\
+1989, Journal of Time Series Analysis}
+Abstract. The purpose of this paper is to discuss several fundamental issues in the theory of time‐dependent spectra for univariate and multivariate non‐stationary processes. The general framework is provided by Priestley's evolutionary spectral theory which is based on a family of stochastic integral representations. A particular spectral density function can be obtained from the Wold—Cramer decomposition, as illustrated by several examples. It is shown why the coherence is time invariant in the evolutionary theory and how the theory can be generalized so that the coherence becomes time dependent. Statistical estimation of the spectrum is also considered. An improved upper bound for the bias due to non‐stationarity is obtained which does not rely on the characteristic width of the process. The results obtained in the paper are illustrated using time series simulated from an evolving bivariate autoregressive moving‐average process of order (1, 1) with a highly time‐varying coherence. Copyright 1989, Wiley Blackwell. All rights reserved \\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Focus: Priestly's EPS and Wold-Cramer SDF
+    \item Explanation of coherence's time invariance
+    \item Generalization to time dependent coherence
+    \item Improved upper bound for bias due to non-stationarity 
+          \textcolor{skaroon}{Haven't considered this - look into it and whether someone (perhaps Azadeh) has improved it further}
+    \item Simulation: ARMA(1,1) with time-varying coherence
+\end{itemize}
+\end{minipage}
+}\\
+
+{\LARGE\section{Derivative Works}}
+
+\subsection{Some Comments on the Analysis of “Big” Scientific Time Series \\
+D. Thomson, F. Vernon \\
+2016, Proceedings of the IEEE}
+Experience with long time series from space, climate, seismology, and engineering has demonstrated the need for even longer data series with better precision, timing, and larger instrument arrays. We find that almost all the data we have examined, including atmospheric, seismic data, and dropped calls in cellular phone networks contain evidence for solar mode oscillations that couple into Earth systems through magnetic fields, and that these are often the strongest signals present. We show two examples suggesting that robustness has been overused and that many of the extremes in geomagnetic and space physics data may be the result of a superposition of numerous modes. We also present initial evidence that the evolution of turbulence in interplanetary space may be controlled by modes. Returning to the theme of “big data,” our experience has been that theoretical predictions that spectra would be asymptotically unbiased have turned out to be largely irrelevant with very long time series primarily showing that we simply did not understand the problems. Data that were considered to have excessively variable spectra appear to evolve into processes with dense sets of modes. In short data blocks, these modes are not resolved and as the relative phase of the modes within the estimator varies, so does the apparent power. Ideas that data series become uncorrelated at modest distances in either time or space do not seem to be true with the long duration continuous time series data we have examined.\\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Data: superposition of modes (solar line components?) in geomagnetic data
+    \item Long time series don't present as asymptotically unbiased
+    \item Wiggly spectra evolve to processes with dense sets of modes
+\end{itemize}
+\end{minipage}
+}\\
+
+\subsection{An evolutionary spectral representation for blind separation of biosignals \\
+S. Senay \\
+2018, Evol. Syst.}
+TL;DR: This paper proposes an evolutionary spectral representation based on the discrete prolate spheroidal sequences (DPSS), which is derived from the relation between discrete evolutionary transform and evolutionary periodogram to derive the Slepian evolutionary spectrum. \\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item EPS from DPSS (been there done that?)
+    \item \textcolor{skaroon}{``Slepian Evolutionary Spectrum"} derived
+\end{itemize}
+\end{minipage}
+}
+
+\subsection{Applications of Multitaper Spectral Analysis to Nonstationary Data \\
+K. Rahim \\
+2014}
+This thesis is concerned with changes in the spectrum over time observed in Holocene climate data as recorded in the Burgundy grape harvest date series. These changes represent nonstationarities, and while spectral estimation techniques are relatively robust in the presence of nonstationarity—that is, they are able to detect significant contributions to power at a given frequency in cases where the contribution to power at that given frequency is not constant over time—estimation and prediction can be improved by considering nonstationarity. We propose improving spectral estimation by considering such changes. Specifically, we propose estimating the level of change in frequency over time, detecting change-point(s) and sectioning the time series into stationary segments. We focus on locating a change in frequency domain in time, and propose a graphical technique to detect spectral changes over time. We test the estimation technique in simulation, and then apply it to the Burgundy grape harvest date series. The Burgundy grape harvest date series was selected to demonstrate the introduced estimator and methodology because the time series is equally spaced, has few missing values, and a multitaper spectral analysis, which the methodology proposed in this thesis is based on, of the grape harvest date series was recently published. In addition, we propose a method using a test for goodness-of-fit of autoregressive estimators to aid in assessment of change in spectral properties over time. ii This thesis has four components: (1) introduction and study of a level-of-change estimator for use in the frequency domain change-point detection, (2) spectral analysis of the Burgundy grape harvest date series, (3) goodness-of-fit estimates for autoregressive processes, and (4) introduction of a statistical software package for multitaper spectral analysis. We present four results. (1) We introduce and demonstrate the feasibility of a level-of-change estimator. (2) We present a spectral analysis and coherence study of the Burgundy grape harvest date series that includes locating a change-point. (3) We present a study showing an advantage using multitaper spectral estimates when calculating autocorrelation coefficients. And (4) we introduce an R software package, available on the Comprehensive R Archive Network (CRAN), to perform multitaper spectral estimation. \\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Data: nonstationary grape harvest 
+    \item Estimate frequency variation: where and how much? +Partitioning series into stationary components
+    \item Graphical test for spectral changes; simulation; application
+    \item Goodness-of-fit test for AR estimators to estimate spectral changes over time
+    \item Level of change estimator; Multitaper; new R package
+\end{itemize}
+\end{minipage}
+}\\
+
+
+\subsection{Time-frequency BSS of biosignals \\
+S. Senay \\
+2018, Healthcare technology letters}
+Time–frequency (TF) representations are very important tools to understand and explain circumstances, where the frequency content of non-stationary signals varies in time. A variety of biosignals such as speech, electrocardiogram (ECG), electroencephalogram (EEG), and electromyogram (EMG) show some form of non-stationarity. Considering Priestley's evolutionary (time-dependent) spectral theory for analysis of non-stationary signals, the authors defined a TF representation called evolutionary Slepian transform (EST). The evolutionary spectral theory generalises the definition of spectra while avoiding some of the shortcomings of bilinear TF methods. The performance of the EST in the representation of biosignals for the blind source separation (BSS) problem to extract information from a mixture of sources is studied. For example, in the case of EEG recordings, as electrodes are placed along the scalp, what is actually observed from EEG data at each electrode is a mixture of all the active sources. Separation of these sources from a mixture of observations is crucial for the analysis of recordings. In this study, they show that the EST can be used efficiently in the TF-based BSS problem of biosignals. \\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Data: various non-stationary electro-grams (Health; eg: ECG)
+    \item Using Priestly EPS: \textcolor{skaroon}{Evolutionary Slepian Transform}
+    \item Performance of EST in Blind Source Separation (pull out signals from complex source - many signals or noisy data, idk I'm not a doctor)
+\end{itemize}
+\end{minipage}
+}
+
+{\LARGE\section{Citations}}
+
+\subsection{An overview of multiple-window and quadratic-inverse spectrum estimation methods \\
+D. Thomson \\
+1994, Proceedings of ICASSP '94. IEEE International Conference on Acoustics, Speech and Signal Processing}
+Presents examples, history, and a brief review of the theory of multiple-window and quadratic-inverse spectrum estimation methods for mixed harmonizable processes. In addition to the standard uses of making consistent non-parametric auto- and cross-spectrum estimates with jackknife confidence intervals and estimating periodic components in coloured noise, quadratic-inverse theory gives a time-frequency decomposition for stochastic processes. This leads to new estimates of both common and less-familiar functions such as the ``time-derivative" of a spectrum. \\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Review of quadratic inverse theory in spectrum estimation for harmonizable processes
+    \item T-F decomposition (follows from above)
+    \item Introduce idea of a spectrum's time-derivative \textcolor{skaroon}{ - IN USE} 
+\end{itemize}
+\end{minipage}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%% CITED BY %%%%%%%%%%%%%%%%%%%%%%%
+{\LARGE\section{Cited by}}
+
+\subsection{Optimal Bandwidth for Multitaper Spectrum Estimation \\
+C. Haley, M. Anitescu \\
+2017, IEEE Signal Processing Letters}
+A systematic method for bandwidth parameter selection is desired for Thomson multitaper spectrum estimation. We give a method for determining the optimal bandwidth based on a mean squared error (MSE) criterion. When the true spectrum has a second-order Taylor series expansion, one can express quadratic local bias as a function of the curvature of the spectrum, that can be estimated by using a simple spline approximation. This is combined with a variance estimate, obtained by jackknifing over individual spectrum estimates, to produce an estimated MSE for the log spectrum estimate for each choice of time-bandwidth product. The bandwidth that minimizes the estimated MSE then gives the desired spectrum estimate. Additionally, the bandwidth obtained by using our method is also optimal for cepstrum estimates. We give an example of a damped oscillatory (Lorentzian) process in which the approximate optimal bandwidth can be written as a function of the damping parameter. The true optimal bandwidth agrees well with that given by minimizing estimated the MSE in these examples. \\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Quadratic Local Bias as a function of spectrum's curvature (est. via spline)
+    \item variance estimated via jackknifing
+    \item QLB and variance estimate log-spectrum for each time-bandwidth product (BT: the thing that = NW) 
+    \item bandwidth which minimizes MSE is optimal for estimating spectrum
+    \item damped oscillatory (Lorentzian) process example: opt. bandwidth is a function of damping parameter 
+\end{itemize}
+\end{minipage}
+}\\
+
+\subsection{Quadratic-Inverse Expansion of the Rihaczek Distribution \\
+D. Thomson \\
+2005, Conference Record of the Thirty-Ninth Asilomar Conference onSignals, Systems and Computers, 2005.}
+This paper describes some unexpected relationships between multitaper estimates of the spectrum and time–frequency distributions. In particular, there is an orthogonal decomposition of a localized Rihaczek distribution in terms of quadratic–inverse expansions. The frequency marginal of this estimate is the standard multitaper estimate and thus much more accurate than conventional forms that have the periodogram as the frequency marginal. The time marginal is a smoothed version of the instantaneous power. The first three terms of the quadratic–inverse expansion are approximately the multitaper estimate and the quadratic–inverse estimates of the time and frequency derivatives of the spectrum.\\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Rihaczek Distribution: Bilinear TF distribution with kernel $\phi(\eta,\tau) = e^{-i2\pi \frac{\eta\tau}{2}}$
+    \item Quadratic Inverse expansion approximates MT \& QI estimates of spec's time and frequency derivatives 
+\end{itemize}
+\end{minipage}
+}
+
+
+
+\subsection{Evolutionary Spectra Based on the Multitaper Method with Application To Stationarity Test \\
+Yu Xiang, Jie Ding, V. Tarokh \\
+2018, IEEE International Conference on Acoustics, Speech, and Signal Processing \\[10pt] wait is this just Azedeh's thesis?}
+In this work, we propose a new inference procedure for understanding non-stationary processes, under the framework of evolutionary spectra developed by Priestley. Among various frameworks of modeling non-stationary processes, the distinguishing feature of the evolutionary spectra is its focus on the physical meaning of frequency. The classical estimate of the evolutionary spectral density is based on a double-window technique consisting of a short-Fourier transform and a smoothing. However, smoothing is known to suffer from the so-called bias leakage problem. By incorporating Thomson's multitaper method that was originally designed for stationary processes, we propose an improved estimate of the evolutionary spectral density, and analyze its bias/variance/resolution tradeoff. As an application of the new estimate, we further propose a non-parametric rank-based stationarity test, and provide various experimental studies. \\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item estimate Evolutionary Spectral Density via multitaper
+    \item analyze bias/variance/resolution tradeoff
+    \item non-parametric rank-based stationarity test
+\end{itemize}
+\end{minipage}
+}\\
+
+\subsection{Nonparametric and Parametric Methods for Solar Oscillation Spectra \\
+C. Haley \\
+2014}
+The study of the systematic oscillations of the Sun has led to better understanding of the Sun’s inner structure and dynamics, and may help to resolve inconsistencies between observations and the standard solar model. Recent studies have concluded that solar modal structure remains coherent past turbulence in the convection zone and imprints its signatures on the solar wind and the interplanetary magnetic field fluctuations, and these structures are coherent with atmospheric pressure variations, terrestrial seismic oscillations, and data from communications systems. Time series containing modal structure can be expected to contain several thousands of resolved and unresolved line components in very short bands in frequency, and the measurement of these modes pushes spectrum estimation methods for time series to its limit. This thesis presents two theoretical contributions for modeling solar oscillations in power spectra (i) expressions for the expected number and shape of significant spurious peaks in spectrum estimates are given, in the absence of modal structure, and a permutation test for the identification of spectra containing pathological numbers of modal components. (ii) A model for maximum likelihood estimation of the solar oscillation parameters in composite spectra is given. The scientific contributions of this thesis are (a) identification of highly significant modal artifacts in solar wind measurements as seen by the Advanced Composition Explorer (ACE) on the 2 - 3mHz band and (b) quantification of the presence of modal structure in secondary cosmic rays (specifically neutrons) on Earth.\\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item many line components within small freq band
+    \item permutation test for pathological numbers of modal components
+    \item Model solar oscillation parameters (ACE satellite)
+\end{itemize}
+\end{minipage}
+}\\
+
+\subsection{
+Techniques to Obtain Good Resolution and Concentrated Time-Frequency Distributions: A Review \\
+I. Shafi+ 2 authorsF. M. Kashif \\
+2009, EURASIP Journal on Advances in Signal Processing}
+We present a review of the diversity of concepts and motivations for improving the concentration and resolution of timefrequencydistributions (TFDs) along the individual components of the multi-component signals. The central idea has been to obtain a distribution that represents the signal’s energy concentration simultaneously in time and frequency without blur andcrosscomponents so that closely spaced components can be easily distinguished. The objective is the precise description of spectralcontent of a signal with respect to time, so that first, necessary mathematical and physical principles may be developed, andsecond, accurate understanding of a time-varying spectrum may become possible. The fundamentals in this area of research havebeen found developing steadily, with significant advances in the recent past.\\
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item Review of TF-methods, may extend beyond scope of Azadeh?
+\end{itemize}
+\end{minipage}
+}
+ \newpage 
+ 
+\section*{ Xiang 2018 \\ 
+{\small Evolutionary Spectra Based on the Multitaper Method with
+Application to Stationarity Test}}
+
+\fbox{
+\begin{minipage}{0.9\linewidth}
+\begin{itemize}
+    \item estimate Evolutionary Spectral Density via multitaper
+    \item analyze bias/variance/resolution tradeoff
+    \item non-parametric rank-based stationarity test
+\end{itemize}
+\end{minipage}
+}\\
+
+\paragraph{Methods of Analysis - Non-stationary}
+\begin{enumerate}
+    \item Instantaneous Power Spectra \\
+          {\small C. H. Page, ``Instantaneous power spectra,”}
+    \item Evolutionary Spectra \\ {\small Priestly 1966}
+    \item Wigner-Ville Spectral Analysis \\
+          {\small W. Martin and P. Flandrin, ``Wigner-Ville spectral analysis of nonstationary processes”}
+    \item Locally Stationary Processes \\
+          {\small R. Dahlhaus, “On the Kullback-Leibler information divergence for locally stationary processes”}
+    \item Local Cosine bases \\
+          {\footnotesize S. Mallat, G. Papanicolaou, and Z. Zhang, ``Adaptive covariance estimation of locally stationary processes,”}
+\end{enumerate}
+
+In a recent work by Abreu and Romero, for stationary processes, the mean squared error (MSE) of the spectral estimate based on the multitaper method is characterized. \\
+
+\textit{L. D. Abreu and J. L. Romero, “MSE estimates for
+multitaper spectral estimation and off-grid compressive
+sensing,” arXiv preprint arXiv:1703.08190, 2017.}
+
+\textbf{Xiang:} Extend to Non-stationary framework \\
+
+\textbf{Section 3: }
+Unbiased estimate $|J_t(\omega)|^2$ of EPS $f_t(\omega)$ with pseudo-delta applied to Time (rather than Freq) domain. 
+
+\textbf{Section 4.2: Multitaper EPS Estimate}
+\begin{flalign*}
+    &\text{Estimate}&
+    \hat f^(K)_t(\omega) &= 
+    \frac{1}{K}\sum_{k=0}^{K-1}
+    \left|
+        \sum_{u = t-\frac{N-1}{2}}^{t+\frac{N-1}{2}}
+        \nu_k\left((u-t) + \frac{N-1}{2}\right)
+        X(u)e^{i\omega u}
+    \right|^2 & 
+    \\
+    &\text{Mean}&
+    E\left[\hat f^(K)_t(\omega)\right] &=
+\end{flalign*}
+
+\end{document}
