@@ -1,0 +1,1422 @@
+---
+output: pdf_document
+---
+
+# Prelims
+
+```{r setup, echo = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE, warning = FALSE)
+
+# Packages
+library(multitaper)
+library(pbapply)
+library(kableExtra)
+library(itsmr)
+library(animation)
+library(fields)
+```
+
+```{r}
+## --- Custom Plots/Graphics------------------------------------ ##
+
+# --- My colours --- #
+skol <-  list(red = "#EF8085", orange = "#ee9946", yellow = "#FCD779",
+            green = "#B3C99D",   blue = "#9DBACA", purple = "#B29CC9",
+           brown1 = "#EFEBE6", brown2 = "#DFD6CD", brown3 = "#896f58",
+           brown4 = "#544536",  cream = "#F7F3F3",   salt = "#FBFAF9")
+
+# --- Rectangle --- #
+rekt <- function(col = "#FEFAFA", log = FALSE){
+  if(log == FALSE){
+      rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = col)
+  } else if(log == "x"){
+      rect(10^par("usr")[1], par("usr")[3], 10^par("usr")[2], par("usr")[4], col = col)
+  } else if(log == "y"){
+      rect(par("usr")[1], 10^par("usr")[3], par("usr")[2], 10^par("usr")[4], col = col)
+  } else if (log == "xy"){
+      rect(10^par("usr")[1], 10^par("usr")[3], 10^par("usr")[2], 10^par("usr")[4], col = col)
+  }
+}
+
+# --- Label Function --- # NORMALLY 1.7 is actually 1.5!!!!!!!!!!!!!!!!!!!
+slab <- function(main = "", subb = "", xlab = "", ylab = ""){
+  mtext(main, 3, 1.7,  font = 2, cex = 1.1 )
+  mtext(subb, 3, 0.25,           cex = 1   )
+  mtext(xlab, 1, 2.75, font = 1, cex = 1.05)
+  mtext(ylab, 2, 2.5 , font = 1, cex = 1.05)
+}
+
+# --- Colour Boundaries --- ##
+rext <- function(N=1000,B=100){rect(
+     xleft = c(par("usr")[[1]],N-ceiling(B/2)),
+     ybottom = c(par("usr")[[3]], par("usr")[[3]]),
+     xright = c(ceiling(B/2), par("usr")[[2]]),
+     ytop = c(par("usr")[[4]], par("usr")[[4]]),
+     col = skol$cream, border = NA)}
+
+# --- Plot function --- #
+splot <- function(x, y,
+                  col  = skol$brown4,
+                  main = "", subb = "", xlab = "", ylab = "",
+                  type = "p",
+                  pch  = 19,
+                  colr = "#FEFAFA", 
+                  rexs = FALSE, bord = 100, ...){
+  # frame
+  plot(x, y, xlab = "", ylab = "", ...)
+  # bg colours
+  rekt(colr); if(rexs){
+    rext(length(x),bord)
+    abline(v = c(ceiling(B/2),N-ceiling(B/2)), col = skol$green, lty = 2)
+    abline(v=c(par("usr")[1]),#par("usr")[3]),
+           h=par("usr")[4]) 
+  }
+  # add
+  if(type == "p"){points(x, y, col = col, pch = pch, ...)
+  } else {
+    lines(x, y, col = col, type = type, ...)
+  }
+  slab(main,subb,xlab,ylab)
+}
+```
+
+```{r prelims, echo = TRUE}
+## --- Preliminaries ------------ ##
+M  <- 100                       # No. of simulations
+N  <- 1000                      # No. of obs
+NF <- 2^ceiling(log(N,2)) + 1   # No. of Fourier freqs
+FF <- 1/(2*NF)                  # Fundamental Fourier freq
+Fs <- FF*(0:(NF-1))             # Fourier freq mesh
+t  <- 1:N                       # Time vector
+#f <- Fs[round(length(Fs)/4)]   # A fixed freq ~1/8
+w  <- 0.004                     # Analysis bandwidth (freq)
+B  <- 100 # 100                 # Block size (for sliding window)
+i  <- complex(1,0,1)            # imaginary i
+# B2 <- floor(B/2)                # Midpoint shift
+K  <- 7                         # Eigencoefs per frequency
+# vb <- spec.mtm(ts(1:B), plot = FALSE)$mtm$dpss$v # DPSS (based on block size)
+v  <- spec.mtm(ts(1:N), plot = FALSE)$mtm$dpss$v # DPSS (based on series length)
+
+B2 <- ceiling(B/2)                               # Midpoint shift
+vb <- spec.mtm(ts(1:B), plot = FALSE)$mtm$dpss$v # DPSS (based on block size)
+b  <- 1:(N-(B-1))                                # block indices
+tb <- b + B2 - 1                                 # time in-block
+```
+
+# Stationary Examples
+
+Before examining processes which actually \textit{evolve} over time, let us play with some trivial examples. As we construct the following time series, assume $N=1000$ and $\Delta t = 1$ (giving us a Nyquist frequency of $1/2$). The frequency domain will be discretized to $N_f = 2^{\lceil\log_2(N)\rceil}+1 = 1025$ frequencies on the interval $[0,1/2]$. 
+
+$$
+\begin{aligned}
+     x(t) &\sim w\big(0,\;\sigma_x^2 = 10^2\big) \\&\\
+     y(t) &= 0.5\,y(t-1) - 0.5\,y(t-2) + \epsilon(t)    \\
+     \epsilon(t) &\sim w\big(0,\;\sigma_\epsilon^2 = 10^2\big)
+\end{aligned}
+$$
+
+We will examine the CBCMTFSE for bot $x$ and $y$. This gives some anecdotal insight into the estimator's performance for pure white noise $(x)$, in addition to an example of a stationary AR(2) process $(y)$. Note that $x$ and $\epsilon$ are identically distributed, but are distinct realizations. The theoretucal spectrum for the white noise process $x(t)$ should be obvious: uniformly distributed power at $\sigma_x^2$ on the interval $[1,1/2]$. The spectrogram will have identical rows \textit{and} columns - in its graphical depiction, it should just be a rectangle of one solid colour. The series $y(t)$ is AR(2) and stationary, thus its theoretical spectrum should be:
+
+$$
+S_Y(f) = \frac{\sigma_\epsilon^2}{\Big|1 - 0.5e^{-i2\pi f} + 0.5e^{-i4\pi f}\Big|^2}.
+$$
+
+In this case, the spectrogram should only display vertical lines of colour as they vary across a horizontal axis of frequencies.
+
+We can think of both series as UMPs if we consider $c(t) = 1$ to be their common modulating function for $t \in \{0,\dots,N-1\}$. We'll use this to plot their theoretical spectrograms for the purpose of comparing them to our estimates, later on.
+
+```{r t_funcs}
+set.seed(17)
+
+# Modulating function; AR(2); UMP
+# xt <- rnorm(N, sd=10)
+# yt <- arima.sim(model = list(ar = c(0.5,-0.5), sd = 10), n = N)
+ct <- rep(1,N)
+
+# TRUE specta of X and Y
+xf.true  <- rep(10^2, NF)
+
+# (divide by 10^2 to compare to spec.mtm plot)
+yf.true  <- (10^2)/Mod( 1 - 0.5*exp(-i*2*pi*Fs) + 0.5*(exp(-i*4*pi*Fs)))^2 
+
+# TRUE spectrogram of X and Y
+xtf.true <- outer(ct^2,xf.true)
+ytf.true <- outer(ct^2,yf.true)
+```
+
+```{r sgram_0, include = FALSE, eval = FALSE}  
+# # TRUE evo. spectrum of X
+# image(x = Fs, y = t, z = t(xtf.true), xlab = "", ylab = "")
+# slab("Theoretical Spectrogram of x(t)",
+#      "White Noise; Unmodulated",
+#      "Frequency","Time")
+# 
+# # TRUE evo. spectrum of X
+# image(x = Fs, y = t, z = t(ytf.true), xlab = "", ylab = "")
+# slab("Theoretical Spectrogram of Y(t)",
+#      "Stationary AR(2); Unmodulated",
+#      "Frequency","Time")
+```
+
+Under more strict conditions than the stationarity we've constructed, the MTFSE and BCMTMTFSE have been compared to established TFS estimators: the HRS and SWHRS [??]. We will add another link to this estimator-chain by simply comparing the CBCMTFSE to the BCMTFSE, both of which include extrapolations into the time boundary regions. Caring about these extrapolations is counter-intuitive in the stationary case, of course, where we expect the spectra not to evolve over time - however, a good estimator should be still able to account for a \textit{lack} of evolution in this sense.
+
+```{r eigenProblem}
+
+# # --- Prelim Reset ----------- #
+# M  <- 10                                         # No. of simulations
+# B  <- 200 # 100 # CAREFUL: mval/vecs                   # Block size (for sliding window)
+# vb <- spec.mtm(ts(1:B), plot = FALSE)$mtm$dpss$v # DPSS (based on block size)
+# b  <- 1:(N-(B-1))                                # block indices
+# tb <- b + B2 - 1                                 # time in-block
+# 
+# 
+# # --- eigenProblem ----------- #
+# 
+# # N x inner sum coef                   /----w_B----\
+# Ma  <- function(t,m){return(B*(sin(2*pi *(K+1)/(2*B)* (t-m))/(pi*(t-m)))^2)}
+# 
+# # Matrix of Interest
+# mat <- matrix(0,nrow = B, ncol = B)
+# for(s in 1:B){mat[s,] <- Ma(s,1:B)}
+# 
+# # Fill diagonal with Sinc function at "0/0"
+# diag(mat) <- 1 
+# 
+# # Get eigenstuff
+# mval <- eigen(mat)$values
+# mvec <- eigen(mat)$vectors
+# 
+# # check eigenvals: should match test vals, below
+# # test.vals <- 2*B*(K+1)/(2*B) - c(0,1)/2
+# # abs(test.vals - mval[1:2])
+```
+
+```{r prepSim_Calcs}
+# 
+# # Function to estimate coefficients {a(l,b)}
+# a  <- function(s,l,b){ (K/(B*(mval[l+1]))) * (mvec[,l+1] %*% matrix(s[,b], ncol = NF)) }
+# 
+# # omega function vals for upcoming Taylor expansions (pre-compute for speed)
+# w0.0 <- sum(mvec[,1])
+# w2.0 <- sum(mvec[,3])
+# w1.1 <- c(((-B2):(B2-1))   %*% mvec[,2])
+# w0.2 <- c(((-B2):(B2-1))^2 %*% mvec[,1])
+# w2.2 <- c(((-B2):(B2-1))^2 %*% mvec[,3])
+# d.02 <- (w2.0*w0.2 - w0.0*w2.2)
+# 
+# # Functions for first and second time-derivatives
+# tdtfse  <- function(s,p){ B*a(s,1,p)/w1.1 }
+# # stdtfse <- function(s,p,cc,mm){ 2*(B*a(s,2,p)-cc[tb[p],,mm]*w2.0) / w2.2}
+# stdtfse <- function(s,p){ 2*B * (a(s,0,p)*w2.0 - a(s,2,p)*w0.0) / d.02}
+```
+
+## Stationary simulations
+
+### FUNCTION
+
+```{r bcmtfse_cbcmtfse_sims}
+# Prep simulations
+set.seed(17)
+
+# Simulate FUNCTION
+cbc <- function(type = "noise", M = 100, seed = 0, B = 100){ 
+  
+        # Prelims
+        B2 <- ceiling(B/2)                               # Midpoint shift
+        vb <- spec.mtm(ts(1:B), plot = FALSE)$mtm$dpss$v # DPSS (based on block size)
+        b  <- 1:(N-(B-1))                                # block indices
+        tb <- b + B2 - 1                                 # time in-block
+        
+        # ------------
+        # N x inner sum coef                   /----w_B----\
+        Ma  <- function(t,m){return(B*(sin(2*pi *(K+1)/(2*B)* (t-m))/(pi*(t-m)))^2)}
+        
+        # Matrix of Interest
+        mat <- matrix(0,nrow = B, ncol = B)
+        for(s in 1:B){mat[s,] <- Ma(s,1:B)}
+        
+        # Fill diagonal with Sinc function at "0/0"
+        diag(mat) <- 1 
+        
+  # Get eigenstuff
+  mval <- eigen(mat)$values
+  mvec <- eigen(mat)$vectors
+
+  # ------------
+  # Function to estimate coefficients {a(l,b)}
+  a  <- function(s,l,b){ (K/(B*(mval[l+1]))) * (mvec[,l+1] %*% matrix(s[,b], ncol = NF)) }
+        
+  # omega function vals for upcoming Taylor expansions (pre-compute for speed)
+  w0.0 <- sum(mvec[,1])
+  w2.0 <- sum(mvec[,3])
+  w1.1 <- c(((-B2):(B2 - 1 - (B/2 != B2)))   %*% mvec[,2])
+  w0.2 <- c(((-B2):(B2 - 1 - (B/2 != B2)))^2 %*% mvec[,1])
+  w2.2 <- c(((-B2):(B2 - 1 - (B/2 != B2)))^2 %*% mvec[,3])
+  d.02 <- (w2.0*w0.2 - w0.0*w2.2)
+        
+        # Functions for first and second time-derivatives
+        tdtfse  <- function(s,p){ B*a(s,1,p)/w1.1 }
+        stdtfse <- function(s,p){ 2*B * (a(s,0,p)*w2.0 - a(s,2,p)*w0.0) / d.02}
+        
+  # Setup
+  if(seed > 0){ set.seed(seed) }
+  pb <- txtProgressBar(style = 3)
+  
+  # Initialize arrays
+  cbcmtfse.sims <- bcmtfse.sims <- array(dim = c(N,NF,M))
+    
+  for(m in 1:M){
+    # Create: noise process (X) or AR(2) series (Y)
+    if(type == "noise"){
+      xt <- rnorm(N, sd=10)
+    } else if(type == "AR2"){
+      xt <- arima.sim(model = list(ar = c(0.5,-0.5), sd = 10), n = N)
+    } else {error}
+    
+    # Sliding window: full window included
+    sw <- (B/K) * Mod( sapply(b, function(p){
+          vb %*% t(spec.mtm(ts(xt[(p):(p+B-1)]),
+                            nFFT = (2*NF-1),
+                            plot = FALSE,
+                            returnInternals = TRUE)$mtm$eigenCoefs)}))^2
+    
+    setTxtProgressBar(pb, (m-0.5)/M)
+    
+    # Modify, storing midpoints
+    bcmtfse.sims[tb,,m] <- (K/mval[1]) * t(sapply(b, function(p){mvec[,1] %*% matrix(sw[,p], ncol = NF)})) / w0.0
+  
+    # More Modify, storing midpoints
+    cbcmtfse.sims[tb,,m] <- t(sapply(b, function(p){ B*(a(sw,2,p)*w0.2 - a(sw,0,p)*w2.2) / d.02 }))
+    
+    # Endpoints: 1st derivative
+    tdtfse.start <- tdtfse(sw,1)      # c(((K/mval[2]) / w1.1 )) * (mvec[,2] %*% matrix(sw[,1], ncol = NF))
+    tdtfse.end   <- tdtfse(sw,max(b)) # c(((K/mval[2]) / w1.1 )) * (mvec[,2] %*% matrix(sw[,max(b)], ncol = NF))
+    
+    # Endpoints: 2nd derivative
+    stdtfse.start <- stdtfse(sw,1)      # stdtfse(sw,1,cbcmtfse.sims,m)
+    stdtfse.end   <- stdtfse(sw,max(b)) # stdtfse(sw,max(b),cbcmtfse.sims,m)
+    
+    # Clean
+    rm(sw); gc()
+    
+    # Boundary Corrected Modified Time Frequency Spectrum Estimate: Variant 1
+    bcmtfse.sims[1:(tb[1]-1),,m]   <- t(sapply((tb[1]-1):1, function(h){ bcmtfse.sims[tb[1],,m] - h*tdtfse.start }))
+    bcmtfse.sims[(max(tb)+1):N,,m] <- t(sapply(1:(B2-(B2 != B/2)), function(h){ bcmtfse.sims[max(tb),,m] + h*tdtfse.end }))
+    
+    # Boundary Corrected Modified Time Frequency Spectrum Estimate: Variant 2
+    # TBA
+    # Question: can S be approximated well as a fn of time by its taylor expansion? Check pure sgram. Azadeh assumes this.
+    
+    # Curvy Boundary Corrected Modified Time Frequency Spectrum Estimate: Variant 1
+    cbcmtfse.sims[1:(tb[1]-1),,m]   <- t(sapply((tb[1]-1):1, function(h){ 
+        cbcmtfse.sims[tb[1],,m] - h*tdtfse.start - (h^2)*stdtfse.start/2 }))
+    
+    cbcmtfse.sims[(max(tb)+1):N,,m] <- t(sapply(1:(B2-(B2 != B/2)), function(h){ 
+        cbcmtfse.sims[max(tb),,m] + h*tdtfse.end + (h^2)*stdtfse.end/2 }))
+  
+    # Phew!
+    setTxtProgressBar(pb, m/M); gc()
+    }
+  return(list(bc = bcmtfse.sims, cbc = cbcmtfse.sims))
+}
+
+```
+
+### SIMULATIONS
+
+```{r this_is_sim_0}
+trial.x0 <- cbc(type = "UMP", M = 100, seed = 17, B=200); gc()
+# trial.y0 <- cbc(type = "AR2", M = 100, seed = 17, B = 400); gc()
+```
+
+```{r stat_X0}
+## --- Statistics X --------------------------------- ##
+# bc.x <- cbc.x <- list(); gc()
+# 
+# bc.x$mean <- pbapply(trial.x0$bc, 1:2, mean)
+# bc.x$q1   <- pbapply(trial.x0$bc, 1:2, function(x){ quantile(x,probs = 0.025) }); gc() # q = 0.025
+# bc.x$q2   <- pbapply(trial.x0$bc, 1:2, function(x){ quantile(x,probs = 0.500) }); gc() # q = 0.500
+# bc.x$q3   <- pbapply(trial.x0$bc, 1:2, function(x){ quantile(x,probs = 0.975) }); gc() # q = 0.975
+# 
+# cbc.x$mean <- pbapply(trial.x0$cbc, 1:2, mean)
+# cbc.x$q1   <- pbapply(trial.x0$cbc, 1:2, function(x){ quantile(x,probs = 0.025) }); gc() # q = 0.025
+# cbc.x$q2   <- pbapply(trial.x0$cbc, 1:2, function(x){ quantile(x,probs = 0.500) }); gc() # q = 0.500
+# cbc.x$q3   <- pbapply(trial.x0$cbc, 1:2, function(x){ quantile(x,probs = 0.975) }); gc() # q = 0.975
+
+# rm(trial.x0);gc()
+```
+
+### Stats
+
+```{r stat_Y0}
+## --- Statistics Y --------------------------------- ##
+bc.y <- cbc.y <- list(); gc()
+
+bc.y$mean <- pbapply(trial.y0$bc, 1:2, mean); gc()
+bc.y$se   <- pbapply(trial.y0$bc, 1:2, sd)/sqrt(M); gc()
+# bc.y$q1   <- pbapply(trial.y0$bc, 1:2, function(x){ quantile(x,probs = 0.025) }); gc() # q = 0.025
+# bc.y$q2   <- pbapply(trial.y0$bc, 1:2, function(x){ quantile(x,probs = 0.500) }); gc() # q = 0.500
+# bc.y$q3   <- pbapply(trial.y0$bc, 1:2, function(x){ quantile(x,probs = 0.975) }); gc() # q = 0.975
+
+cbc.y$mean <- pbapply(trial.y0$cbc, 1:2, mean); gc()
+cbc.y$se   <- pbapply(trial.y0$cbc, 1:2, sd)/sqrt(M); gc()
+# cbc.y$q1   <- pbapply(trial.y0$cbc, 1:2, function(x){ quantile(x,probs = 0.025) }); gc() # q = 0.025
+# cbc.y$q2   <- pbapply(trial.y0$cbc, 1:2, function(x){ quantile(x,probs = 0.500) }); gc() # q = 0.500
+# cbc.y$q3   <- pbapply(trial.y0$cbc, 1:2, function(x){ quantile(x,probs = 0.975) }); gc() # q = 0.975
+
+# rm(bcmtfse.sims,cbcmtfse.sims);gc()
+```
+
+### Plot Prep
+
+```{r}
+## --- Parameters --------------------------------- ##
+my.t  <- c(25,500,975)      # fixed timepoint
+my.f  <- c(388,900)         # fixed freq (max power)
+
+## --- Lines 
+bc.low   <- bc.y$mean - 2*bc.y$se
+bc.high  <- bc.y$mean + 2*bc.y$se
+cbc.low  <- cbc.y$mean - 2*cbc.y$se
+cbc.high <- cbc.y$mean + 2*cbc.y$se
+
+## --- Y Limits 
+# mylim.tx <- range(bc.x$q1[my.t,],bc.x$q3[my.t,], cbc.x$q1[my.t,],cbc.x$q3[my.t,])
+# mylim.fx <- range(bc.x$q1[,my.f],bc.x$q3[,my.f], cbc.x$q1[,my.f],cbc.x$q3[,my.f])
+# 
+# mylim.ty <- range(bc.y$q1[my.t,],bc.y$q3[my.t,], cbc.y$q1[my.t,],cbc.y$q3[my.t,])
+# mylim.fy <- range(bc.y$q1[,my.f],bc.y$q3[,my.f], cbc.y$q1[,my.f],cbc.y$q3[,my.f])
+
+mylim.ty <- range(bc.low[my.t,], bc.high[my.t,], cbc.low[my.t,], cbc.high[my.t,])
+mylim.fy <- range(bc.low[,my.f], bc.high[,my.f], cbc.low[,my.f], cbc.high[,my.f])
+
+```
+
+
+### SPECTROGRAMS
+
+```{r plotTest}
+ytf.true <- outer(ct^2,yf.true)
+zlim <- range(ytf.true/100, bc.y$mean, cbc.y$mean)
+
+# load(file = "~/Research/Skye/Summer23/Data/Prop_y0.RData"); skol$salt <- "#FBFAF9"u
+png(filename = "~/Research/Skye/Summer23/Prop_Plots/sgrams_y0_B200_new.png",
+    width = 5.5, height = 10, units = "in", res = 200, bg = skol$salt, pointsize = 8)
+par(mfrow = c(3,1))
+# splot(1,1); slab("check","check","check","check")
+# splot(1,1); slab("check","check","check","check");
+# splot(1,1); slab("check","check","check","check");
+# splot(1,1); slab("check","check","check","check");
+# splot(1,1); slab("check","check","check","check");
+# splot(1,1); slab("check","check","check","check");
+# dev.off()
+
+# # png(filename = "~/Research/Skye/Summer23/Prop_Plots/sgram_x0.png", width = 920, height = 920)
+# image(x = Fs, y = t, z = t(xtf.true), xlab = "", ylab = "")
+# # splot(1,1)
+# slab("True Time-Frequency Spectrum: White Noise x(t)",
+#      "Mean over 100 Simulations",
+#      "Frequency",
+#      "Time")
+# # dev.off()
+
+
+# png(filename = "~/Research/Skye/Summer23/Prop_Plots/sgram_y0.png", width = 920, height = 920)
+image(x = Fs, y = t, z = t(ytf.true/100), xlab = "", ylab = "", zlim = zlim, las = 1)
+slab("True Time-Frequency Spectrum: AR(2) series y(t)",
+     "Mean over 100 Simulations       B = 400",
+     "Frequency",
+     "Time")
+# dev.off()
+
+
+# # png(filename = "~/Research/Skye/Summer23/Prop_Plots/bc_sgram_x0.png", width = 920, height = 920)
+# image(x = Fs, y = t, z = t(bc.x$mean), xlab = "", ylab = "")
+# # splot(1,1)
+# slab("BCMTFSE: Spectrogram of White Noise x(t)",
+#      "Mean over 100 Simulations",
+#      "Frequency",
+#      "Time")
+# # dev.off()
+
+
+# png(filename = "~/Research/Skye/Summer23/Prop_Plots/bc_sgram_y0.png", width = 920, height = 920)
+image(x = Fs, y = t, z = t(bc.y$mean), xlab = "", ylab = "", zlim = zlim)
+slab("BCMTFSE: Spectrogram of AR(2) series y(t)",
+     "Mean over 100 Simulations       B = 400",
+     "Frequency",
+     "Time")
+# dev.off()
+
+
+# # png(filename = "~/Research/Skye/Summer23/Prop_Plots/cbc_sgram_x0.png", width = 920, height = 920)
+# image(x = Fs, y = t, z = t(cbc.x$mean), xlab = "", ylab = "")
+# slab("CBCMTFSE: Spectrogram of White Noise x(t)",
+#      "Mean over 100 Simulations",
+#      "Frequency",
+#      "Time")
+# # dev.off()
+
+
+# png(filename = "~/Research/Skye/Summer23/Prop_Plots/cbc_sgram_y0.png", width = 920, height = 920)
+image(x = Fs, y = t, z = t(cbc.y$mean), xlab = "", ylab = "", zlim = zlim)
+slab("CBCMTFSE: Spectrogram of AR(2) series y(t)",
+     "Mean over 100 Simulations       B = 400",
+     "Frequency",
+     "Time")
+dev.off()
+
+```
+
+### TIME-DOMAIN PLOTS
+
+#### SKYE: might have to re-run xtf.true, ytf.true if you're loading the data!!!!!!!!!
+
+```{r tx}
+png(filename = "~/Research/Skye/Summer23/Prop_Plots/time_x0.png",
+    width = 1080, height = 668)
+#------------------------------------------------------------------------------------------
+# TRUE
+splot(t, xtf.true[,my.f],
+      type = "l", ylim = c(0,max(mylim.fx)), lwd = 2, rexs = TRUE, bord=B) 
+
+# --- Means
+lines(tb, bc.x$mean[tb,my.f] , col = skol$blue, lwd = 2)                   #
+lines(t[1:tb[1]]  , bc.x$mean[1:tb[1]  ,my.f], col = skol$blue, lwd = 2)   # OLD bc.x
+lines(t[max(tb):N], bc.x$mean[max(tb):N,my.f], col = skol$blue, lwd = 2)   #
+
+lines(tb, cbc.x$mean[tb,my.f], col = skol$orange, lwd = 2,)                     #
+lines(t[1:tb[1]]  , cbc.x$mean[1:tb[1]  ,my.f], col = skol$orange, lwd = 2)     # cbc.x
+lines(t[max(tb):N], cbc.x$mean[max(tb):N,my.f], col = skol$orange, lwd = 2)     # 
+
+# --- Quantiles
+for(j in 2:4){ 
+  lines(tb, bc.x[[j]][tb,my.f] , col = skol$blue  , lwd = 1)                  #
+  lines(t[1:tb[1]]  , bc.x[[j]][1:tb[1]  ,my.f], col = skol$blue, lwd = 1)    # OLD bc.x
+  lines(t[max(tb):N], bc.x[[j]][max(tb):N,my.f], col = skol$blue, lwd = 1)    #
+  
+  lines(tb, cbc.x[[j]][tb,my.f], col = skol$orange, lwd = 1)                    #
+  lines(t[1:tb[1]]  , cbc.x[[j]][1:tb[1]  ,my.f], col = skol$orange, lwd = 1)   # cbc.x
+  lines(t[max(tb):N], cbc.x[[j]][max(tb):N,my.f], col = skol$orange, lwd = 1)   #
+}
+
+# --- Labels
+ylabel <- bquote(hat(S)[X]~"(t, f = "~.(Fs[my.f])*")")
+slab(main = bquote("Spectrogram Estimates for X at fixed freq f="*.(Fs[my.f])),
+     subb = bquote("White Noise        Blockwidth B = "~.(B)),
+     xlab = "Time",
+     ylab = bquote(hat(S)[X]~"(t, f = "~.(Fs[my.f])*")"))
+
+# --- Legend
+legend("top",
+       legend = c("means","quantiles","",
+                  "True spectrum at f",
+                  "BCMTFSE",
+                  "CBCMTFSE",
+                  "","q = 0.025, 0.5, 0.975"),
+       lty = c(1,1,NA,
+               1,
+               NA,
+               NA,
+               NA,NA),
+       lwd = c(3,1,NA,
+               NA,
+               NA,
+               NA,
+               NA,NA),
+       pch = c(NA,NA,NA,
+               NA,
+               19,
+               19,
+               NA,NA),
+       col = c(skol$brown4, skol$brown4, NA, 
+               skol$brown4,
+               "dodgerblue2",
+               "goldenrod",
+               NA,NA),
+       bg = "white",
+       inset = c(0.01,0.02)
+)
+#------------------------------------------------------------------------------------------
+dev.off()
+```
+
+```{r ty}
+# png(filename = "~/Research/Skye/Summer23/Prop_Plots/time_y0_maxPower.png",
+#     width = 1080, height = 668)
+#------------------------------------------------------------------------------------------
+# TRUE
+splot(t, ytf.true[,my.f]/100,
+      type = "l", ylim = mylim.fy*2, lwd = 2, rexs = TRUE, bord=B) 
+
+# --- Means
+lines(tb, bc.y$mean[tb,my.f] , col = skol$blue, lwd = 2)                   #
+lines(t[1:tb[1]]  , bc.y$mean[1:tb[1]  ,my.f], col = skol$blue, lwd = 2)   # OLD bc.y
+lines(t[max(tb):N], bc.y$mean[max(tb):N,my.f], col = skol$blue, lwd = 2)   #
+
+lines(tb, cbc.y$mean[tb,my.f], col = skol$orange, lwd = 2,)                     #
+lines(t[1:tb[1]]  , cbc.y$mean[1:tb[1]  ,my.f], col = skol$orange, lwd = 2)     # cbc.y
+lines(t[max(tb):N], cbc.y$mean[max(tb):N,my.f], col = skol$orange, lwd = 2)     # 
+
+# --- Quantiles
+# for(j in 2:4){ 
+#   lines(tb, bc.y[[j]][tb,my.f] , col = skol$blue  , lwd = 1)                 #
+#   lines(t[1:tb[1]]  , bc.y[[j]][1:tb[1]  ,my.f], col = skol$blue, lwd = 1)   # OLD bc.y
+#   lines(t[max(tb):N], bc.y[[j]][max(tb):N,my.f], col = skol$blue, lwd = 1)   #
+#   
+#   lines(tb, cbc.y[[j]][tb,my.f], col = skol$orange, lwd = 1)                    #
+#   lines(t[1:tb[1]]  , cbc.y[[j]][1:tb[1]  ,my.f], col = skol$orange, lwd = 1)   # cbc.y
+#   lines(t[max(tb):N], cbc.y[[j]][max(tb):N,my.f], col = skol$orange, lwd = 1)   #
+# }
+
+# --- Standard Errors
+lines(tb, bc.low[tb,my.f] , col = skol$blue  , lwd = 1)                     
+lines(t[1:tb[1]]  , bc.low[1:tb[1]  ,my.f], col = skol$blue, lwd = 1)  
+lines(t[max(tb):N], bc.low[max(tb):N,my.f], col = skol$blue, lwd = 1)
+
+lines(tb, bc.high[tb,my.f] , col = skol$blue  , lwd = 1)                     
+lines(t[1:tb[1]]  , bc.high[1:tb[1]  ,my.f], col = skol$blue, lwd = 1)  
+lines(t[max(tb):N], bc.high[max(tb):N,my.f], col = skol$blue, lwd = 1)
+
+lines(tb, cbc.low[tb,my.f] , col = skol$orange  , lwd = 1)                     
+lines(t[1:tb[1]]  , cbc.low[1:tb[1]  ,my.f], col = skol$orange, lwd = 1)  
+lines(t[max(tb):N], cbc.low[max(tb):N,my.f], col = skol$orange, lwd = 1)
+
+lines(tb, cbc.high[tb,my.f] , col = skol$orange  , lwd = 1)                     
+lines(t[1:tb[1]]  , cbc.high[1:tb[1]  ,my.f], col = skol$orange, lwd = 1)  
+lines(t[max(tb):N], cbc.high[max(tb):N,my.f], col = skol$orange, lwd = 1)
+
+# --- Labels
+slab(main = bquote("Spectrogram Estimates for Y at fixed freq f="*.(Fs[my.f])),
+     subb = bquote("AR(2)        Blockwidth B = "~.(B)),
+     xlab = "Time",
+     ylab = bquote(hat(S)[X]~"(t, f = "~.(Fs[my.f])*")"))
+
+# --- Legend
+legend("top",
+       legend = c("means","mean +/- 2se","",
+                  "True spectrum at f",
+                  "BCMTFSE",
+                  "CBCMTFSE"),
+       lty = c(1,1,NA,
+               1,
+               NA,
+               NA),
+       lwd = c(3,1,NA,
+               NA,
+               NA,
+               NA),
+       pch = c(NA,NA,NA,
+               19,
+               19,
+               19),
+       col = c(skol$brown4, skol$brown4, skol$brown4, 
+               skol$brown4,
+               "dodgerblue2",
+               "goldenrod"),
+       bg = "white",
+       inset = c(0.01,0.02)
+)
+#------------------------------------------------------------------------------------------
+# dev.off()
+```
+
+### FREQ PLOTS (Inside Time-Boundary)
+
+```{r fx}
+png(filename = "~/Research/Skye/Summer23/Prop_Plots/freq_x0_in.png",
+    width = 1080, height = 668)
+#------------------------------------------------------------------------------------------
+# --- True
+splot(Fs, xtf.true[my.t,], type = "l", ylim = mylim.tx, lwd = 2, colr = "#FCF8F8") 
+
+# --- Means
+lines(Fs,  bc.x$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc.x
+lines(Fs, cbc.x$mean[my.t,], col = "goldenrod", lwd = 2) # Cbc.x  
+
+# --- Quantiles
+for(j in 2:4){ 
+  lines(Fs, bc.x[[j]][my.t,], col = skol$blue, lwd = 1)   # OLD bc.x
+  lines(Fs,cbc.x[[j]][my.t,], col = skol$orange, lwd = 1) # Cbc.x
+}
+
+# --- Labels
+slab(main = "Spectrogram Estimates for X at fixed time t = 300",
+     subb = bquote("White Noise        Blockwidth B ="~.(B)),
+     xlab = "Frequency",
+     ylab = bquote(hat(S)[X]~"(t = "*.(my.t)*", f)"))
+
+
+## --- Legend -------------------------------------- ##
+legend("top",
+       legend = c("means","quantiles","",
+                  "True spectrum at t",
+                  "BCMTFSE",
+                  "CBCMTFSE",
+                  "","q = 0.025,0.5,0.975"),
+       lty = c(1,1,NA,
+               1,
+               NA,
+               NA,
+               NA,NA),
+       lwd = c(3,1,NA,
+               NA,
+               NA,
+               NA,
+               NA,NA),
+       pch = c(NA,NA,NA,
+               NA,
+               19,
+               19,
+               NA,NA),
+       col = c(skol$brown4, skol$brown4, NA, 
+               skol$brown4,
+               "dodgerblue2",
+               "goldenrod",
+               NA,NA),
+       bg = "white",
+       inset = c(0.01,0.02)
+)
+#------------------------------------------------------------------------------------------
+dev.off()
+```
+
+```{r fy}
+png(filename = "~/Research/Skye/Summer23/Prop_Plots/freq_y0_in_B50.png",
+    width = 1080, height = 668)
+#------------------------------------------------------------------------------------------
+# --- True
+splot(Fs, ytf.true[my.t,]/100, type = "l", ylim = mylim.ty, lwd = 2, colr = "#FCF8F8") 
+
+# --- Means
+lines(Fs,  bc.y$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc.y
+lines(Fs, cbc.y$mean[my.t,], col = "goldenrod", lwd = 2) # Cbc.y  
+
+# # --- Quantiles
+# for(j in 2:4){ 
+#   lines(Fs, bc.y[[j]][my.t,], col = skol$blue, lwd = 1)   # OLD bc.y
+#   lines(Fs,cbc.y[[j]][my.t,], col = skol$orange, lwd = 1) # Cbc.y
+# }
+
+# --- Standard Errors
+lines(Fs, bc.low [my.t,] , col = skol$blue  , lwd = 1)                     
+lines(Fs, bc.high[my.t,] , col = skol$blue  , lwd = 1)                     
+
+lines(Fs, cbc.low [my.t,], col = skol$orange, lwd = 1)                     
+lines(Fs, cbc.high[my.t,], col = skol$orange, lwd = 1)                     
+
+# --- Labels
+slab(main = "Spectrogram Estimates for Y at fixed time t=300",
+     subb = bquote("AR(2)        Blockwidth B ="~.(B)),
+     xlab = "Frequency",
+     ylab = bquote(hat(S)[X]~"(t = "*.(my.t)*", f)"))
+
+
+## --- Legend -------------------------------------- ##
+legend("top",
+       legend = c("means","mean +/- 2se","",
+                  "True spectrum at t",
+                  "BCMTFSE",
+                  "CBCMTFSE"),
+       lty = c(1,1,NA,
+               1,
+               NA,
+               NA),
+       lwd = c(3,1,NA,
+               NA,
+               NA,
+               NA),
+       pch = c(NA,NA,NA,
+               19,
+               19,
+               19),
+       col = c(skol$brown4, skol$brown4, skol$brown4, 
+               skol$brown4,
+               "dodgerblue2",
+               "goldenrod"),
+       bg = "white",
+       inset = c(0.01,0.02)
+)
+#------------------------------------------------------------------------------------------
+dev.off()
+```
+
+### FREQ PLOTS (Outside Time-Boundary)
+
+```{r}
+my.t <- 10
+mylim.tx <- range(bc.x$q1[my.t,],bc.x$q3[my.t,], cbc.x$q1[my.t,],cbc.x$q3[my.t,])
+mylim.ty <- range(bc.y$q1[my.t,],bc.y$q3[my.t,], cbc.y$q1[my.t,],cbc.y$q3[my.t,])
+```
+
+```{r fx}
+png(filename = "~/Research/Skye/Summer23/Prop_Plots/freq_x0_out_10.png",
+    width = 1080, height = 668)
+#------------------------------------------------------------------------------------------
+# --- True
+splot(Fs, xtf.true[my.t,], type = "l", ylim = mylim.tx, lwd = 2, colr = "#FCF8F8") 
+
+# --- Means
+lines(Fs,  bc.x$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc.x
+lines(Fs, cbc.x$mean[my.t,], col = "goldenrod", lwd = 2) # Cbc.x  
+
+# --- Quantiles
+for(j in 2:4){ 
+  lines(Fs, bc.x[[j]][my.t,], col = skol$blue, lwd = 1)   # OLD bc.x
+  lines(Fs,cbc.x[[j]][my.t,], col = skol$orange, lwd = 1) # Cbc.x
+}
+
+# --- Labels
+slab(main = "Spectrogram Estimates for X at fixed time t = 10 (OUT OF BOUNDS)",
+     subb = bquote("White Noise        Blockwidth B ="~.(B)),
+     xlab = "Frequency",
+     ylab = bquote(hat(S)[X]~"(t = "*.(my.t)*", f)"))
+
+
+## --- Legend -------------------------------------- ##
+legend("top",
+       legend = c("means","quantiles","",
+                  "True spectrum at t",
+                  "BCMTFSE",
+                  "CBCMTFSE",
+                  "","q = 0.025,0.5,0.975"),
+       lty = c(1,1,NA,
+               1,
+               NA,
+               NA,
+               NA,NA),
+       lwd = c(3,1,NA,
+               NA,
+               NA,
+               NA,
+               NA,NA),
+       pch = c(NA,NA,NA,
+               NA,
+               19,
+               19,
+               NA,NA),
+       col = c(skol$brown4, skol$brown4, NA, 
+               skol$brown4,
+               "dodgerblue2",
+               "goldenrod",
+               NA,NA),
+       bg = "white",
+       inset = c(0.01,0.02)
+)
+#------------------------------------------------------------------------------------------
+dev.off()
+```
+
+```{r fy}
+png(filename = "~/Research/Skye/Summer23/Prop_Plots/freq_y0_out_10.png",
+    width = 1080, height = 668)
+#------------------------------------------------------------------------------------------
+# --- True
+splot(Fs, ytf.true[my.t,]/100, type = "l", ylim = mylim.ty, lwd = 2, colr = "#FCF8F8") 
+
+# --- Means
+lines(Fs,  bc.y$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc.y
+lines(Fs, cbc.y$mean[my.t,], col = "goldenrod", lwd = 2) # Cbc.y  
+
+# --- Quantiles
+for(j in 2:4){ 
+  lines(Fs, bc.y[[j]][my.t,], col = skol$blue, lwd = 1)   # OLD bc.y
+  lines(Fs,cbc.y[[j]][my.t,], col = skol$orange, lwd = 1) # Cbc.y
+}
+
+# --- Labels
+slab(main = "Spectrogram Estimates for Y at fixed time t = 10 (OUT OF BOUNDS)",
+     subb = bquote("AR(2)        Blockwidth B ="~.(B)),
+     xlab = "Frequency",
+     ylab = bquote(hat(S)[X]~"(t = "*.(my.t)*", f)"))
+
+
+## --- Legend -------------------------------------- ##
+legend("top",
+       legend = c("means","quantiles","",
+                  "True spectrum at t",
+                  "BCMTFSE",
+                  "CBCMTFSE",
+                  "","q = 0.025,0.5,0.975"),
+       lty = c(1,1,NA,
+               1,
+               NA,
+               NA,
+               NA,NA),
+       lwd = c(3,1,NA,
+               NA,
+               NA,
+               NA,
+               NA,NA),
+       pch = c(NA,NA,NA,
+               NA,
+               19,
+               19,
+               NA,NA),
+       col = c(skol$brown4, skol$brown4, NA, 
+               skol$brown4,
+               "dodgerblue2",
+               "goldenrod",
+               NA,NA),
+       bg = "white",
+       inset = c(0.01,0.02)
+)
+#------------------------------------------------------------------------------------------
+dev.off()
+```
+
+
+
+
+
+
+### ANIMATIONS
+
+```{r ani_time}
+# library(animation)
+# mylim.fy <- range(bc.low[,388], bc.high[,388], cbc.low[,388], cbc.high[,388])
+
+saveGIF({  for (my.f in seq(188,588, by = 2)) {
+#------------------------------------------------------------------------------------------
+# TRUE
+splot(t, ytf.true[,my.f]/100,
+      type = "l", ylim = mylim.fy*2, lwd = 2, rexs = TRUE, bord=B) 
+
+# --- Means
+lines(tb, bc.y$mean[tb,my.f] , col = skol$blue, lwd = 2)                   #
+lines(t[1:tb[1]]  , bc.y$mean[1:tb[1]  ,my.f], col = skol$blue, lwd = 2)   # OLD bc.y
+lines(t[max(tb):N], bc.y$mean[max(tb):N,my.f], col = skol$blue, lwd = 2)   #
+
+lines(tb, cbc.y$mean[tb,my.f], col = skol$orange, lwd = 2,)                     #
+lines(t[1:tb[1]]  , cbc.y$mean[1:tb[1]  ,my.f], col = skol$orange, lwd = 2)     # cbc.y
+lines(t[max(tb):N], cbc.y$mean[max(tb):N,my.f], col = skol$orange, lwd = 2)     # 
+
+# --- Quantiles
+# for(j in 2:4){ 
+#   lines(tb, bc.y[[j]][tb,my.f] , col = skol$blue  , lwd = 1)                 #
+#   lines(t[1:tb[1]]  , bc.y[[j]][1:tb[1]  ,my.f], col = skol$blue, lwd = 1)   # OLD bc.y
+#   lines(t[max(tb):N], bc.y[[j]][max(tb):N,my.f], col = skol$blue, lwd = 1)   #
+#   
+#   lines(tb, cbc.y[[j]][tb,my.f], col = skol$orange, lwd = 1)                    #
+#   lines(t[1:tb[1]]  , cbc.y[[j]][1:tb[1]  ,my.f], col = skol$orange, lwd = 1)   # cbc.y
+#   lines(t[max(tb):N], cbc.y[[j]][max(tb):N,my.f], col = skol$orange, lwd = 1)   #
+# }
+
+# --- Standard Errors
+lines(tb, bc.low[tb,my.f] , col = skol$blue  , lwd = 1)                     
+lines(t[1:tb[1]]  , bc.low[1:tb[1]  ,my.f], col = skol$blue, lwd = 1)  
+lines(t[max(tb):N], bc.low[max(tb):N,my.f], col = skol$blue, lwd = 1)
+
+lines(tb, bc.high[tb,my.f] , col = skol$blue  , lwd = 1)                     
+lines(t[1:tb[1]]  , bc.high[1:tb[1]  ,my.f], col = skol$blue, lwd = 1)  
+lines(t[max(tb):N], bc.high[max(tb):N,my.f], col = skol$blue, lwd = 1)
+
+lines(tb, cbc.low[tb,my.f] , col = skol$orange  , lwd = 1)                     
+lines(t[1:tb[1]]  , cbc.low[1:tb[1]  ,my.f], col = skol$orange, lwd = 1)  
+lines(t[max(tb):N], cbc.low[max(tb):N,my.f], col = skol$orange, lwd = 1)
+
+lines(tb, cbc.high[tb,my.f] , col = skol$orange  , lwd = 1)                     
+lines(t[1:tb[1]]  , cbc.high[1:tb[1]  ,my.f], col = skol$orange, lwd = 1)  
+lines(t[max(tb):N], cbc.high[max(tb):N,my.f], col = skol$orange, lwd = 1)
+
+# --- Labels
+slab(main = bquote("Spectrogram Estimates for Y at fixed freq f="*.(Fs[my.f])),
+     subb = bquote("AR(2)        Blockwidth B = "~.(B)),
+     xlab = "Time",
+     ylab = bquote(hat(S)[X]~"(t, f = "~.(Fs[my.f])*")"))
+
+# --- Legend
+legend("top",
+       legend = c("means","mean +/- 2se","",
+                  "True spectrum at f",
+                  "BCMTFSE",
+                  "CBCMTFSE"),
+       lty = c(1,1,NA,
+               1,
+               NA,
+               NA),
+       lwd = c(3,1,NA,
+               NA,
+               NA,
+               NA),
+       pch = c(NA,NA,NA,
+               19,
+               19,
+               19),
+       col = c(skol$brown4, skol$brown4, skol$brown4, 
+               skol$brown4,
+               "dodgerblue2",
+               "goldenrod"),
+       bg = "white",
+       inset = c(0.01,0.02)
+); gc()
+#------------------------------------------------------------------------------------------
+  } },
+        interval = 0.1, movie.name = "~/Research/Skye/Summer23/animations/test_time_400.gif", ani.height = 668, ani.width = 1080)
+```
+
+
+
+```{r ani_freq}
+
+## --- Parameters --------------------------------- ##
+# my.t  <- 300            # fixed timepoint
+# my.f  <- 388            # fixed freq (max power)
+
+## --- Lines 
+bc.low   <- bc.y$mean - 2*bc.y$se
+bc.high  <- bc.y$mean + 2*bc.y$se
+cbc.low  <- cbc.y$mean - 2*cbc.y$se
+cbc.high <- cbc.y$mean + 2*cbc.y$se
+
+## --- Y Limits 
+# mylim.tx <- range(bc.x$q1[my.t,],bc.x$q3[my.t,], cbc.x$q1[my.t,],cbc.x$q3[my.t,])
+# mylim.fx <- range(bc.x$q1[,my.f],bc.x$q3[,my.f], cbc.x$q1[,my.f],cbc.x$q3[,my.f])
+# 
+# mylim.ty <- range(bc.y$q1[my.t,],bc.y$q3[my.t,], cbc.y$q1[my.t,],cbc.y$q3[my.t,])
+# mylim.fy <- range(bc.y$q1[,my.f],bc.y$q3[,my.f], cbc.y$q1[,my.f],cbc.y$q3[,my.f])
+
+# mylim.ty <- range(bc.low[my.t,], bc.high[my.t,], cbc.low[my.t,], cbc.high[my.t,])
+# mylim.fy <- range(bc.low[,my.f], bc.high[,my.f], cbc.low[,my.f], cbc.high[,my.f])
+
+
+rm(trial.y0); gc()
+B2 <- ceiling(B/2)                               # Midpoint shift
+vb <- spec.mtm(ts(1:B), plot = FALSE)$mtm$dpss$v # DPSS (based on block size)
+b  <- 1:(N-(B-1))                                # block indices
+tb <- b + B2 - 1                                 # time in-block
+
+# ylim.ty <- 1.25*mylim.ty # expand it a bit since it underestimates the power
+ylim.ty <- range(bc.low,cbc.low,bc.high,cbc.high)
+ytf <- ytf.true[my.t[1],]/100
+
+pb <- txtProgressBar(style = 3)
+p <- 0
+# par(bg = skol$green)
+# par(bg = skol$red)
+
+
+
+
+
+
+
+
+
+# skye: 2d plot of colmeans?
+
+
+
+
+
+
+
+saveGIF({  for (my.t in seq(1,N,by = 5)) {
+# if((my.t >= tb[1]) & (my.t <= max(tb))) {par(bg = skol$green)} else {par(bg = skol$red)}; gc()
+  
+# --- True Plot
+splot(Fs, ytf, type = "l", ylim = ylim.ty, lwd = 2, colr = "#FCF8F8"); gc()
+
+# --- Means
+lines(Fs,  bc.y$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc.y
+lines(Fs, cbc.y$mean[my.t,], col = "goldenrod", lwd = 2) # Cbc.y  
+
+# # --- Quantiles
+# for(j in 2:4){ 
+#   lines(Fs, bc.y[[j]][my.t,], col = skol$blue, lwd = 1)   # OLD bc.y
+#   lines(Fs,cbc.y[[j]][my.t,], col = skol$orange, lwd = 1) # Cbc.y
+# }
+
+# --- Standard Errors
+lines(Fs, bc.low [my.t,] , col = skol$blue  , lwd = 1)                     
+lines(Fs, bc.high[my.t,] , col = skol$blue  , lwd = 1)                     
+
+lines(Fs, cbc.low [my.t,], col = skol$orange, lwd = 1)                     
+lines(Fs, cbc.high[my.t,], col = skol$orange, lwd = 1)                     
+
+# --- Labels
+slab(main = "Spectrogram Estimates for Y",
+     subb = bquote("AR(2)        Blockwidth B ="~.(B)),
+     xlab = "Frequency",
+     ylab = bquote(hat(S)[X]~"(t = "*.(my.t)*", f)")); gc()
+
+
+## --- Legend -------------------------------------- ##
+legend("topright",
+       legend = c("means","mean +/- 2se","",
+                  "True spectrum at t",
+                  "BCMTFSE",
+                  "CBCMTFSE"),
+       lty = c(1,1,NA,
+               1,
+               NA,
+               NA),
+       lwd = c(3,1,NA,
+               NA,
+               NA,
+               NA),
+       pch = c(NA,NA,NA,
+               19,
+               19,
+               19),
+       col = c(skol$brown4, skol$brown4, skol$brown4, 
+               skol$brown4,
+               "dodgerblue2",
+               "goldenrod"),
+       bg = "white",
+       inset = c(0.01,0.02)
+  )
+legend("topleft", legend = bquote("Time t ="*.(my.t)*"  "),
+       inset = c(0.05,0.08), cex = 2.5,
+       bg = if((my.t >= tb[1]) & (my.t <= max(tb))) {skol$green} else {"#F4A4A8"})
+  gc()
+  p <- p+1
+  setTxtProgressBar(pb, p/200)
+#------------------------------------------------------------------------------------------
+} },
+        interval = 0.1, movie.name = "~/Research/Skye/Summer23/animations/test_freq_400.gif", ani.height = 668, ani.width = 1080); gc()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# UMP
+
+In the previous section, aside from white noise, we considered a stationary AR(2) series. Now, let us examine how these estimators perform when a similar series is uniformly modulated to no longer be stationary. The series we'll use is exactly the one featured in [??] - this allows for a graphical sanity check in terms of accurately reproducing the BCMTFSE and its results.
+
+Suppose we have the following time series:
+
+$$
+\begin{aligned}
+    X(t)        &= \left( 2 - \exp\left\{\frac{-(t-500)^2}{2(200)^2}\right\} \right) Y(t) \\
+    Y(t)        &= 0.8\,Y(t-1) - 0.4\,Y(t-2) + \epsilon(t)                 \\
+    \epsilon(t) &= w\big(0,\;\sigma_\epsilon^2 = 10^4\big).
+\end{aligned}
+$$
+
+As the reader can see, $X(t)$ is an UMP, $Y$ is a stationary AR(2) process, and $\epsilon$ is purely white noise. What follows are the images we get when we run the new series through the code used to acheive the set of figures from the previous section.
+
+
+## BCMTFSE \& CBCMTFSE
+
+```{r bcmtfse_cbcmtfse_sims}
+
+# Prep simulations
+set.seed(17)
+pb <- txtProgressBar(style = 3)
+
+# Simulate FUNCTION
+cbc <- function(type = "noise", M = 100, seed = 0, B = 100){ 
+  
+        # Prelims
+        B2 <- ceiling(B/2)                               # Midpoint shift
+        vb <- spec.mtm(ts(1:B), plot = FALSE)$mtm$dpss$v # DPSS (based on block size)
+        b  <- 1:(N-(B-1))                                # block indices
+        tb <- b + B2 - 1                                 # time in-block
+        
+        # ------------
+        # N x inner sum coef                    /----w_B----\
+        Ma  <- function(t,m){return(B*(sin(2*pi *(K+1)/(2*B)* (t-m))/(pi*(t-m)))^2)}
+        
+        # Matrix of Interest
+        mat <- matrix(0,nrow = B, ncol = B)
+        for(s in 1:B){mat[s,] <- Ma(s,1:B)}
+        
+        # Fill diagonal with Sinc function at "0/0"
+        diag(mat) <- 1 
+        
+  # Get eigenstuff
+  mval <- eigen(mat)$values
+  mvec <- eigen(mat)$vectors
+
+  # ------------
+  # Function to estimate coefficients {a(l,b)}
+  a  <- function(s,l,b){ (K/(B*(mval[l+1]))) * (mvec[,l+1] %*% matrix(s[,b], ncol = NF)) }
+        
+  # omega function vals for upcoming Taylor expansions (pre-compute for speed)
+  w0.0 <- sum(mvec[,1])
+  w2.0 <- sum(mvec[,3])
+  w1.1 <- c(((-B2):(B2 - 1 - (B/2 != B2)))   %*% mvec[,2])
+  w0.2 <- c(((-B2):(B2 - 1 - (B/2 != B2)))^2 %*% mvec[,1])
+  w2.2 <- c(((-B2):(B2 - 1 - (B/2 != B2)))^2 %*% mvec[,3])
+  d.02 <- (w2.0*w0.2 - w0.0*w2.2)
+        
+        # Functions for first and second time-derivatives
+        tdtfse  <- function(s,p){ B*a(s,1,p)/w1.1 }
+        stdtfse <- function(s,p){ 2*B * (a(s,0,p)*w2.0 - a(s,2,p)*w0.0) / d.02}
+        
+  # Setup
+  if(seed > 0){ set.seed(seed) }
+  pb <- txtProgressBar(style = 3)
+  
+  # Initialize arrays
+  cbcmtfse.sims <- bcmtfse.sims <- array(dim = c(N,NF,M))
+    
+  for(m in 1:M){
+    # Create: noise process (X) or AR(2) series (Y)
+    if(type == "noise"){
+      xt <- rnorm(N, sd=10)
+    } else if(type == "AR2"){
+      xt <- arima.sim(model = list(ar = c(0.5,-0.5), sd = 10), n = N)
+    } else if(type == "UMP"){
+      ct <- 2 - exp((-(t-500)^2)/(2*(200^2)))
+      yt <- arima.sim(model = list(ar = c(0.8,-0.4), sd = 100), n = N)
+      xt <- ct*yt
+    } else {error}
+    
+    
+    # Sliding window: full window included
+    sw <- (B/K) * Mod( sapply(b, function(p){
+          vb %*% t(spec.mtm(ts(xt[(p):(p+B-1)]),
+                            nFFT = (2*NF-1),
+                            plot = FALSE,
+                            returnInternals = TRUE)$mtm$eigenCoefs)}))^2
+    
+    setTxtProgressBar(pb, (m-0.5)/M)
+    
+    # Modify, storing midpoints
+    bcmtfse.sims[tb,,m] <- (K/mval[1]) * t(sapply(b, function(p){mvec[,1] %*% matrix(sw[,p], ncol = NF)})) / w0.0
+  
+    # More Modify, storing midpoints
+    cbcmtfse.sims[tb,,m] <- t(sapply(b, function(p){ B*(a(sw,2,p)*w0.2 - a(sw,0,p)*w2.2) / d.02 }))
+    
+    # Endpoints: 1st derivative
+    tdtfse.start <- tdtfse(sw,1)      # c(((K/mval[2]) / w1.1 )) * (mvec[,2] %*% matrix(sw[,1], ncol = NF))
+    tdtfse.end   <- tdtfse(sw,max(b)) # c(((K/mval[2]) / w1.1 )) * (mvec[,2] %*% matrix(sw[,max(b)], ncol = NF))
+    
+    # Endpoints: 2nd derivative
+    stdtfse.start <- stdtfse(sw,1)      # stdtfse(sw,1,cbcmtfse.sims,m)
+    stdtfse.end   <- stdtfse(sw,max(b)) # stdtfse(sw,max(b),cbcmtfse.sims,m)
+    
+    # Clean
+    rm(sw); gc()
+    
+    # Boundary Corrected Modified Time Frequency Spectrum Estimate: Variant 1
+    bcmtfse.sims[1:(tb[1]-1),,m]   <- t(sapply((tb[1]-1):1, function(h){ bcmtfse.sims[tb[1],,m] - h*tdtfse.start }))
+    bcmtfse.sims[(max(tb)+1):N,,m] <- t(sapply(1:(B2-(B2 != B/2)), function(h){ bcmtfse.sims[max(tb),,m] + h*tdtfse.end }))
+    
+    # Boundary Corrected Modified Time Frequency Spectrum Estimate: Variant 2
+    # TBA
+    # Question: can S be approximated well as a fn of time by its taylor expansion? Check pure sgram. Azadeh assumes this.
+    
+    # Curvy Boundary Corrected Modified Time Frequency Spectrum Estimate: Variant 1
+    cbcmtfse.sims[1:(tb[1]-1),,m]   <- t(sapply((tb[1]-1):1, function(h){ 
+        cbcmtfse.sims[tb[1],,m] - h*tdtfse.start - (h^2)*stdtfse.start/2 }))
+    
+    cbcmtfse.sims[(max(tb)+1):N,,m] <- t(sapply(1:(B2-(B2 != B/2)), function(h){ 
+        cbcmtfse.sims[max(tb),,m] + h*tdtfse.end + (h^2)*stdtfse.end/2 }))
+  
+    # Phew!
+    setTxtProgressBar(pb, m/M); gc()
+    }
+  return(list(bc = bcmtfse.sims, cbc = cbcmtfse.sims))
+}
+```
+
+
+```{r}
+trial.x0 <- cbc(type = "UMP", M = 100, seed = 17, B = 100)
+```
+
+
+```{r}
+## --- Statistics X --------------------------------- ##
+bc.x <- cbc.x <- list(); gc()
+
+bc.x$mean  <- pbapply(trial.x0$bc, 1:2, mean); gc()
+bc.x$se    <- pbapply(trial.x0$bc, 1:2, sd)/sqrt(M); gc()
+
+cbc.x$mean <- pbapply(trial.x0$cbc, 1:2, mean); gc()
+cbc.x$se   <- pbapply(trial.x0$cbc, 1:2, sd)/sqrt(M); gc()
+
+
+## --- save --- ##
+save.image(paste0("C:/Users/skyep/Documents/Research/Skye/Summer23/Data/UMP_B",B,"_full.RData"))
+
+rm(trial.x0); gc()
+
+save.image(paste0("C:/Users/skyep/Documents/Research/Skye/Summer23/Data/UMP_B",B,"_mini.RData"))
+```
+
+
+```{r}
+
+## --- Plot Prep --------------- ###
+
+# Confidence Intervals (if it were Gaussian, at least)
+x.bc.low   <- bc.x$mean - 2*bc.x$se
+x.bc.high  <- bc.x$mean + 2*bc.x$se
+x.cbc.low  <- cbc.x$mean - 2*cbc.x$se
+x.cbc.high <- cbc.x$mean + 2*cbc.x$se
+
+y.bc.low   <- bc.y$mean - 2*bc.y$se
+y.bc.high  <- bc.y$mean + 2*bc.y$se
+y.cbc.low  <- cbc.y$mean - 2*cbc.y$se
+y.cbc.high <- cbc.y$mean + 2*cbc.y$se
+
+
+# True info
+ct <- 2 - exp((-(t-500)^2)/(2*(200^2)))
+xf.true  <- rep(10^2, NF)
+yf.true  <- (10^4)/( 1 - 2.24*cos(2*pi*Fs) + 1.6*(cos(2*pi*Fs))^2 )
+xtf.true <- outer(ct^2, xf.true)# UMP: outer(ct^2,yf.true)
+
+# ylims
+ylim.tx <- range(bc.low,cbc.low,bc.high,cbc.high)
+
+# test if plottable at t=1
+my.t <- 1
+splot(Fs, xtf.true[my.t,]/1e4, type = "l", ylim = ylim.tx, lwd = 2, colr = "#FCF8F8")
+lines(Fs,  bc.x$mean[my.t,], col = "dodgerblue2", lwd = 2)
+lines(Fs, cbc.x$mean[my.t,], col = "goldenrod", lwd = 2)
+```
+
+```{r}
+
+### --- Plot ------------------- ###
+
+p <- 0
+pb <- txtProgressBar(style = 3)
+
+saveGIF({  for (my.t in seq(1,N,by = 4)) {
+  
+# --- True Plot
+splot(Fs, xtf.true[my.t,]/1e4, type = "l", ylim = ylim.tx, lwd = 2, colr = "#FCF8F8"); gc()
+
+# --- Means
+lines(Fs,  bc.x$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc.x
+lines(Fs, cbc.x$mean[my.t,], col = "goldenrod", lwd = 2) # Cbc.x  
+
+# # --- Quantiles
+# for(j in 2:4){ 
+#   lines(Fs, bc.x[[j]][my.t,], col = skol$blue, lwd = 1)   # OLD bc.x
+#   lines(Fs,cbc.x[[j]][my.t,], col = skol$orange, lwd = 1) # Cbc.x
+# }
+
+# --- Standard Errors
+lines(Fs, bc.low [my.t,] , col = skol$blue  , lwd = 1)                     
+lines(Fs, bc.high[my.t,] , col = skol$blue  , lwd = 1)                     
+
+lines(Fs, cbc.low [my.t,], col = skol$orange, lwd = 1)                     
+lines(Fs, cbc.high[my.t,], col = skol$orange, lwd = 1)                     
+
+# --- Labels
+slab(main = "Spectrogram Estimates: UMP: c(t)*AR(2)",
+     subb = bquote("c(t) = exp{ (-t-500)"^2*"/(2(200"^2*")) }        Blockwidth B ="~.(B)),
+     xlab = "Frequency",
+     ylab = bquote(hat(S)[X]~"(t = "*.(my.t)*", f)")); gc()
+
+
+## --- Legend -------------------------------------- ##
+legend("topright",
+       legend = c("means","mean +/- 2se","",
+                  "True spectrum at t",
+                  "BCMTFSE",
+                  "CBCMTFSE"),
+       lty = c(1,1,NA,
+               1,NA,NA),
+       lwd = c(3,1,NA,
+               NA,NA,NA),
+       pch = c(NA,NA,NA,
+               19,19,19),
+       col = c(skol$brown4, skol$brown4, skol$brown4, 
+               skol$brown4,"dodgerblue2","goldenrod"),
+       bg = "white",
+       inset = c(0.01,0.02)
+  )
+legend("topleft", legend = bquote("Time t ="*.(my.t)*"  "),
+       inset = c(0.05,0.08), cex = 2.5,
+       bg = if((my.t >= tb[1]) & (my.t <= max(tb))) {skol$green} else {"#F4A4A8"})
+  gc()
+  p <- p+1
+  setTxtProgressBar(pb, p/250)
+#------------------------------------------------------------------------------------------
+} },
+        interval = 0.1, movie.name = "~/Research/Skye/Summer23/animations/test_freq_300_UMP.gif", ani.height = 668, ani.width = 1080); gc()
+```
+
+
+
+
+```{r}
+### --- Spectrograms ------------ ###
+
+png(filename = "~/Research/Skye/Summer23/Prop_Plots/sgrams_x0_UMP_B200.png", width = 3.5*920, height = 920)
+
+par(mfrow = c(1,3))
+
+# splot(1,1);splot(1,1);splot(1,1)
+# dev.off()
+
+image(x = Fs, y = t, z = t(xtf.true), xlab = "", ylab = "")
+slab("True Time-Frequency Spectrum: UMP series x(t)",
+     bquote("Mean over 100 Simulations       Blockwidth B ="~.(B)),
+     "Frequency",
+     "Time")
+
+image(x = Fs, y = t, z = t(bc.x$mean), xlab = "", ylab = "")
+slab("BCMTFSE: Spectrogram of x(t)",
+     bquote("Mean over 100 Simulations       Blockwidth B ="~.(B)),
+     "Frequency",
+     "Time")
+
+image(x = Fs, y = t, z = t(cbc.x$mean), xlab = "", ylab = "")
+slab("CBCMTFSE: Spectrogram of x(t)",
+     bquote("Mean over 100 Simulations       Blockwidth B ="~.(B)),
+     "Frequency",
+     "Time")
+
+dev.off()
+
+
+```
+
+
