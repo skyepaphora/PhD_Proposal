@@ -1,4 +1,4 @@
-## Setup
+### Setup
 
 ```{r}
 ## --- Packages ------------------------------------ ##
@@ -9,194 +9,154 @@ library(itsmr)
 library(animation)
 library(fields)
 
-## --- Custom Plots/Graphics ----------------------- ##
-
-# --- My colours --- #
-skol <-  list(red = "#EF8085", orange = "#ee9946", yellow = "#FCD779",
-            green = "#B3C99D",   blue = "#9DBACA", purple = "#B29CC9",
-           brown1 = "#EFEBE6", brown2 = "#DFD6CD", brown3 = "#896f58",
-           brown4 = "#544536",  cream = "#F7F3F3",   salt = "#FBFAF9")
-
-# --- Rectangle --- #
-rekt <- function(col = "#FEFAFA", log = FALSE){
-  if(log == FALSE){
-      rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = col)
-  } else if(log == "x"){
-      rect(10^par("usr")[1], par("usr")[3], 10^par("usr")[2], par("usr")[4], col = col)
-  } else if(log == "y"){
-      rect(par("usr")[1], 10^par("usr")[3], par("usr")[2], 10^par("usr")[4], col = col)
-  } else if (log == "xy"){
-      rect(10^par("usr")[1], 10^par("usr")[3], 10^par("usr")[2], 10^par("usr")[4], col = col)
-  }
-}
-
-# --- box around plot --- #
-sox <- function(){
-  abline(v = c(par("usr")[1], par("usr")[2]),
-         h = c(par("usr")[3], par("usr")[4])) }
-
-# --- orientation lines --- #
-skor <- function(x, y, n1 = 11, n2 = 9, col = "white"){
-  abline(v = seq(min(x), max(x), length.out = n1), col = col, lwd = 2)
-  abline(h = seq(min(y), max(y), length.out = n2), col = col, lwd = 2)
-  sox()
-}
-
-# --- Label Function --- # NORMALLY 1.7 is actually 1.5!!!!!!!!!!!!!!!!!!!
-slab <- function(main = "", subb = "", xlab = "", ylab = ""){
-  if(subb == ""){mtext(main, 3, 1,  font = 2, cex = 1.1 )} else {mtext(main, 3, 1.75,  font = 2, cex = 1.1 )}
-  mtext(subb, 3, 0.28,           cex = 1   )
-  mtext(xlab, 1, 2.75, font = 1, cex = 1.05)
-  mtext(ylab, 2, 3.5 , font = 1, cex = 1.05)
-}
-
-# --- Colour Boundaries --- ##
-rext <- function(N=1000,B=100){rect(
-     xleft = c(par("usr")[[1]],N-ceiling(B/2)),
-     ybottom = c(par("usr")[[3]], par("usr")[[3]]),
-     xright = c(ceiling(B/2), par("usr")[[2]]),
-     ytop = c(par("usr")[[4]], par("usr")[[4]]),
-     col = skol$cream, border = NA)}
-
-# --- Plot function --- #
-splot <- function(x, y,
-                  col  = skol$brown4,
-                  main = "", subb = "", xlab = "", ylab = "",
-                  type = "p",
-                  pch  = 19,
-                  colr = "#F0F0F0", 
-                  rexs = FALSE, bord = 100,
-                  n1 = 11, n2 = 9, skorcol = "white",
-                  labs = FALSE, las = 1, ...){
-  # frame
-  plot(x, y, xlab = "", ylab = "", las = las, ...)
-  # bg colours
-  rekt(colr); if(rexs){
-    rext(length(x),bord)
-    abline(v = c(ceiling(B/2),N-ceiling(B/2)), col = skol$green, lty = 2)
-    abline(v=c(par("usr")[1]),#par("usr")[3]),
-           h=par("usr")[4]) 
-  }
-  # orient
-  skor(x, y, n1, n2, skorcol)
-  # add
-  if(type == "p"){points(x, y, col = col, pch = pch, ...)
-  } else {
-    lines(x, y, col = col, type = type, ...)
-  }
-  # Labels
-  if(labs){slab(main,subb,xlab = substitute(x),ylab = substitute(y))} else {slab(main,subb,xlab,ylab)}
-}
+## --- Splot + Spalette ---------------------------- ##
+load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/splot.RData")
 ```
 
 
 
 
-## Spectrograms
+# Spectrograms
 
-```{r setupSgram}
-load(file = "~/Research/Skye/Summer23/Data/Noise-AR2_B200.RData")
+## Noise \& AR(2)
 
+```{r setupSgram_zy}
+
+## --- Load 
+load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/noise_B200_mini.RData")
+bc.z  <- bc
+cbc.z <- cbc
+
+load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/AR2_B200_mini.RData")
+bc.y  <- bc
+cbc.y <- cbc
+
+## --- Scaling & plot limits
 bc.y$mean  <- bc.y$mean *100 # scale
 cbc.y$mean <- cbc.y$mean*100
 
-zlim.x <- range(xtf.true, bc.x$mean, cbc.x$mean)
+zlim.z <- range(ztf.true, bc.z$mean, cbc.z$mean)
 zlim.y <- range(ytf.true, bc.y$mean, cbc.y$mean)
-
-# par(mfrow = c(2,2), oma = c(4,0,0,0), mar = c(4,4,2,1))
-# par(mar = c(6,4,2,1))
-# image(1:10, 1:10, xtf.true[1:10,1:10],
-#            zlim = zlim.x)
-# image.plot(legend.only = TRUE,
-#            zlim = zlim.x,
-#            horizontal = TRUE, smallplot = c(0.16,0.96,0,0.05))
-
-# png(filename = "~/Research/Skye/Summer23/Prop_Plots/sgram_x0.png", width = 920, height = 920)
 ```
 
-```{r}
-png(filename = "~/Research/Skye/Summer23/Prop_Plots/test.png",
-    width = 8.5, height = 11, units = "in", res = 200, bg = skol$salt, pointsize = 8)
+```{r Sgram_xy}
 
-par(mfrow = c(3,2), oma = c(4,1,4,3), mar = c(4,5,2,2))
-plot(1,1, las = 1)
-slab("True Time-Frequency Spectrum: White Noise x(t)",
-     "","","Time")
-plot(1,1);plot(1,1);plot(1,1)
-
-
-par(mar = c(6,5,2,2))
-plot(1,1)
-image.plot(legend.only = TRUE,
-           zlim = zlim.y,
-           horizontal = TRUE, smallplot = c(0.11,0.96,0,0.05))
-plot(1,1)
-
-
-dev.off()
-```
-
-```{r plotTest}
-
-png(filename = paste0("~/Research/Skye/Summer23/Prop_Plots/sgrams_Noise-AR2_B",B,".png"),
+png(filename = paste0("C:/Users/skyep/Documents/Research/PhD_Proposal/Plots/sgrams_Noise-AR2_B",B,".png"),
     width = 8.5, height = 11, units = "in", res = 200, bg = skol$salt, pointsize = 8)
 ## ----------------------------------------------------------------------------------
 
-## ------------ MARGINS
-par(mfrow = c(3,2), oma = c(4,1,4,3), mar = c(7,5,2,2))
-
-## --- TRUE X 
-image(x = Fs, y = t, z = t(xtf.true),
-      xlab = "", ylab = "", zlim = zlim.x,
-      las = 1, col = tim.colors()); sox()
-slab("True Time-Frequency Spectrum: White Noise x(t)",
-     "","","Time")
-
-## --- TRUE Y
-image(x = Fs, y = t, z = t(ytf.true),
-      xlab = "", ylab = "", zlim = zlim.y,
-      las = 1, col = tim.colors()); sox()
-slab("True Time-Frequency Spectrum: AR(2) series y(t)",
-     "","","")
+      ## --- MARGINS
+      par(mfrow = c(3,2), oma = c(4,1,4,3), mar = c(7,5,2,2))
 
 
-## --- BC X
-image(x = Fs, y = t, z = t(bc.x$mean),
-      xlab = "", ylab = "", zlim = zlim.x,
-      las = 1, col = tim.colors()); sox()
-slab("BCMTFSE:  White Noise x(t)",
-     "","","Time")
+  ## --- TRUE Z 
+  image(x = Fs, y = t, z = t(ztf.true),
+        xlab = "", ylab = "", zlim = zlim.z,
+        las = 1, col = tim.colors()); sox()
+  slab("True Time-Frequency Spectrum: White Noise z(t)",
+       "","","Time")
+  
+  ## --- TRUE Y
+  image(x = Fs, y = t, z = t(ytf.true),
+        xlab = "", ylab = "", zlim = zlim.y,
+        las = 1, col = tim.colors()); sox()
+  slab("True Time-Frequency Spectrum: AR(2) series y(t)",
+       "","","")
 
-## --- BC Y
-image(x = Fs, y = t, z = t(bc.y$mean),
-      xlab = "", ylab = "", zlim = zlim.y,
-      las = 1, col = tim.colors()); sox()
-slab("BCMTFSE:  AR(2) series y(t)",
-     "","","")
+
+      ## --- BC Z
+      image(x = Fs, y = t, z = t(bc.z$mean),
+            xlab = "", ylab = "", zlim = zlim.z,
+            las = 1, col = tim.colors()); sox()
+      slab("BCMTFSE:  White Noise x(t)",
+           "","","Time")
+      
+      ## --- BC Y
+      image(x = Fs, y = t, z = t(bc.y$mean),
+            xlab = "", ylab = "", zlim = zlim.y,
+            las = 1, col = tim.colors()); sox()
+      slab("BCMTFSE:  AR(2) series y(t)",
+           "","","")
 
 
-## --- CBC X
-image(x = Fs, y = t, z = t(cbc.x$mean),
-      xlab = "", ylab = "", zlim = zlim.x,
-      las = 1, col = tim.colors()); sox()
-slab("CBCMTFSE:  White Noise x(t)",
-     "","Frequency","Time")
-image.plot(legend.only = TRUE,
-           zlim = zlim.x,
-           horizontal = TRUE, smallplot = c(0.11,0.96,0,0.05))
-
-## --- CBC Y
-image(x = Fs, y = t, z = t(cbc.y$mean),
-      xlab = "", ylab = "", zlim = zlim.y,
-      las = 1, col = tim.colors()); sox()
-slab("CBCMTFSE:  AR(2) series y(t)",
-     "","Frequency","")
-image.plot(legend.only = TRUE,
-           zlim = zlim.y,
-           horizontal = TRUE, smallplot = c(0.11,0.96,0,0.05))
+  ## --- CBC Z
+  image(x = Fs, y = t, z = t(cbc.z$mean),
+        xlab = "", ylab = "", zlim = zlim.z,
+        las = 1, col = tim.colors()); sox()
+  slab("CBCMTFSE:  White Noise x(t)",
+       "","Frequency","Time")
+  image.plot(legend.only = TRUE,
+             zlim = zlim.z,
+             horizontal = TRUE, smallplot = c(0.11,0.96,0,0.05))
+  
+  ## --- CBC Y
+  image(x = Fs, y = t, z = t(cbc.y$mean),
+        xlab = "", ylab = "", zlim = zlim.y,
+        las = 1, col = tim.colors()); sox()
+  slab("CBCMTFSE:  AR(2) series y(t)",
+       "","Frequency","")
+  image.plot(legend.only = TRUE,
+             zlim = zlim.y,
+             horizontal = TRUE, smallplot = c(0.11,0.96,0,0.05))
 
 ## ----------------------------------------------------------------------------------
 dev.off()
+
+```
+
+
+
+## UMP
+
+```{r setupSgram_z}
+
+## --- Load 
+load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/UMP_B200_mini.RData")
+bc.x  <- bc
+cbc.x <- cbc
+
+## --- Scaling & plot limits
+zlim.z <- range(xtf.true, bc.x$mean, cbc.x$mean)
+```
+
+```{r Sgram_z}
+
+png(filename = paste0("C:/Users/skyep/Documents/Research/PhD_Proposal/Plots/sgrams_UMP_B",B,".png"),
+    width = 12.6, height = 4.2, units = "in", res = 200, bg = skol$salt, pointsize = 8)
+## ----------------------------------------------------------------------------------
+
+  # Margins
+  par(mfrow = c(1,3), oma = c(0,3,0,5))
+  
+  # --- TRUE
+  image(x = Fs, y = t, z = t(xtf.true/1e4),
+        xlab = "", ylab = "", zlim = zlim.x,
+        las = 1, col = tim.colors()); sox()
+  slab("True TFS: UMP x(t)",
+       "","Frequency","Time"); gc()
+  
+  # --- BC
+  image(x = Fs, y = t, z = t(bc.x$mean),
+        xlab = "", ylab = "", zlim = zlim.x,
+        las = 1, col = tim.colors()); sox()
+  slab("BCMTFSE:  UMP x(t)",
+       "","Frequency",""); gc()
+  
+  # --- CBC
+  image(x = Fs, y = t, z = t(cbc.x$mean),
+        xlab = "", ylab = "", zlim = zlim.x,
+        las = 1, col = tim.colors()); sox()
+  slab("CBCMTFSE:  UMP x(t)",
+       "","Frequency",""); gc()
+  
+  # --- Legend
+  par(oma = c(0,0,0,3))
+  image.plot(legend.only = TRUE,
+             zlim = zlim.x, legend.shrink = 1, legend.width = 2)
+
+## ----------------------------------------------------------------------------------
+dev.off()
+  
 ```
 
 
@@ -204,150 +164,92 @@ dev.off()
 
 
 
+# Animations
 
-
-
-
+## Frequency-Domain Animations
 
 ```{r}
-load("~/Research/Skye/Summer23/Data/Prop_x0_B200_UMP.RData")
+## --- Choose your series
+load("C:/Users/skyep/Documents/Research/PhD_Proposal/Data/")
 ```
 
-```{r}
-
-## --- Optional: switch label --- ###
-# bc.x  <- bc.y
-# cbc.x <- cbc.y
-# xtf.true <- ytf.true
-
+```{r ani_prep}
 ## --- Plot Prep ---------------- ###
 
-# Confidence Intervals (if it were Gaussian, at least)
-x.bc.low   <- bc.x$mean - 2*bc.x$se
-x.bc.high  <- bc.x$mean + 2*bc.x$se
-x.cbc.low  <- cbc.x$mean - 2*cbc.x$se
-x.cbc.high <- cbc.x$mean + 2*cbc.x$se
-
-# True info: COMMENT OUT IF ONLY USING Y (AR-2)
-ct <- 2 - exp((-(t-500)^2)/(2*(200^2)))
-xf.true  <- rep(10^2, NF)
-yf.true  <- (10^4)/( 1 - 2.24*cos(2*pi*Fs) + 1.6*(cos(2*pi*Fs))^2 )
-xtf.true <- outer(ct^2, yf.true)# UMP: outer(ct^2,yf.true)
+# Confidence Intervals (if it were Gaussian... isn't it more chi^2?)
+bc.low   <-  bc$mean - 2* bc$se
+bc.high  <-  bc$mean + 2* bc$se
+cbc.low  <- cbc$mean - 2*cbc$se
+cbc.high <- cbc$mean + 2*cbc$se
 
 # ylims
-ylim.tx <- range(x.bc.low, x.cbc.low, x.bc.high, x.cbc.high)
+ylim <- range(bc.low, cbc.low, bc.high, cbc.high)
 
 # Spectrogram limit
-zlim.x <- range(xtf.true/1e4, bc.x$mean, cbc.x$mean)
+zlim <- range(xtf.true/1e4, bc$mean, cbc$mean)
 ```
 
-```{r}
+```{r f_domain_gif}
 
-### --- Plot ------------------- ###
 p <- 0
 pb <- txtProgressBar(style = 3)
 
+### --- Create GIF ------------------- ###
+
 saveGIF({  for (my.t in seq(1,N,by = 5)) {
   
-# --- True Plot
-splot(Fs, xtf.true[my.t,]/1e4, type = "l", ylim = ylim.tx, lwd = 2, colr = "#FCF8F8"); gc()
-
-# --- Means
-lines(Fs,  bc.x$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc.x
-lines(Fs, cbc.x$mean[my.t,], col = "goldenrod", lwd = 2) # Cbc.x  
-
-# --- Standard Errors
-lines(Fs, x.bc.low [my.t,] , col = skol$blue  , lwd = 1)                     
-lines(Fs, x.bc.high[my.t,] , col = skol$blue  , lwd = 1)                     
-
-lines(Fs, x.cbc.low [my.t,], col = skol$orange, lwd = 1)                     
-lines(Fs, x.cbc.high[my.t,], col = skol$orange, lwd = 1)                     
-
-# --- Labels
-slab(main = "Spectrogram Estimates: UMP: c(t)*AR(2)",
-     subb = bquote("c(t) = exp{ (-t-500)"^2*"/(2(200"^2*")) }        Blockwidth B ="~.(B)),
-     xlab = "Frequency",
-     ylab = bquote(hat(S)[X]~"(t = "*.(my.t)*", f)")); gc()
-
-
-## --- Legend -------------------------------------- ##
-legend("topright",
-       legend = c("means","mean +/- 2se","",
-                  "True spectrum at t",
-                  "BCMTFSE",
-                  "CBCMTFSE"),
-       lty = c(1,1,NA,
-               1,NA,NA),
-       lwd = c(3,1,NA,
-               NA,NA,NA),
-       pch = c(NA,NA,NA,
-               19,19,19),
-       col = c(skol$brown4, skol$brown4, skol$brown4, 
-               skol$brown4,"dodgerblue2","goldenrod"),
-       bg = "white",
-       inset = c(0.01,0.02)
-  )
-legend("topleft", legend = bquote("Time t ="*.(my.t)*"  "),
-       inset = c(0.05,0.08), cex = 2.5,
-       bg = if((my.t >= tb[1]) & (my.t <= max(tb))) {skol$green} else {"#F4A4A8"})
+  # --- True Plot
+  splot(Fs, ztf.true[my.t,]/1e4, type = "l", ylim = ylim.tx, lwd = 2, colr = "#FCF8F8"); gc()
+  
+  # --- Means
+  lines(Fs,  bc$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc
+  lines(Fs, cbc$mean[my.t,], col = "goldenrod"  , lwd = 2) # Cbc  
+  
+  # --- Standard Errors
+  lines(Fs, bc.low [my.t,] , col = skol$blue  , lwd = 1)                     
+  lines(Fs, bc.high[my.t,] , col = skol$blue  , lwd = 1)                     
+  
+  lines(Fs, cbc.low [my.t,], col = skol$orange, lwd = 1)                     
+  lines(Fs, cbc.high[my.t,], col = skol$orange, lwd = 1)                     
+  
+  # --- Labels
+  slab(main = "Spectrogram Estimates: UMP: c(t)*AR(2)",
+       subb = bquote("c(t) = exp{ (-t-500)"^2*"/(2(200"^2*")) }        Blockwidth B ="~.(B)),
+       xlab = "Frequency",
+       ylab = bquote(hat(S)[X]~"(t = "*.(my.t)*", f)")); gc()
+  
+  
+  ## --- Legends (& other graphics) --------------------------- ##
+  legend("topright",
+         legend = c("means","mean +/- 2se","",
+                    "True spectrum at t",
+                    "BCMTFSE",
+                    "CBCMTFSE"),
+         lty = c( 1, 1,NA,    1,NA,NA),
+         lwd = c( 3, 1,NA,   NA,NA,NA),
+         pch = c(NA,NA,NA,   19,19,19),
+         
+         col = c(skol$brown4, skol$brown4, skol$brown4,     skol$brown4,"dodgerblue2","goldenrod"),
+         bg  = "white",
+         inset = c(0.01,0.02)
+    )
+  legend("topleft", legend = bquote("Time t ="*.(my.t)*"  "),
+         inset = c(0.05,0.08), cex = 2.5,
+         bg = if((my.t >= tb[1]) & (my.t <= max(tb))) {skol$green} else {"#F4A4A8"})
+  ## ---------------------------------------------------------- ##  
+  
   gc()
-  p <- p+1
-  setTxtProgressBar(pb, p/500)
-#------------------------------------------------------------------------------------------
-} },
-  interval = 0.1,
-  movie.name = paste0("~/Research/Skye/Summer23/animations/test_B",B,"_UMP.gif"),
+    p <- p+1
+    setTxtProgressBar(pb, p/500)
+
+    } },
+  
+  # --- GIF details
+  interval   = 0.1,
+  movie.name = paste0("~/Plots/",my.type,"_B",B,".gif"),
   ani.height = 668, ani.width = 1080); gc()
 ```
 
-
-```{r}
-
-png(filename = paste0("~/Research/Skye/Summer23/Prop_Plots/sgrams_UMP_B",B,".png"),
-    width = 12.6, height = 4.2, units = "in", res = 200, bg = skol$salt, pointsize = 8)
-
-par(mfrow = c(1,3), oma = c(0,3,0,5))
-
-image(x = Fs, y = t, z = t(xtf.true/1e4),
-      xlab = "", ylab = "", zlim = zlim.x,
-      las = 1, col = tim.colors()); sox()
-slab("True TFS: UMP x(t)",
-     "","Frequency","Time"); gc()
-
-image(x = Fs, y = t, z = t(bc.x$mean),
-      xlab = "", ylab = "", zlim = zlim.x,
-      las = 1, col = tim.colors()); sox()
-slab("BCMTFSE:  UMP x(t)",
-     "","Frequency",""); gc()
-
-image(x = Fs, y = t, z = t(cbc.x$mean),
-      xlab = "", ylab = "", zlim = zlim.x,
-      las = 1, col = tim.colors()); sox()
-slab("CBCMTFSE:  UMP x(t)",
-     "","Frequency",""); gc()
-
-par(oma = c(0,0,0,3))
-image.plot(legend.only = TRUE,
-           zlim = zlim.x, legend.shrink = 1, legend.width = 2)
-
-dev.off()
-```
-
-## Time Plots
-
-
-
-
-
-## Freq Plots
-
-```{r}
-par(mfrow = c(1,3))
-```
-
-
-
-## Animations
 
 
 
