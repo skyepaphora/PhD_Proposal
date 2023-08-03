@@ -164,7 +164,7 @@ cbc <- function(type = "noise", M = 100, seed = 0, B = 100){
 ## Simulate
 
 ```{r}
-my.type <- "noise"
+my.type <- "AR2"
 trial <- cbc(type = my.type, M = 100, seed = 17, B = 200)
 ```
 
