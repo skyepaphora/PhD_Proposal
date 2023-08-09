@@ -19,9 +19,9 @@ These estimates are flexible, aimed at general non-stationary series. For the si
 
 $$
 \begin{aligned}
-    X(t) &= \left( 2 - \exp\left[\frac{-(t-500)^2}{2(200)^2}\right] \right) Y(t)  \\ &\quad \\
-    Y(t) &= 0.8\,Y(t-1) - 0.4\,Y(t-2) + z(t)                                      \\ &\quad \\
-    z(t) &= w\big(0,\;\sigma_z^2 = 10^4\big).
+    X(t) &= \left( 2 - \exp\left[\frac{-(t-500)^2}{2(200)^2}\right] \right) Y(t)  \\ & \; \\
+    Y(t) &= 0.8\,Y(t-1) - 0.4\,Y(t-2) + z(t)                                      \\ & \; \\
+    z(t) &= w\big(0,\;\sigma_z^2 = 10^4\big). 
 \end{aligned}
 $$
 
