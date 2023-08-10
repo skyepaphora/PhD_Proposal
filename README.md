@@ -102,11 +102,12 @@ $$
 
 N unknowns, N equations. Matrix for system of equations:
 
+$$ A_{lj} = \frac{-\textit{rowsum } l}{\textit{rowsum }j} \qquad \textit{(1's on diagonal)}$$
+
 $$
-A_{lj} = \frac{-\textit{rowsum } l}{\textit{rowsum }j} \qquad \textit{(1's on diagonal)} 
-\\ c = \Big[c(1)^2, \dots, c(N)^2\Big]' 
-\\ \text{ } 
-\\ \text{solve: Ac = 0}
+c = \Big[c(1)^2, \dots, c(N)^2\Big]'
+\text{ } \qquad \qquad \\
+\text{solve: Ac = 0}
 $$
 
 ---
