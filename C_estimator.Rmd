@@ -1,0 +1,250 @@
+---
+output: html_document
+---
+
+
+## Prelims
+
+```{r packages, warning=FALSE, message=FALSE}
+## --- Packages 
+library(multitaper)   
+library(pbapply)      # Progress bar for apply() functions
+library(kableExtra)   
+library(itsmr)        # Time series stuff, convenient for ARMA
+library(animation)    # For creating gifs
+library(fields)       # Supplement for image plots: legends, better colour
+
+## --- Load Data (choose 1)
+# load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/noise_B200_mini.RData")  # white noise [trival][[NO SERIOUSLY TRIVIAL]]
+# load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/AR2_B200_mini.RData")    # AR(2) [also trivial]
+load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/UMP_B200_mini.RData")    # UMP
+
+## --------- TEMPORARY --------- ##
+load("~/Research/Plot_Animations/splot.RData")
+## --------- --------- --------- ##
+```
+
+## Previous Methods: SVD
+
+## Proposed Method
+
+### Estimating c
+
+```{r get_c_est}
+
+## --- Modification
+ct.n <- ct/ct[1]              # neutralize c
+wid <- max(ct.n) - min(ct.n)  # range of c(t)
+ctn <- ct.n^2 - wid
+
+## --- BC
+A.bc <- outer(1:N,1:N, function(l,j){-rowSums(bc$mean)[l]/rowSums(bc$mean)[j]}); diag(A.bc) <- rep(1,N)
+C.bc <- solve(A.bc,rep(-1,N))
+
+## --- CBC
+A.cbc <- outer(1:N,1:N, function(l,j){-rowSums(cbc$mean)[l]/rowSums(cbc$mean)[j]}); diag(A.cbc) <- rep(1,N)
+C.cbc <- solve(A.cbc,rep(-1,N))
+```
+
+```{r plot_compare, echo = FALSE, fig.dim = c(12,8)}
+# total height of normalized ct function
+wid <- max(ct.n) - min(ct.n)
+ctn <- ct.n^2 - wid
+lim <- range(ctn, C.bc, C.cbc)
+
+par(mar = c(4,5,4,1))
+splot(t,ctn, type = "l", ylim = lim, colr = skrown$smoke)
+lines(C.bc , col = skaturate$blue, lwd = 2)
+lines(C.cbc, col = skol$orange, lwd = 2)
+slab(main = "c(t) and estimates",
+     subb = bquote(hat(c)*" is the solution to Ac= 0"),
+     xlab = "Time", ylab = "c(t)")
+
+legend("top", legend = c("BC", "CBC", "c(t) [modified]"),
+        col = c(skaturate$blue, skol$orange, "black"),
+       lwd = 2, inset = 0.01)
+```
+
+Modification: $\underline{c^2}(t) := \bigg(\frac{c(t)}{c(1)}\bigg)^2 - \frac{\max c(t)-\min c(t)}{c(1)}$
+
+### Return to Spectrogram
+
+```{r f_domain}
+# control
+ct.bc  <- rowSums(bc$mean)/rowSums(bc$mean)[1]
+ct.cbc <- rowSums(cbc$mean)/rowSums(cbc$mean)[1]
+
+# True vals
+yt <- arima.sim(model = list(ar = c(0.8,-0.4), sd = 100), n = N)
+xt <- ct*yt
+
+# Estimated AR(2)
+yt.bc.control  <- xt/ct.bc
+yt.cbc.control <- xt/ct.cbc
+
+yt.bc  <- xt/(C.bc+1)   # +1 in denominator so that it's positive
+yt.cbc <- xt/(C.cbc+1)  # not rigorous just desperate
+
+# estimated spectra of S(f)
+yf.mtm <- spec.mtm(ts(yt), plot = FALSE)$spec
+
+yf.bc.control  <- spec.mtm(ts(yt.bc.control) , plot = FALSE)$spec
+yf.cbc.control <- spec.mtm(ts(yt.cbc.control), plot = FALSE)$spec
+
+yf.bc.con.scale  <- spec.mtm(ts(yt.bc.control) , plot = FALSE)$spec   / 1e1
+yf.cbc.con.scale <- spec.mtm(ts(yt.cbc.control), plot = FALSE)$spec   / 1e1
+
+yf.bc  <- spec.mtm(ts(yt.bc) , plot = FALSE)$spec
+yf.cbc <- spec.mtm(ts(yt.cbc), plot = FALSE)$spec
+
+yf.bc.scale  <- spec.mtm(ts(yt.bc) , plot = FALSE)$spec   /2
+yf.cbc.scale <- spec.mtm(ts(yt.cbc), plot = FALSE)$spec   /2
+
+limes.control <- range(yf.mtm, yf.bc.control, yf.cbc.control)
+limes.con.scale <- range(yf.mtm, yf.bc.con.scale, yf.cbc.con.scale)
+limes <- range(yf.mtm, yf.bc, yf.cbc)
+limes.scale <- range(yf.mtm, yf.bc.scale, yf.cbc.scale) 
+
+```
+
+```{r, fig.dim = c(12,8), echo = FALSE}
+
+# ---  Plots ------------ ## 
+par(mar = c(4,5,4,1))
+
+# -- Control 
+splot(Fs, yf.true/1e4, type = "l", colr = skrown$salt, ylim = limes.control)
+lines(Fs, yf.mtm)
+lines(Fs, yf.bc.control , col = skaturate$blue)
+lines(Fs, yf.cbc.control, col = skol$orange)
+
+slab(main = "Spectrum estimates using y = x/c",
+     subb = bquote(hat(c)*" is: rowsums, normalized by rowsum at t = 1"),
+     xlab = "frequency", ylab = "y(f)")
+
+legend("top", legend = c("BC", "CBC", "mtm"),
+        col = c(skaturate$blue, skol$orange, "black"),
+       lwd = 2, inset = 0.01)
+
+# -- Control (scaled)
+splot(Fs, yf.true/1e4, type = "l", colr = skrown$salt, ylim = limes.con.scale)
+lines(Fs, yf.mtm)
+lines(Fs, yf.bc.con.scale , col = skaturate$blue)
+lines(Fs, yf.cbc.con.scale, col = skol$orange)
+
+slab(main = "Spectrum estimates using y = x/c",
+     subb = "rowsums, normalized by rowsum at t = 1, SCALED down (1/10)",
+     xlab = "frequency", ylab = "y(f)")
+
+legend("top", legend = c("BC", "CBC", "mtm"),
+        col = c(skaturate$blue, skol$orange, "black"),
+       lwd = 2, inset = 0.01)
+
+# -- Proposed method
+splot(Fs, yf.true/1e4, type = "l", colr = skrown$salt, ylim = limes)
+lines(Fs, yf.mtm, col = skrown$B2)
+lines(Fs, yf.bc , col = skaturate$blue)
+lines(Fs, yf.cbc, col = skol$orange)
+
+slab(main = "Spectrum estimates using y = x/c",
+     subb = bquote(hat(c)*" is solution to Ac = 0"),
+     xlab = "frequency", ylab = "y(f)")
+
+legend("top", legend = c("BC", "CBC", "mtm"),
+        col = c(skaturate$blue, skol$orange, "black"),
+       lwd = 2, inset = 0.01)
+
+# -- Proposed method SCALED
+splot(Fs, yf.true/1e4, type = "l", colr = skrown$salt, ylim = limes.scale)
+lines(Fs, yf.mtm, col = skrown$B2)
+lines(Fs, yf.bc.scale , col = skaturate$blue)
+lines(Fs, yf.cbc.scale, col = skol$orange)
+
+slab(main = "Spectrum estimates using y = x/c",
+     subb = bquote(hat(c)*" is solution to Ac = 0, SCALED down (1/2)"),
+     xlab = "frequency", ylab = "y(f)")
+
+legend("top", legend = c("BC", "CBC", "mtm"),
+        col = c(skaturate$blue, skol$orange, "black"),
+       lwd = 2, inset = 0.01)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r animation plot, eval = FALSE, echo = FALSE}
+yf.bc  <-  bc$mean/C.bc
+yf.cbc <- cbc$mean/C.cbc
+yf.n   <-  bc$mean/ct^2
+
+
+# image.plot(yf.n)
+p <- 0
+pb <- txtProgressBar(style = 3)
+
+saveGIF({  for (my.t in seq(1,N,by = 5)) {
+
+splot(Fs, yf.true/1e3, type = "l", lwd = 2)
+lines(Fs, yf.bc[my.t,], col = "blue")
+lines(Fs, yf.cbc[my.t,], col = "goldenrod")
+
+  gc()
+    p <- p+1
+    setTxtProgressBar(pb, p/500)
+
+    } },
+  
+  # --- GIF details
+  interval   = 0.1,
+  movie.name = paste0("~/Plots/test_1.gif"),
+  ani.height = 668, ani.width = 1080); gc()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
