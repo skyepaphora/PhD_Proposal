@@ -10,7 +10,7 @@ library(animation)
 library(fields)
 
 ## --- Splot + Spalette ---------------------------- ##
-load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/splot.RData")
+load(file = "C:/Users/skyep/Documents/Research/Plot_Animations/splot.RData")
 ```
 
 
@@ -21,71 +21,70 @@ load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/splot.RData")
 ## Noise \& AR(2)
 
 ```{r setupSgram_zy}
-
 ## --- Load 
-load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/noise_B200_mini.RData")
+load(file = "Data/noise_B200_mini.RData")
 bc.z  <- bc
 cbc.z <- cbc
 
-load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/AR2_B200_mini.RData")
+load(file = "Data/AR2_B200_mini.RData")
 bc.y  <- bc
 cbc.y <- cbc
 
 ## --- Scaling & plot limits
-bc.y$mean  <- bc.y$mean *100 # scale
-cbc.y$mean <- cbc.y$mean*100
+bc.y$mean  <- bc.y$mean *1e5  # scale
+cbc.y$mean <- cbc.y$mean*1e5
 
-zlim.z <- range(ztf.true, bc.z$mean, cbc.z$mean)
-zlim.y <- range(ytf.true, bc.y$mean, cbc.y$mean)
+zlim.z <- range(tru$zf.true, bc.z$mean, cbc.z$mean)
+zlim.y <- range(tru$yf.true, bc.y$mean, cbc.y$mean)
 ```
 
 ```{r Sgram_xy}
-
-png(filename = paste0("C:/Users/skyep/Documents/Research/PhD_Proposal/Plots/sgrams_Noise-AR2_B",B,".png"),
-    width = 8.5, height = 11, units = "in", res = 200, bg = skol$salt, pointsize = 8)
+# 
+# png(filename = paste0("C:/Users/skyep/Documents/Research/PhD_Proposal/Plots/sgrams_Noise-AR2_B",B,".png"),
+#     width = 8.5, height = 11, units = "in", res = 200, bg = skol$salt, pointsize = 8)
 ## ----------------------------------------------------------------------------------
 
       ## --- MARGINS
-      par(mfrow = c(3,2), oma = c(4,1,4,3), mar = c(7,5,2,2))
+      par(mfrow = c(3,2), oma = c(4,1,4,3), mar = c(10,5,0,2))
 
 
   ## --- TRUE Z 
   image(x = Fs, y = t, z = t(ztf.true),
         xlab = "", ylab = "", zlim = zlim.z,
         las = 1, col = tim.colors()); sox()
-  slab("True Time-Frequency Spectrum: White Noise z(t)",
-       "","","Time")
+  slab("True Time-Frequency Spectrum: White Noise z(t)","",
+       "Frequency","Time")
   
   ## --- TRUE Y
   image(x = Fs, y = t, z = t(ytf.true),
         xlab = "", ylab = "", zlim = zlim.y,
         las = 1, col = tim.colors()); sox()
-  slab("True Time-Frequency Spectrum: AR(2) series y(t)",
-       "","","")
+  slab("True Time-Frequency Spectrum: AR(2) series y(t)","",
+       "Frequency","Time")
 
 
       ## --- BC Z
       image(x = Fs, y = t, z = t(bc.z$mean),
             xlab = "", ylab = "", zlim = zlim.z,
             las = 1, col = tim.colors()); sox()
-      slab("BCMTFSE:  White Noise x(t)",
-           "","","Time")
+      slab("BCMTFSE:  White Noise x(t)","",
+       "Frequency","Time")
       
       ## --- BC Y
       image(x = Fs, y = t, z = t(bc.y$mean),
             xlab = "", ylab = "", zlim = zlim.y,
             las = 1, col = tim.colors()); sox()
-      slab("BCMTFSE:  AR(2) series y(t)",
-           "","","")
+      slab("BCMTFSE:  AR(2) series y(t)","",
+       "Frequency","Time")
 
 
   ## --- CBC Z
   image(x = Fs, y = t, z = t(cbc.z$mean),
         xlab = "", ylab = "", zlim = zlim.z,
         las = 1, col = tim.colors()); sox()
-  slab("CBCMTFSE:  White Noise x(t)",
-       "","Frequency","Time")
-  image.plot(legend.only = TRUE,
+  slab("CBCMTFSE:  White Noise x(t)","",
+       "Frequency","Time")
+  image.plot(legend.only = TRUE, legend.lab = "Evolutionary Power Spectral Density", legend.line = 1,
              zlim = zlim.z,
              horizontal = TRUE, smallplot = c(0.11,0.96,0,0.05))
   
@@ -93,15 +92,15 @@ png(filename = paste0("C:/Users/skyep/Documents/Research/PhD_Proposal/Plots/sgra
   image(x = Fs, y = t, z = t(cbc.y$mean),
         xlab = "", ylab = "", zlim = zlim.y,
         las = 1, col = tim.colors()); sox()
-  slab("CBCMTFSE:  AR(2) series y(t)",
-       "","Frequency","")
-  image.plot(legend.only = TRUE,
-             zlim = zlim.y,
-             horizontal = TRUE, smallplot = c(0.11,0.96,0,0.05))
+  slab("CBCMTFSE:  AR(2) series y(t)","",
+       "Frequency","Time")
+image.plot(legend.only = TRUE, legend.lab = "Evolutionary Power Spectral Density", legend.line = 1,
+           zlim = zlim.y,
+           horizontal = TRUE, smallplot = c(0.11,0.96,0,0.05))
 
 ## ----------------------------------------------------------------------------------
-dev.off()
-
+# dev.off()
+# 
 ```
 
 
@@ -109,20 +108,19 @@ dev.off()
 ## UMP
 
 ```{r setupSgram_z}
-
 ## --- Load 
-load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/UMP_B200_mini.RData")
+load(file = "Data/UMP_B200_mini.RData")
 bc.x  <- bc
 cbc.x <- cbc
 
 ## --- Scaling & plot limits
-zlim.z <- range(xtf.true, bc.x$mean, cbc.x$mean)
+zlim.x <- range(tru$xtf.true, bc.x$mean, cbc.x$mean)
 ```
 
 ```{r Sgram_z}
-
-png(filename = paste0("C:/Users/skyep/Documents/Research/PhD_Proposal/Plots/sgrams_UMP_B",B,".png"),
-    width = 12.6, height = 4.2, units = "in", res = 200, bg = skol$salt, pointsize = 8)
+# 
+# png(filename = paste0("C:/Users/skyep/Documents/Research/PhD_Proposal/Plots/sgrams_UMP_B",B,".png"),
+#     width = 12.6, height = 4.2, units = "in", res = 200, bg = skol$salt, pointsize = 8)
 ## ----------------------------------------------------------------------------------
 
   # Margins
@@ -155,8 +153,8 @@ png(filename = paste0("C:/Users/skyep/Documents/Research/PhD_Proposal/Plots/sgra
              zlim = zlim.x, legend.shrink = 1, legend.width = 2)
 
 ## ----------------------------------------------------------------------------------
-dev.off()
-  
+# dev.off()
+#   
 ```
 
 

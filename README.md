@@ -1,7 +1,5 @@
 # CBC_Simulations.Rmd
 
-\_
-
 ### TFS Estimators
 
 The file *CBC_Simulations.Rmd* produces a simulated ensemble of time series, and estimates the time-frequency spectra (TFS) of each series.
@@ -20,9 +18,9 @@ These estimates are flexible, aimed at general non-stationary series. For the si
 
 $$
 \begin{aligned}
-    X(t) &= \left( 2 - \exp\left[\frac{-(t-500)^2}{2(200)^2}\right] \right) Y(t)  \\ 
+    X(t) &= \exp\left(\frac{-(t-500)^2}{2(200)^2}\right) Y(t)  \\ 
     &\\
-    Y(t) &= 0.8 Y(t-1) - 0.4 Y(t-2) + z(t)                                        \\ 
+    Y(t) &= 0.5 Y(t-1) - 0.5 Y(t-2) + z(t)                                        \\ 
     &\\
     z(t) &= w\big(0, \sigma_z^2 = 10^4\big). 
 \end{aligned}
@@ -82,45 +80,51 @@ $$
 \hat{\vec{C}^2} \stackrel{\small def}{=} b_uU_1 \qquad\qquad \hat{\vec S}_y \stackrel{\small def}{=} b_vV_1^T
 $$
 
-### Proposed Method (Skye) [Actually Glen]
-Define the following:
-
+### Proposed Method (Skye) [Actually Glen] [OLD]
 $$
-c(1)^2 = a_{1j}*c(j)^2 \qquad a_{1j} = \frac{\textit{rowsum }1}{\textit{rowsum }j}
-\qquad 1 < j \leq N
+c(i)^2 = a_{ij}c(j)^2 \qquad a_{ij} = \frac{S [rowsum\;i]}{S [rowsum\;j]} = \frac{c(i)^2}{c(j)^2}
+\qquad 1 \leq j \leq N
+\\ \quad \\
+c(i)^2 = a_{ii}c(i)^2 + \sum_{j\neq i} a_{ij}c(j)^2 \\
+\therefore 0 = \sum_{j\neq i} a_{ij}c(j)^2
 $$
 
-sum both sides over j and divide by N-1
 
 $$
 \begin{aligned}
-    c(1)^2 &= \frac{\sum_{j=2}^{N}a_{1j} \text{ } c(j)^2}{(N-1)}    \\
-           &\quad \vdots \\
-    c(N)^2 &= \frac{\sum_{j=2}^{N}a_{Nj} \text{ } c(j)^2}{(N-1)}    \\
+    \sum_{j=1}^N c(i)^2 &= \sum_{j=1}^N a_{ij}c(j)^2 \\  &\\
+    c(i)^2 &= \frac{\sum_{j=1}^{N}a_{ij} \, c(j)^2}{N} \qquad i \in \{1,\dots, N\}                        \\ & \\
+    c(i)^2 &= \frac{a_{ii}c(i)^2 + \sum_{j\neq i} a_{ij}c(j)^2 }{N} \qquad i \in \{1,\dots, N\}           \\ & \\
+    c(i)^2 &= \frac{1}{N}c(i)^2 + \frac{1}{N}\sum_{j\neq i} a_{ij}c(j)^2 \qquad i \in \{1,\dots, N\} \\ & \\
+    N(1 - \frac{1}{N}) c(i)^2 &= \sum_{j\neq i} a_{ij}c(j)^2 \qquad i \in \{1,\dots, N\} \\ & \\
+    (N - 1) c(i)^2 &= \sum_{j\neq i} a_{ij}c(j)^2 \qquad i \in \{1,\dots, N\} \\&\\
+    0 &= N c(i)^2 - c(i)^2 - \sum_{j\neq i} a_{ij}c(j)^2 \\
+    0 &= N c(i)^2 - \sum_{j=1}^N a_{ij}c(j)^2
 \end{aligned}
 $$
 
 N unknowns, N equations. Matrix for system of equations:
 
-$$ A_{lj} = \frac{-\textit{rowsum } l}{\textit{rowsum }j} \qquad \textit{(1's on diagonal)}$$
+$$
+A_{ij} = \frac{rowsum\; i}{rowsum\;j} \qquad \text{(1's on diagonal)} \\
+c = \Big[c(1)^2, \dots, c(N)^2\Big]' \\ \; \\
+\text{solve: }\qquad  \frac{1}{N}Ac = c \\
+OR: \quad (1/N)Ac - Ic = 0 \\ 
+\quad ((1/N)A - I)c = 0 
+$$
 
-$$
-c = \Big[c(1)^2, \dots, c(N)^2\Big]'
-\text{ } \qquad \qquad \\
-\text{solve: Ac = 0}
-$$
+JUST FIND eigenvec matching eigenval = 1, for $B = A/N$
 
 ---
 
-### Help Skye is confused
-I'm sorry sometimes I suck at linear algebra, it's cringe :(
+### Proposed Method (Skye) [Actually Glen] [OLD]
 
-#### Q1 
-Why is $Ac$ set equal to zero? I've tried `solve()` (and `qr.solve()`) but all I get back is a zero vector. Which makes sense to me. I get interesting (good) results when I set $Ac = -\vec 1$ where $\vec 1$ is an $N$ length vector of $1$'s. 
 
-Follow up question: why is the numerator of $A_{lj}$ negative? Source: Glen during one of our meetings
 
 ---
+
+
+
 
 # Plotter_1.Rmd
 
