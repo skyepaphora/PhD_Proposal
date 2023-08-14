@@ -80,7 +80,7 @@ $$
 \hat{\vec{C}^2} \stackrel{\small def}{=} b_uU_1 \qquad\qquad \hat{\vec S}_y \stackrel{\small def}{=} b_vV_1^T
 $$
 
-### Proposed Method (Skye) [Actually Glen] [OLD]
+### Proposed Method (Skye) [Actually Glen] 
 $$
 c(i)^2 = a_{ij}c(j)^2 \qquad a_{ij} = \frac{S [rowsum\;i]}{S [rowsum\;j]} = \frac{c(i)^2}{c(j)^2}
 \qquad 1 \leq j \leq N
@@ -114,12 +114,6 @@ OR: \quad (1/N)Ac - Ic = 0 \\
 $$
 
 JUST FIND eigenvec matching eigenval = 1, for $B = A/N$
-
----
-
-### Proposed Method (Skye) [Actually Glen] [OLD]
-
-
 
 ---
 
