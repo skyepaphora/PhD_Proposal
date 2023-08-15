@@ -181,7 +181,7 @@ trial <- ccbc(type = my.type, ct = ct, M = 100, seed = 17, B = 200)
 ```{r}
 ## --- Stats --------- ##
 cbc <- bc <- list()
-tru <- trial$tru
+tru <- trial$tru; names(tru) <- c("zf", "yf", "ztf", "ytf", "xtf")
 
 bc$mean  <- pbapply(trial$bc, 1:2, mean); gc()
 bc$se    <- pbapply(trial$bc, 1:2, sd)/sqrt(M); gc()
