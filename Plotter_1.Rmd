@@ -58,7 +58,7 @@ png(filename = paste0("NewPlots/sgrams_Noise-AR2_B",B,"_letterbox.png"),
   image(x = Fs, y = t, z = t(tru.z$ztf),
         xlab = "", ylab = "", zlim = zlim.z,
         las = 1, col = tim.colors()); sox()
-  abline(h = range(tb), col = skrown$B2, lty = 3)
+  abline(h = range(tb), col = skrown$B2, lty = 2)
   slab("True Time-Frequency Spectrum: White Noise z(t)","",
        "Frequency","Time")
   
@@ -66,25 +66,25 @@ png(filename = paste0("NewPlots/sgrams_Noise-AR2_B",B,"_letterbox.png"),
   image(x = Fs, y = t, z = t(tru.y$ytf),
         xlab = "", ylab = "", zlim = zlim.y,
         las = 1, col = tim.colors()); sox()
-  abline(h = range(tb), col = skrown$B2, lty = 3)
+  abline(h = range(tb), col = skrown$salt, lty = 2)
   slab("True Time-Frequency Spectrum: AR(2) series y(t)","",
        "Frequency","Time")
 
 
-      ## --- BC Z
-      image(x = Fs, y = t, z = t(bc.z$mean),
-            xlab = "", ylab = "", zlim = zlim.z,
-            las = 1, col = tim.colors()); sox()
-      abline(h = range(tb), col = skrown$B2, lty = 3)
-      slab("BCMTFSE:  White Noise x(t)","",
+  ## --- BC Z
+  image(x = Fs, y = t, z = t(bc.z$mean),
+        xlab = "", ylab = "", zlim = zlim.z,
+        las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$B2, lty = 2)
+  slab("BCMTFSE:  White Noise x(t)","",
        "Frequency","Time")
-      
-      ## --- BC Y
-      image(x = Fs, y = t, z = t(bc.y$mean),
-            xlab = "", ylab = "", zlim = zlim.y,
-            las = 1, col = tim.colors()); sox()
-      abline(h = range(tb), col = skrown$B2, lty = 3)
-      slab("BCMTFSE:  AR(2) series y(t)","",
+  
+  ## --- BC Y
+  image(x = Fs, y = t, z = t(bc.y$mean),
+        xlab = "", ylab = "", zlim = zlim.y,
+        las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$salt, lty = 2)
+  slab("BCMTFSE:  AR(2) series y(t)","",
        "Frequency","Time")
 
 
@@ -92,7 +92,7 @@ png(filename = paste0("NewPlots/sgrams_Noise-AR2_B",B,"_letterbox.png"),
   image(x = Fs, y = t, z = t(cbc.z$mean),
         xlab = "", ylab = "", zlim = zlim.z,
         las = 1, col = tim.colors()); sox()
-  abline(h = range(tb), col = skrown$B2, lty = 3)
+  abline(h = range(tb), col = skrown$B2, lty = 2)
   slab("CBCMTFSE:  White Noise x(t)","",
        "Frequency","Time")
   image.plot(legend.only = TRUE , legend.lab = "Power",
@@ -104,7 +104,7 @@ png(filename = paste0("NewPlots/sgrams_Noise-AR2_B",B,"_letterbox.png"),
   image(x = Fs, y = t, z = t(cbc.y$mean),
         xlab = "", ylab = "", zlim = zlim.y,
         las = 1, col = tim.colors()); sox()
-  abline(h = range(tb), col = skrown$B2, lty = 3)
+  abline(h = range(tb), col = skrown$salt, lty = 2)
   slab("CBCMTFSE:  AR(2) series y(t)","",
        "Frequency","Time")
   image.plot(legend.only = TRUE , legend.lab = "Power",
@@ -151,7 +151,7 @@ png(filename = paste0("NewPlots/sgrams_UMP_B",B,"_rev_letterbox.png"),
   image(x = Fs, y = t, z = t(tru.x$xtf),
         xlab = "", ylab = "", zlim = zlim.x,
         las = 1, col = tim.colors()); sox()
-  abline(h = range(tb), col = skrown$salt, lty = 3)
+  abline(h = range(tb), col = skrown$salt, lty = 2)
   slab("True TFS: UMP x(t)",
        "","Frequency","Time"); gc()
   
@@ -159,7 +159,7 @@ png(filename = paste0("NewPlots/sgrams_UMP_B",B,"_rev_letterbox.png"),
   image(x = Fs, y = t, z = t(bc.x$mean),
         xlab = "", ylab = "", zlim = zlim.x,
         las = 1, col = tim.colors()); sox()
-  abline(h = range(tb), col = skrown$salt, lty = 3)
+  abline(h = range(tb), col = skrown$salt, lty = 2)
   slab("BCMTFSE:  UMP x(t)",
        "","Frequency","Time"); gc()
   
@@ -167,7 +167,7 @@ png(filename = paste0("NewPlots/sgrams_UMP_B",B,"_rev_letterbox.png"),
   image(x = Fs, y = t, z = t(cbc.x$mean),
         xlab = "", ylab = "", zlim = zlim.x,
         las = 1, col = tim.colors()); sox()
-  abline(h = range(tb), col = skrown$salt, lty = 3)
+  abline(h = range(tb), col = skrown$salt, lty = 2)
   slab("CBCMTFSE:  UMP x(t)",
        "","Frequency","Time"); gc()
   
@@ -182,6 +182,67 @@ dev.off()
 ```
 
 ---
+
+# C estimators
+
+```{r plot_compare, echo = FALSE, fig.dim = c(12,8)}
+png(filename = paste0("NewPlots/gest_UMP_B",B,"_B",2*B,"_rev.png"),
+# png(filename = paste0("NewPlots/gest_UMP_B",B,".png"),
+    width = 12.6, height = 9, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
+# ----------------------------------------------------------------------------------------
+par(mfrow = c(2,2), mar = c(4,4,4.4,1))
+lim <- range(ct, g.bc, g.cbc)
+# --- BC
+splot(t, ct^2 , type = "l", ylim = lim, colr = skrown$smoke, labs = FALSE, lwd = 2)
+lines(   g.bc , col = skaturate$blue, lwd = 2)
+slab(main = "Estimation of g(t) based on BC",
+     subb = bquote(hat(g)*" is the solution to:    (1/N)Ag = g"),
+     xlab = "Time", ylab = "g(t)")
+legend("top", legend = c("True g(t)", "BC", paste("B =",B)),
+       col = c("black", skaturate$blue),
+       lwd = c(2,2,NA), inset = 0.01)
+
+# --- CBC
+splot(t, ct^2 , type = "l", ylim = lim, colr = skrown$smoke, labs = FALSE, lwd = 2)
+lines(   g.cbc, col = skol$orange, lwd = 2)
+slab(main = "Estimation of g(t) based on CBC",
+     subb = bquote(hat(g)*" is the solution to:    (1/N)Ag = g"),
+     xlab = "Time", ylab = "g(t)")
+legend("top", legend = c("True g(t)", "CBC", paste("B =",B)),
+       col = c("black", skol$orange),
+       lwd = c(2,2,NA), inset = 0.01)
+# ----------------------------------------------------------------------------------------
+dev.off()
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Animations
 

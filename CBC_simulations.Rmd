@@ -32,7 +32,7 @@ vb <- spec.mtm(ts(1:B), plot = FALSE)$mtm$dpss$v # DPSS (based on block size)
 
 
 ## --- Modulating function
-ct  <- exp((-(t-500)^2)/(2*(200^2)))       
+ct  <- exp((-(t-500)^2)/(2*(200^2))) # for rev marble, subtract from 1       
 
 ## --- Function: true spectral density of an AR(2) series (sd = 10 is fixed)
 ar2 <- function(phi = c(0,0)){ (10^2)/Mod( 1 - phi[1]*exp(-i*2*pi*Fs) - phi[2]*(exp(-i*4*pi*Fs)))^2 }
@@ -174,7 +174,7 @@ ccbc <- function(type = "noise", ct = rep(1,N), M = 100, seed = 0, B = 100, ar2 
 
 ```{r}
 my.type <- "UMP"
-trial <- ccbc(type = my.type, ct = ct, M = 100, seed = 17, B = 200)
+trial <- ccbc(type = my.type, ct = ct, M = 100, seed = 17, B = B)
 ```
 
 
@@ -191,11 +191,11 @@ cbc$se   <- pbapply(trial$cbc, 1:2, sd)/sqrt(M); gc()
 
 
 ## --- Save! --------- ##
-save.image(paste0("Data/",my.type,"_B",B,"_full.RData"))
+save.image(paste0("Data/",my.type,"_B",B,"_full_rev.RData"))
 
 rm(trial); gc() # discard individual simulations, keep stats
 
-save.image(paste0("Data/",my.type,"_B",B,"_mini.RData"))
+save.image(paste0("Data/",my.type,"_B",B,"_mini_rev.RData"))
 ```
 
 

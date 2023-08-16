@@ -14,14 +14,20 @@ library(itsmr)        # Time series stuff, convenient for ARMA
 library(animation)    # For creating gifs
 library(fields)       # Supplement for image plots: legends, better colour
 
-## --- Load Data (choose 1)
-# load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/noise_B200_mini.RData")  # white noise [trival][[NO SERIOUSLY TRIVIAL]]
-# load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/AR2_B200_mini.RData")    # AR(2) [also trivial]
-load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/UMP_B200_mini.RData")    # UMP
-
 ## --------- TEMPORARY --------- ##
 load("~/Research/Plot_Animations/splot.RData")
 ## --------- --------- --------- ##
+```
+
+
+```{r}
+## --- Load Data (choose 1)
+# load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/noise_B200_mini.RData")  # white noise [trival][[NO SERIOUSLY TRIVIAL]]
+# load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/AR2_B200_mini.RData")    # AR(2) [also trivial]
+load(file = "Data/UMP_B200_mini.RData")       
+load(file = "Data/UMP_B200_mini_rev.RData")   
+load(file = "Data/UMP_B400_mini.RData")    
+load(file = "Data/UMP_B400_mini_rev.RData")
 ```
 
 ## Previous Methods: SVD
@@ -33,37 +39,26 @@ load("~/Research/Plot_Animations/splot.RData")
 ```{r get_c_est}
 
 ## --- Modification
-ct.n <- ct/ct[1]              # neutralize c
-wid <- max(ct.n) - min(ct.n)  # range of c(t)
-ctn <- ct.n^2 - wid
+# ct.n <- ct/ct[1]              # neutralize c
+# wid <- max(ct.n) - min(ct.n)  # range of c(t)
+# ctn <- ct.n^2 - wid
 
 ## --- BC
-A.bc <- outer(1:N,1:N, function(l,j){-rowSums(bc$mean)[l]/rowSums(bc$mean)[j]}); diag(A.bc) <- rep(1,N)
-C.bc <- solve(A.bc,rep(-1,N))
+A.bc <- outer(1:N,1:N, function(l,j){rowSums(bc$mean)[l]/rowSums(bc$mean)[j]})
+g.bc <- Mod(eigen(A.bc/N)$vectors[,1])
+g.bc <- g.bc/max(g.bc) # normalize
 
 ## --- CBC
-A.cbc <- outer(1:N,1:N, function(l,j){-rowSums(cbc$mean)[l]/rowSums(cbc$mean)[j]}); diag(A.cbc) <- rep(1,N)
-C.cbc <- solve(A.cbc,rep(-1,N))
+A.cbc <- outer(1:N,1:N, function(l,j){rowSums(cbc$mean)[l]/rowSums(cbc$mean)[j]})
+g.cbc <- Mod(eigen(A.cbc/N)$vectors[,1])
+g.cbc <- g.cbc/max(g.cbc) # normalize
+
+
+# Save
+
 ```
 
-```{r plot_compare, echo = FALSE, fig.dim = c(12,8)}
-# total height of normalized ct function
-wid <- max(ct.n) - min(ct.n)
-ctn <- ct.n^2 - wid
-lim <- range(ctn, C.bc, C.cbc)
 
-par(mar = c(4,5,4,1))
-splot(t,ctn, type = "l", ylim = lim, colr = skrown$smoke)
-lines(C.bc , col = skaturate$blue, lwd = 2)
-lines(C.cbc, col = skol$orange, lwd = 2)
-slab(main = "c(t) and estimates",
-     subb = bquote(hat(c)*" is the solution to Ac= 0"),
-     xlab = "Time", ylab = "c(t)")
-
-legend("top", legend = c("BC", "CBC", "c(t) [modified]"),
-        col = c(skaturate$blue, skol$orange, "black"),
-       lwd = 2, inset = 0.01)
-```
 
 Modification: $\underline{c^2}(t) := \bigg(\frac{c(t)}{c(1)}\bigg)^2 - \frac{\max c(t)-\min c(t)}{c(1)}$
 
