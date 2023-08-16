@@ -46,8 +46,8 @@ zlim.y <- range(tru.y$yf, bc.y$mean, cbc.y$mean)
 
 ```{r Sgram_xy}
 
-png(filename = paste0("Plots/sgrams_Noise-AR2_B",B,".png"),
-    width = 8.5, height = 11, units = "in", res = 200, bg = skol$salt, pointsize = 8)
+png(filename = paste0("NewPlots/sgrams_Noise-AR2_B",B,"_letterbox.png"),
+    width = 8.5, height = 11, units = "in", res = 200, bg = skrown$salt, pointsize = 8)
 ## ----------------------------------------------------------------------------------
 
       ## --- MARGINS
@@ -58,6 +58,7 @@ png(filename = paste0("Plots/sgrams_Noise-AR2_B",B,".png"),
   image(x = Fs, y = t, z = t(tru.z$ztf),
         xlab = "", ylab = "", zlim = zlim.z,
         las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$B2, lty = 3)
   slab("True Time-Frequency Spectrum: White Noise z(t)","",
        "Frequency","Time")
   
@@ -65,6 +66,7 @@ png(filename = paste0("Plots/sgrams_Noise-AR2_B",B,".png"),
   image(x = Fs, y = t, z = t(tru.y$ytf),
         xlab = "", ylab = "", zlim = zlim.y,
         las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$B2, lty = 3)
   slab("True Time-Frequency Spectrum: AR(2) series y(t)","",
        "Frequency","Time")
 
@@ -73,6 +75,7 @@ png(filename = paste0("Plots/sgrams_Noise-AR2_B",B,".png"),
       image(x = Fs, y = t, z = t(bc.z$mean),
             xlab = "", ylab = "", zlim = zlim.z,
             las = 1, col = tim.colors()); sox()
+      abline(h = range(tb), col = skrown$B2, lty = 3)
       slab("BCMTFSE:  White Noise x(t)","",
        "Frequency","Time")
       
@@ -80,6 +83,7 @@ png(filename = paste0("Plots/sgrams_Noise-AR2_B",B,".png"),
       image(x = Fs, y = t, z = t(bc.y$mean),
             xlab = "", ylab = "", zlim = zlim.y,
             las = 1, col = tim.colors()); sox()
+      abline(h = range(tb), col = skrown$B2, lty = 3)
       slab("BCMTFSE:  AR(2) series y(t)","",
        "Frequency","Time")
 
@@ -88,6 +92,7 @@ png(filename = paste0("Plots/sgrams_Noise-AR2_B",B,".png"),
   image(x = Fs, y = t, z = t(cbc.z$mean),
         xlab = "", ylab = "", zlim = zlim.z,
         las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$B2, lty = 3)
   slab("CBCMTFSE:  White Noise x(t)","",
        "Frequency","Time")
   image.plot(legend.only = TRUE , legend.lab = "Power",
@@ -99,6 +104,7 @@ png(filename = paste0("Plots/sgrams_Noise-AR2_B",B,".png"),
   image(x = Fs, y = t, z = t(cbc.y$mean),
         xlab = "", ylab = "", zlim = zlim.y,
         las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$B2, lty = 3)
   slab("CBCMTFSE:  AR(2) series y(t)","",
        "Frequency","Time")
   image.plot(legend.only = TRUE , legend.lab = "Power",
@@ -117,7 +123,7 @@ dev.off()
 
 ```{r setupSgram_z}
 ## --- Load 
-load(file = "Data/UMP_B200_mini.RData")
+load(file = "Data/UMP_B200_mini_rev.RData")
 bc.x  <- bc
 cbc.x <- cbc
 tru.x <- tru
@@ -134,8 +140,8 @@ zlim.x <- range(tru.x$xtf, bc.x$mean, cbc.x$mean)
 
 ```{r Sgram_z}
 
-png(filename = paste0("Plots/sgrams_UMP_B",B,".png"),
-    width = 12.6, height = 4.2, units = "in", res = 200, bg = skol$salt, pointsize = 8)
+png(filename = paste0("NewPlots/sgrams_UMP_B",B,"_rev_letterbox.png"),
+    width = 12.6, height = 4.2, units = "in", res = 200, bg = skrown$salt, pointsize = 8)
 ## ----------------------------------------------------------------------------------
 
   # Margins
@@ -145,6 +151,7 @@ png(filename = paste0("Plots/sgrams_UMP_B",B,".png"),
   image(x = Fs, y = t, z = t(tru.x$xtf),
         xlab = "", ylab = "", zlim = zlim.x,
         las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$salt, lty = 3)
   slab("True TFS: UMP x(t)",
        "","Frequency","Time"); gc()
   
@@ -152,15 +159,17 @@ png(filename = paste0("Plots/sgrams_UMP_B",B,".png"),
   image(x = Fs, y = t, z = t(bc.x$mean),
         xlab = "", ylab = "", zlim = zlim.x,
         las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$salt, lty = 3)
   slab("BCMTFSE:  UMP x(t)",
-       "","Frequency",""); gc()
+       "","Frequency","Time"); gc()
   
   # --- CBC
   image(x = Fs, y = t, z = t(cbc.x$mean),
         xlab = "", ylab = "", zlim = zlim.x,
         las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$salt, lty = 3)
   slab("CBCMTFSE:  UMP x(t)",
-       "","Frequency",""); gc()
+       "","Frequency","Time"); gc()
   
   # --- Legend
   par(oma = c(0,0,0,3))
@@ -171,9 +180,6 @@ png(filename = paste0("Plots/sgrams_UMP_B",B,".png"),
 dev.off()
 
 ```
-
-
-
 
 ---
 
