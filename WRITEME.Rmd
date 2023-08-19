@@ -14,6 +14,7 @@
 * after propsp, look up LINPACK and how to use different eigens 
 
 #### Skye's Wishlist
+
 * fix code for large lattice of g est plots
 * renaming convention involving "rev" factor
 * get data for B=400 NOT rev
@@ -27,3 +28,7 @@
     - this works for UMPs!!
     - Honestly CBC looks a bit better than BC :) for M=100
     - for M=1... Honestly BC is better whatever but it WORKS
+    
+#### Things to bring up
+
+* standard error of $\tilde g$ is very small
