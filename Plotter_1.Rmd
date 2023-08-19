@@ -185,8 +185,16 @@ dev.off()
 
 # C estimators
 
+```{r}
+# what g(t) are you usng?
+vers <- 1 + (gt[1] > gt[10])
+rev <- if(vers > 1){"_rev"} else {""}
+```
+
+## Plotting g(t) obtained from Mean Spectrograms (CHEAT)
+
 ```{r plot_compare, echo = FALSE, fig.dim = c(12,8)}
-png(filename = paste0("NewPlots/gest_UMP_B",B,"_B",2*B,"_rev.png"),
+png(filename = paste0("NewPlots/gest_UMP_B",B,"_B",B,"_rev.png"),
 # png(filename = paste0("NewPlots/gest_UMP_B",B,".png"),
     width = 12.6, height = 9, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
 # ----------------------------------------------------------------------------------------
@@ -216,9 +224,329 @@ dev.off()
 
 ```
 
+### Plotting g(t) obtained from individual sims
+
+```{r}
+# load("Data/gest_UMP_B200_mini.RData")
+# load("Data/gest_UMP_B200_rev_mini.RData")
+# load("Data/gest_UMP_B400_mini.RData")
+# load("Data/gest_UMP_B400_rev_mini.RData")
+```
+
+#### Single Comparison
+
+```{r}
+
+png(filename = paste0("NewPlots/gest_",my.type,"_B",B,rev,".png"),
+width = 12, height = 5, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
+# ----------------------------------------------------------------------------------------
+    par(mfrow = c(1,2), mar = c(4,4,4.4,1))
+    lim <- range(gt, g.bc, g.cbc)
+    
+    # --- BC
+    splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
+    lines(g.bc$mean, col = skaturate$blue, lwd = 2)
+    lines(g.bc$UCL , col = skastel$blue)
+    lines(g.bc$LCL , col = skastel$blue)
+    abline(v = range(tb), col = skrown$B1, lty = 2)
+    slab(main = bquote("Estimation of"~hat(g)[.(vers)]~"(t) based on BC"),
+         subb = bquote("Blockwidth B ="~.(B)),
+         xlab = "Time", ylab = "g(t)")
+    legend(if(vers>1){"top"}else{"topright"},
+           legend = c("True g(t)", bquote(hat(g)~"mean ("*mu*") "), bquote(hat(g)~mu~"+/- 2se  ")),
+           col = c(skrown$B2, skaturate$blue, skastel$blue),
+           lwd = c(2,2,1), inset = 0.01, y.intersp = 1.25, cex = 0.9)
+    
+    # --- CBC
+    splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
+    lines(g.cbc$mean, col = skol$orange, lwd = 2)
+    lines(g.cbc$UCL , col = skaturate$yellow)
+    lines(g.cbc$LCL , col = skaturate$yellow)
+    abline(v = range(tb), col = skrown$B1, lty = 2)
+    slab(main = bquote("Estimation of"~hat(g)[.(vers)]~"(t) based on CBC"),
+         subb = bquote("Blockwidth B ="~.(B)),
+         xlab = "Time", ylab = "g(t)")
+    legend(if(vers>1){"top"}else{"topright"},
+           legend = c("True g(t)", bquote(hat(g)~"mean ("*mu*") "), bquote(hat(g)~mu~"+/- 2se  ")),
+           col = c(skrown$B2, skol$orange, skaturate$yellow),
+           lwd = c(2,2,1), inset = 0.01, y.intersp = 1.25, cex = 0.9)
+    
+# ----------------------------------------------------------------------------------------
+dev.off()
+    
+```
+
+#### Multi-Comparison
+
+```{r}
+
+png(filename = paste0("NewPlots/gest_UMP_B200_B400.png"),
+    width = 12, height = 16, units = "in", res = 200, bg = skrown$salt, pointsize = 12)
+# png(filename = paste0("NewPlots/gest_UMP_B",B,".png"),
+# width = 12, height = 16, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
+
+# ----------------------------------------------------------------------------------------
+par(mfrow = c(3,2))
+# par(mfrow = c(1,2))
+
+
+# --------- B = 200 --------- #
+load("Data/gest_UMP_B200_mini.RData")
+lim <- range(gt, g.bc, g.cbc)
+
+# --- BC
+splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
+lines(g.bc$mean, col = skaturate$blue, lwd = 2)
+lines(g.bc$UCL , col = skastel$blue)
+lines(g.bc$LCL , col = skastel$blue)
+abline(v = range(tb), col = skrown$B1, lty = 2)
+slab(main = bquote("Estimation of"~hat(g)[.(vers)]~"(t) based on BC"),
+     subb = bquote("Blockwidth B ="~.(B)),
+     xlab = "Time", ylab = "g(t)")
+legend(if(vers>1){"top"}else{"topright"},
+       legend = c("True g(t)", bquote(hat(g)~"mean ("*mu*") "), bquote(hat(g)~mu~"+/- 2se  ")),
+       col = c(skrown$B2, skaturate$blue, skastel$blue),
+       lwd = c(2,2,1), inset = 0.02, y.intersp = 1.25, cex = 1.1)
+
+# --- CBC
+splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
+lines(g.cbc$mean, col = skol$orange, lwd = 2)
+lines(g.cbc$UCL , col = skaturate$yellow)
+lines(g.cbc$LCL , col = skaturate$yellow)
+abline(v = range(tb), col = skrown$B1, lty = 2)
+slab(main = bquote("Estimation of"~hat(g)[.(vers)]~"(t) based on CBC"),
+     subb = bquote("Blockwidth B ="~.(B)),
+     xlab = "Time", ylab = "g(t)")
+legend(if(vers>1){"top"}else{"topright"},
+       legend = c("True g(t)", bquote(hat(g)~"mean ("*mu*") "), bquote(hat(g)~mu~"+/- 2se  ")),
+       col = c(skrown$B2, skol$orange, skaturate$yellow),
+       lwd = c(2,2,1), inset = 0.02, y.intersp = 1.25, cex = 1.1)
 
 
 
+
+# --------- B = 200 REV --------- # 
+load("Data/gest_UMP_B200_rev_mini.RData")
+lim <- range(gt, g.bc, g.cbc)
+
+# --- BC
+splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
+lines(g.bc$mean, col = skaturate$blue, lwd = 2)
+lines(g.bc$UCL , col = skastel$blue)
+lines(g.bc$LCL , col = skastel$blue)
+abline(v = range(tb), col = skrown$B1, lty = 2)
+slab(main = bquote("Estimation of"~hat(g)[2]~"(t) based on BC"),
+     subb = bquote("Blockwidth B ="~.(B)),
+     xlab = "Time", ylab = "g(t)")
+legend(if(vers>1){"top"}else{"topright"},
+       legend = c("True g(t)", bquote(hat(g)~"mean ("*mu*") "), bquote(hat(g)~mu~"+/- 2se  ")),
+       col = c(skrown$B2, skaturate$blue, skastel$blue),
+       lwd = c(2,2,1), inset = 0.02, y.intersp = 1.25, cex = 1.1)
+
+# --- CBC
+splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
+lines(g.cbc$mean, col = skol$orange, lwd = 2)
+lines(g.cbc$UCL , col = skaturate$yellow)
+lines(g.cbc$LCL , col = skaturate$yellow)
+abline(v = range(tb), col = skrown$B1, lty = 2)
+slab(main = bquote("Estimation of"~hat(g)[2]~"(t) based on CBC"),
+     subb = bquote("Blockwidth B ="~.(B)),
+     xlab = "Time", ylab = "g(t)")
+legend(if(vers>1){"top"}else{"topright"},
+       legend = c("True g(t)", bquote(hat(g)~"mean ("*mu*") "), bquote(hat(g)~mu~"+/- 2se  ")),
+       col = c(skrown$B2, skol$orange, skaturate$yellow),
+       lwd = c(2,2,1), inset = 0.02, y.intersp = 1.25, cex = 1.1)
+
+
+
+
+# --------- B = 400 REV --------- #
+load("Data/gest_UMP_B400_rev_mini.RData")
+lim <- range(gt, g.bc, g.cbc)
+
+# --- BC
+splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
+lines(g.bc$mean, col = skaturate$blue, lwd = 2)
+lines(g.bc$UCL , col = skastel$blue)
+lines(g.bc$LCL , col = skastel$blue)
+abline(v = range(tb), col = skrown$B1, lty = 2)
+slab(main = bquote("Estimation of"~hat(g)[.(vers)]~"(t) based on BC"),
+     subb = "Blockwidth B=400",
+     xlab = "Time", ylab = "g(t)")
+legend(if(vers>1){"top"}else{"topright"},
+       legend = c("True g(t)", bquote(hat(g)~"mean ("*mu*") "), bquote(hat(g)~mu~"+/- 2se  ")),
+       col = c(skrown$B2, skaturate$blue, skastel$blue),
+       lwd = c(2,2,1), inset = 0.02, y.intersp = 1.25, cex = 1.1)
+
+# --- CBC
+splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
+lines(g.cbc$mean, col = skol$orange, lwd = 2)
+lines(g.cbc$UCL , col = skaturate$yellow)
+lines(g.cbc$LCL , col = skaturate$yellow)
+abline(v = range(tb), col = skrown$B1, lty = 2)
+slab(main = bquote("Estimation of"~hat(g)[.(vers)]~"(t) based on CBC"),
+     subb = "Blockwidth B=400",
+     xlab = "Time", ylab = "g(t)")
+legend(if(vers>1){"top"}else{"topright"},
+       legend = c("True g(t)", bquote(hat(g)~"mean ("*mu*") "), bquote(hat(g)~mu~"+/- 2se  ")),
+       col = c(skrown$B2, skol$orange, skaturate$yellow),
+       lwd = c(2,2,1), inset = 0.02, y.intersp = 1.25, cex = 1.1)
+# ----------------------------------------------------------------------------------------
+dev.off()
+```
+
+
+# Smoothed Spectrograms
+
+## Not cheating
+
+```{r}
+# load("Data/gest_UMP_B200_mini.RData")
+# load("Data/gest_UMP_B200_rev_mini.RData")
+load("Data/gest_UMP_B400_rev_mini.RData")
+```
+
+### Estimates of SY(f)
+
+```{r}
+## --- Sy(f) estimates
+# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
+# lines(yf.bc/max(yf.bc), col = "red")
+
+# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
+# lines(yf.cbc/max(yf.cbc), col = "red")
+```
+
+### Smoothed Spectrograms
+
+```{r}
+png(filename = paste0("NewPlots/smoothgrams_UMP_B",B,rev,"_letterbox.png"),
+    width = 12.6, height = 4.2, units = "in", res = 200, bg = skrown$salt, pointsize = 8)
+## ----------------------------------------------------------------------------------
+
+par(mfrow = c(1,3), mar = c(9,4.4,4.4,1), oma = c(2.5,0,0,0))
+# mat <- matrix(rep(1,16), ncol = 4)
+# image(mat)
+
+# TRUE
+image(Fs, t, t(tru$xtf), zlim = range(tru$xtf),
+      xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+slab("True TFS: UMP", bquote("Modulating function g"[.(vers)]*"(t)"), "Frequency", "Time")
+image.plot(legend.only = TRUE, legend.lab = "Power", zlim = range(tru$xtf),
+           legend.line = -4, legend.cex = 0.9,
+           horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+image(Fs, t, bc.smooth , zlim = range( bc.smooth),
+      xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+abline(h = range(tb), col = skrown$salt, lty = 2)
+slab("Smoothed BC", bquote("Modulating function g"[.(vers)]*"(t)"), "Frequency", "Time")
+image.plot(legend.only = TRUE, legend.lab = "Power", zlim = range(bc.smooth),
+           legend.line = -4, legend.cex = 0.9,
+           horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+image(Fs, t, cbc.smooth , zlim = range( cbc.smooth),
+      xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+abline(h = range(tb), col = skrown$salt, lty = 2)
+slab("Smoothed CBC", bquote("Modulating function g"[.(vers)]*"(t)"), "Frequency", "Time")
+image.plot(legend.only = TRUE, legend.lab = "Power", zlim = range(cbc.smooth),
+           legend.line = -4, legend.cex = 0.9,
+           horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+## ----------------------------------------------------------------------------------
+dev.off()
+```
+
+
+## Really not cheating
+
+```{r}
+# load("Data/gest_UMP_B200_full.RData")
+# load("Data/gest_UMP_B200_rev_full.RData")
+# load("Data/gest_UMP_B400_rev_full.RData")
+
+# what g(t) are you usng?
+vers <- 1 + (gt[1] > gt[10])
+rev <- if(vers > 1){"_rev"} else {""}
+```
+
+### Smoothed Spectrograms
+
+```{r}
+png(filename = paste0("NewPlots/smoothgrams_UMP_B",B,rev,"_single.png"),
+    width = 12.6, height = 4.2, units = "in", res = 200, bg = skrown$salt, pointsize = 8)
+## ----------------------------------------------------------------------------------
+
+par(mfrow = c(1,3), mar = c(9,4.4,4.4,1), oma = c(2.5,0,0,0))
+# mat <- matrix(rep(1,16), ncol = 4)
+# image(mat)
+
+# TRUE
+image(Fs, t, t(tru$xtf), zlim = range(tru$xtf),
+      xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+slab("True TFS: UMP", bquote("Modulating function g"[.(vers)]*"(t)"), "Frequency", "Time")
+image.plot(legend.only = TRUE, legend.lab = "Power", zlim = range(tru$xtf),
+           legend.line = -4, legend.cex = 0.9,
+           horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+image(Fs, t, bc.smooth , zlim = range( bc.smooth),
+      xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+abline(h = range(tb), col = skrown$salt, lty = 2)
+slab("Smoothed BC", bquote("Modulating function g"[.(vers)]*"(t)"), "Frequency", "Time")
+image.plot(legend.only = TRUE, legend.lab = "Power", zlim = range(bc.smooth),
+           legend.line = -4, legend.cex = 0.9,
+           horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+image(Fs, t, cbc.smooth , zlim = range( cbc.smooth),
+      xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+abline(h = range(tb), col = skrown$salt, lty = 2)
+slab("Smoothed CBC", bquote("Modulating function g"[.(vers)]*"(t)"), "Frequency", "Time")
+image.plot(legend.only = TRUE, legend.lab = "Power", zlim = range(cbc.smooth),
+           legend.line = -4, legend.cex = 0.9,
+           horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+## ----------------------------------------------------------------------------------
+dev.off()
+```
+
+
+## Single instance: no smooth
+
+```{r}
+png(filename = paste0("NewPlots/smoothgrams_UMP_B",B,rev,"_raw.png"),
+    width = 12.6, height = 4.2, units = "in", res = 200, bg = skrown$salt, pointsize = 8)
+## ----------------------------------------------------------------------------------
+
+par(mfrow = c(1,3), mar = c(9,4.4,4.4,1), oma = c(2.5,0,0,0))
+# mat <- matrix(rep(1,16), ncol = 4)
+# image(mat)
+
+# TRUE
+image(Fs, t, t(tru$xtf), zlim = range(tru$xtf),
+      xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+slab("True TFS: UMP", bquote("Modulating function g"[.(vers)]*"(t)"), "Frequency", "Time")
+image.plot(legend.only = TRUE, legend.lab = "Power", zlim = range(tru$xtf),
+           legend.line = -4, legend.cex = 0.9,
+           horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+image(Fs, t, t(bc.samp) , zlim = range( bc.samp),
+      xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+abline(h = range(tb), col = skrown$salt, lty = 2)
+slab("Smoothed BC", bquote("Modulating function g"[.(vers)]*"(t)"), "Frequency", "Time")
+image.plot(legend.only = TRUE, legend.lab = "Power", zlim = range(bc.smooth),
+           legend.line = -4, legend.cex = 0.9,
+           horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+image(Fs, t, t(cbc.samp) , zlim = range( cbc.samp),
+      xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+abline(h = range(tb), col = skrown$salt, lty = 2)
+slab("Smoothed CBC", bquote("Modulating function g"[.(vers)]*"(t)"), "Frequency", "Time")
+image.plot(legend.only = TRUE, legend.lab = "Power", zlim = range(cbc.smooth),
+           legend.line = -4, legend.cex = 0.9,
+           horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+## ----------------------------------------------------------------------------------
+dev.off()
+```
 
 
 

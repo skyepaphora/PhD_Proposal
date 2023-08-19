@@ -19,48 +19,265 @@ load("~/Research/Plot_Animations/splot.RData")
 ## --------- --------- --------- ##
 ```
 
-
-```{r}
-## --- Load Data (choose 1)
-# load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/noise_B200_mini.RData")  # white noise [trival][[NO SERIOUSLY TRIVIAL]]
-# load(file = "C:/Users/skyep/Documents/Research/PhD_Proposal/Data/AR2_B200_mini.RData")    # AR(2) [also trivial]
-load(file = "Data/UMP_B200_mini.RData")       
-load(file = "Data/UMP_B200_mini_rev.RData")   
-load(file = "Data/UMP_B400_mini.RData")    
-load(file = "Data/UMP_B400_mini_rev.RData")
-```
+---
 
 ## Previous Methods: SVD
 
-## Proposed Method
+---
 
-### Estimating c
+## Proposed Method (NEW)
+
+### Create function
+
+```{r}
+gest <- function(sgram){
+  N <- length(sgram[,1])
+  A <- outer(1:N,1:N, function(l,j){rowSums(sgram)[l]/rowSums(sgram)[j]})
+  G <- Mod(eigen(A/N)$vectors[,1])
+  G <- G/max(G)
+  return(G); gc()
+}
+```
+
+### Estimating g(t): Based on Mean Results
+
+```{r}
+## --- Load Data (choose 1)
+load(file = "Data/UMP_B200_mini.RData")       
+load(file = "Data/UMP_B200_mini_rev.RData")   
+load(file = "Data/UMP_B400_mini_rev.RData")
+```
 
 ```{r get_c_est}
+# Squared Modulating Function
+gt <- ct^2
 
-## --- Modification
-# ct.n <- ct/ct[1]              # neutralize c
-# wid <- max(ct.n) - min(ct.n)  # range of c(t)
-# ctn <- ct.n^2 - wid
+# Stats
+g.bc  <- list(mean = gest( bc$mean),
+                se = gest( bc$se))
+g.cbc <- list(mean = gest(cbc$mean),
+                se = gest(cbc$se))
 
-## --- BC
-A.bc <- outer(1:N,1:N, function(l,j){rowSums(bc$mean)[l]/rowSums(bc$mean)[j]})
-g.bc <- Mod(eigen(A.bc/N)$vectors[,1])
-g.bc <- g.bc/max(g.bc) # normalize
+# Store Confidence Intervals
+g.bc$LCL <- g.bc$mean - 2*g.bc$se
+g.bc$UCL <- g.bc$mean + 2*g.bc$se
 
-## --- CBC
-A.cbc <- outer(1:N,1:N, function(l,j){rowSums(cbc$mean)[l]/rowSums(cbc$mean)[j]})
-g.cbc <- Mod(eigen(A.cbc/N)$vectors[,1])
-g.cbc <- g.cbc/max(g.cbc) # normalize
+g.cbc$LCL <- g.cbc$mean - 2*g.cbc$se
+g.cbc$UCL <- g.cbc$mean + 2*g.cbc$se
 
+# save
+save.image(paste0("Data/gest_",my.type,"_B",B,"_cheat.RData"))
+```
 
-# Save
+---
 
+### Estimating g(t): Based on ALL Results
+
+```{r}
+## --- Load Data (choose 1)
+load(file = "Data/AR2_B200_full.RData")       
+load(file = "Data/UMP_B200_full.RData")       
+load(file = "Data/UMP_B200_full_rev.RData")   
+load(file = "Data/UMP_B400_full_rev.RData")
+```
+
+```{r}
+# Squared Modulating Function
+gt <- ct^2
+
+# FULL --- (warning: long-ish runtime)
+g.bc.full  <- pbapply(trial$bc, 3, gest); gc()
+g.cbc.full <- pbapply(trial$cbc,3, gest); gc()
+
+# STATS
+g.bc  <- list(mean = pbapply( g.bc.full, 1, mean),
+                se = pbapply( g.bc.full, 1, sd)/sqrt(M))
+g.cbc <- list(mean = pbapply(g.cbc.full, 1, mean),
+                se = pbapply(g.cbc.full, 1, sd)/sqrt(M))
+
+# Store Confidence Intervals
+g.bc$LCL <- g.bc$mean - 2*g.bc$se
+g.bc$UCL <- g.bc$mean + 2*g.bc$se
+
+g.cbc$LCL <- g.cbc$mean - 2*g.cbc$se
+g.cbc$UCL <- g.cbc$mean + 2*g.cbc$se
+```
+
+```{r save_1}
+# save
+gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_rev_full.RData"))
+
+# remove trial
+rm(trial)
+
+# save
+gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_rev_mini.RData"))
 ```
 
 
 
-Modification: $\underline{c^2}(t) := \bigg(\frac{c(t)}{c(1)}\bigg)^2 - \frac{\max c(t)-\min c(t)}{c(1)}$
+
+# Using g(t) to smooth spectrogram estimates
+
+### Cheating
+
+```{r}
+load("Data/gest_UMP_B200_cheat.RData")
+```
+
+```{r}
+yf.bc <- colMeans(bc$mean)
+
+splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
+lines(yf.bc/max(yf.bc), col = "red")
+
+
+bc.smooth <- outer(yf.bc, g.bc$mean)
+
+par(mfrow = c(1,2))
+image.plot(Fs, t, bc.smooth, zlim = range(bc.smooth))
+image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
+
+```
+
+
+### Not cheating
+
+```{r}
+# Load
+# load("Data/gest_UMP_B200_mini.RData")
+# load("Data/gest_UMP_B200_rev_mini.RData")
+load("Data/gest_UMP_B400_rev_mini.RData")
+
+## --- BC
+yf.bc <- colMeans(bc$mean)
+bc.smooth <- outer(yf.bc, g.bc$mean)
+
+## --- CBC
+yf.cbc <- colMeans(cbc$mean)
+cbc.smooth <- outer(yf.cbc, g.cbc$mean)
+
+# Save
+# save.image("Data/gest_UMP_B200_mini.RData")
+# save.image("Data/gest_UMP_B200_rev_mini.RData")
+save.image("Data/gest_UMP_B400_rev_mini.RData")
+```
+
+```{r}
+## --- Sy(f) estimates
+# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
+# lines(yf.bc/max(yf.bc), col = "red")
+
+# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
+# lines(yf.cbc/max(yf.cbc), col = "red")
+
+## --- Smoothed SGrams
+par(mfrow = c(1,2))
+image.plot(Fs, t, bc.smooth, zlim = range(bc.smooth))
+image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
+
+par(mfrow = c(1,2))
+image.plot(Fs, t, cbc.smooth, zlim = range(cbc.smooth))
+image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
+```
+
+### Single instance: REALLY not cheating
+
+```{r}
+# load("Data/gest_UMP_B200_full.RData")
+# load("Data/gest_UMP_B200_rev_full.RData")
+load("Data/gest_UMP_B400_rev_full.RData")
+
+# Roll the 100-sided die
+set.seed(17)
+samp <- sample(1:M, 1)
+
+# Choose realizations, get corresponding g
+bc.samp  <- trial$bc[,,samp]
+gbc.samp <- g.bc.full[,samp]
+
+cbc.samp  <- trial$cbc[,,samp]
+gcbc.samp <- g.cbc.full[,samp]
+
+## --- BC
+yf.bc <- colMeans(bc.samp)
+bc.smooth <- outer(yf.bc, gbc.samp)
+
+## --- CBC
+yf.cbc <- colMeans(cbc.samp)
+cbc.smooth <- outer(yf.cbc, gcbc.samp)
+
+# save.image("Data/gest_UMP_B200_full.RData")
+# save.image("Data/gest_UMP_B200_rev_full.RData")
+save.image("Data/gest_UMP_B400_rev_full.RData")
+```
+
+```{r}
+## --- Sy(f) estimates
+# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
+# lines(yf.bc/max(yf.bc), col = "red")
+
+# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
+# lines(yf.cbc/max(yf.cbc), col = "red")
+
+## --- Smoothed SGrams
+par(mfrow = c(1,2))
+image.plot(Fs, t, bc.smooth, zlim = range(bc.smooth))
+image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
+
+par(mfrow = c(1,2))
+image.plot(Fs, t, cbc.smooth, zlim = range(cbc.smooth))
+image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
+```
+
+```{r}
+# --- No smoothing
+par(mfrow = c(1,2))
+image.plot(Fs, t,  t(bc.samp), zlim = range( bc.samp))
+image.plot(Fs, t, t(cbc.samp), zlim = range(cbc.samp))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Return to Spectrogram
 
