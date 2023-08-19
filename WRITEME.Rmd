@@ -1,0 +1,29 @@
+## August 17
+
+* compare variance/se at a freq (from M=100)
+* YOU'll need to put the c estimate INSIDE the loop, or use apply to the FULL dataset
+* ch 4: investigating how to make the block size adaptive: if B is a fn of time.
+    - small B in center for instance, then large B at edges?
+* compare to Azadeh
+* CBC for stationary -> column average -> compare to multitaper
+* see how this works for 1 simulation
+* look up how to only get eigenvec corresponding 1st eigenvalue or largest eigenvalue 
+* estimate c, get residual estimate of S_Y, outer product should be smooth now
+* do a gump
+
+* after propsp, look up LINPACK and how to use different eigens 
+
+#### Skye's Wishlist
+* fix code for large lattice of g est plots
+* renaming convention involving "rev" factor
+* get data for B=400 NOT rev
+
+#### Results so far
+
+* Got g estimates directly from sims (not mean of sims)
+* Plots for new g estimates
+    - BC looks a bit better than CBC, now :(
+* smoothed BC and CBC by taking outer product of g est and colmeans
+    - this works for UMPs!!
+    - Honestly CBC looks a bit better than BC :) for M=100
+    - for M=1... Honestly BC is better whatever but it WORKS
