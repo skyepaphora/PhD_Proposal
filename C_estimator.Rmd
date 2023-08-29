@@ -21,11 +21,46 @@ load("~/Research/Plot_Animations/splot.RData")
 
 ---
 
-## Previous Methods: SVD
+# Previous Methods: SVD
+
+### Estimating g(t): Based on Mean Results (Cheating)
+
+```{r}
+load("Data/gest_UMP_B200_cheat.RData")
+```
+
+```{r}
+# original code: EstModFunc-count1.Rmd
+
+# Singular Value decomposition
+bc.svd  <- svd( bc$mean,1,1)
+cbc.svd <- svd(cbc$mean,1,1)
+tru.svd <- svd(tru$xtf ,1,1)
+
+# Normalize
+bc.bu <- 1/bc.svd$u[1]        # so that buU[1] = 1
+bc.bv <- bc.svd$d[1]/bc.bu    # d1/bu; now bubv = d1
+
+cbc.bu <- 1/cbc.svd$u[1]
+cbc.bv <- cbc.svd$d[1]/cbc.bu
+
+tru.bu <- 1/tru.svd$u[1]
+tru.bv <- tru.svd$d[1]/tru.bu
+
+# Estimate C
+ag.bc  <-  bc.bu* bc.svd$u
+ag.cbc <- cbc.bu*cbc.svd$u
+ag.tru <- tru.bu*tru.svd$u
+
+# normalize again
+nag.bc  <- ag.bc /max(abs(ag.bc))
+nag.cbc <- ag.cbc/max(abs(ag.cbc))
+nag.tru <- ag.tru/max(abs(ag.tru))
+```
 
 ---
 
-## Proposed Method (NEW)
+# Proposed Method (NEW)
 
 ### Create function
 
@@ -39,7 +74,7 @@ gest <- function(sgram){
 }
 ```
 
-### Estimating g(t): Based on Mean Results
+### Estimating g(t): Based on Mean Results (Cheating)
 
 ```{r}
 ## --- Load Data (choose 1)
@@ -68,8 +103,6 @@ g.cbc$UCL <- g.cbc$mean + 2*g.cbc$se
 # save
 save.image(paste0("Data/gest_",my.type,"_B",B,"_cheat.RData"))
 ```
-
----
 
 ### Estimating g(t): Based on ALL Results
 
@@ -107,19 +140,16 @@ g.cbc$UCL <- g.cbc$mean + 2*g.cbc$se
 # save
 gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_rev_full.RData"))
 
-# remove trial
+# remove trial (large)
 rm(trial)
 
 # save
 gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_rev_mini.RData"))
 ```
 
-
-
-
 # Using g(t) to smooth spectrogram estimates
 
-### Cheating
+### Cheating (M=100)
 
 ```{r}
 load("Data/gest_UMP_B200_cheat.RData")
@@ -127,27 +157,17 @@ load("Data/gest_UMP_B200_cheat.RData")
 
 ```{r}
 yf.bc <- colMeans(bc$mean)
-
-splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
-lines(yf.bc/max(yf.bc), col = "red")
-
-
 bc.smooth <- outer(yf.bc, g.bc$mean)
-
-par(mfrow = c(1,2))
-image.plot(Fs, t, bc.smooth, zlim = range(bc.smooth))
-image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
-
 ```
 
 
-### Not cheating
+### Only cheating with spectrograms, got g for every simulation
 
 ```{r}
-# Load
+## --- Load
 # load("Data/gest_UMP_B200_mini.RData")
 # load("Data/gest_UMP_B200_rev_mini.RData")
-load("Data/gest_UMP_B400_rev_mini.RData")
+# load("Data/gest_UMP_B400_rev_mini.RData")
 
 ## --- BC
 yf.bc <- colMeans(bc$mean)
@@ -160,25 +180,7 @@ cbc.smooth <- outer(yf.cbc, g.cbc$mean)
 # Save
 # save.image("Data/gest_UMP_B200_mini.RData")
 # save.image("Data/gest_UMP_B200_rev_mini.RData")
-save.image("Data/gest_UMP_B400_rev_mini.RData")
-```
-
-```{r}
-## --- Sy(f) estimates
-# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
-# lines(yf.bc/max(yf.bc), col = "red")
-
-# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
-# lines(yf.cbc/max(yf.cbc), col = "red")
-
-## --- Smoothed SGrams
-par(mfrow = c(1,2))
-image.plot(Fs, t, bc.smooth, zlim = range(bc.smooth))
-image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
-
-par(mfrow = c(1,2))
-image.plot(Fs, t, cbc.smooth, zlim = range(cbc.smooth))
-image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
+# save.image("Data/gest_UMP_B400_rev_mini.RData")
 ```
 
 ### Single instance: REALLY not cheating
@@ -186,7 +188,7 @@ image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
 ```{r}
 # load("Data/gest_UMP_B200_full.RData")
 # load("Data/gest_UMP_B200_rev_full.RData")
-load("Data/gest_UMP_B400_rev_full.RData")
+# load("Data/gest_UMP_B400_rev_full.RData")
 
 # Roll the 100-sided die
 set.seed(17)
@@ -209,32 +211,76 @@ cbc.smooth <- outer(yf.cbc, gcbc.samp)
 
 # save.image("Data/gest_UMP_B200_full.RData")
 # save.image("Data/gest_UMP_B200_rev_full.RData")
-save.image("Data/gest_UMP_B400_rev_full.RData")
+# save.image("Data/gest_UMP_B400_rev_full.RData")
+```
+
+# Column Means of Spectrograms for Stationary Series
+
+### Cheating
+
+```{r}
+load("Data/AR2_B200_mini.RData")
 ```
 
 ```{r}
-## --- Sy(f) estimates
-# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
-# lines(yf.bc/max(yf.bc), col = "red")
+# Time Series for MTM
+set.seed(68)
+yt <- arima.sim(model = list(ar = c(0.5,-0.5), sd = 10), n = N)
 
-# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
-# lines(yf.cbc/max(yf.cbc), col = "red")
+# Spectrum Estimates
+yf.mtm <- spec.mtm(yt,plot = FALSE)$spec
+yf.bc  <- colMeans( bc$mean)
+yf.cbc <- colMeans(cbc$mean)
 
-## --- Smoothed SGrams
-par(mfrow = c(1,2))
-image.plot(Fs, t, bc.smooth, zlim = range(bc.smooth))
-image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
+# Standard Error
+se.bc  <- apply(bc$mean,2,sd)/sqrt(N)
+se.cbc <- apply(bc$mean,2,sd)/sqrt(N)
 
-par(mfrow = c(1,2))
-image.plot(Fs, t, cbc.smooth, zlim = range(cbc.smooth))
-image.plot(Fs, t, t(tru$xtf), zlim = range(tru$xtf))
+# +/- 2*SE
+ucl.bc <- yf.bc + 2*se.bc
+lcl.bc <- yf.bc - 2*se.bc
+
+ucl.cbc <- yf.cbc + 2*se.cbc
+lcl.cbc <- yf.cbc - 2*se.cbc
+
+save.image("Data/AR2_B200_mini.RData")
+```
+
+### Not cheating
+
+```{r}
+## --- Load 
+load("Data/AR2_B200_full.RData")
 ```
 
 ```{r}
-# --- No smoothing
-par(mfrow = c(1,2))
-image.plot(Fs, t,  t(bc.samp), zlim = range( bc.samp))
-image.plot(Fs, t, t(cbc.samp), zlim = range(cbc.samp))
+
+# Roll Die
+set.seed(68); samp <- sample(1:M, 1)
+
+# Time Series for MTM
+set.seed(68)
+yt <- arima.sim(model = list(ar = c(0.5,-0.5), sd = 10), n = N)
+
+# Spectrum Estimates
+yf.mtm <- spec.mtm(yt,plot = FALSE)$spec
+yf.bc  <- colMeans(trial$bc [,,samp])
+yf.cbc <- colMeans(trial$cbc[,,samp])
+
+# Standard Error
+se.bc  <- apply(trial$bc [,,samp],2,sd)/sqrt(N)
+se.cbc <- apply(trial$cbc[,,samp],2,sd)/sqrt(N)
+
+# +/- 2*SE
+ucl.bc <- yf.bc + 2*se.bc
+lcl.bc <- yf.bc - 2*se.bc
+
+ucl.cbc <- yf.cbc + 2*se.cbc
+lcl.cbc <- yf.cbc - 2*se.cbc
+
+# SAVE
+rm(trial); gc()
+save.image("Data/AR2_B200_samp.RData")
 ```
 
 
@@ -254,30 +300,7 @@ image.plot(Fs, t, t(cbc.samp), zlim = range(cbc.samp))
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Messy stuff
 
 ### Return to Spectrogram
 

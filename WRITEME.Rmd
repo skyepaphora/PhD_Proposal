@@ -1,14 +1,14 @@
-## August 17
+# August 17
 
 * compare variance/se at a freq (from M=100)
-* YOU'll need to put the c estimate INSIDE the loop, or use apply to the FULL dataset
+- YOU'll need to put the c estimate INSIDE the loop, or use apply to the FULL dataset
 * ch 4: investigating how to make the block size adaptive: if B is a fn of time.
-    - small B in center for instance, then large B at edges?
+    * small B in center for instance, then large B at edges?
 * compare to Azadeh
-* CBC for stationary -> column average -> compare to multitaper
-* see how this works for 1 simulation
+- CBC for stationary -> column average -> compare to multitaper
+- see how this works for 1 simulation
 * look up how to only get eigenvec corresponding 1st eigenvalue or largest eigenvalue 
-* estimate c, get residual estimate of S_Y, outer product should be smooth now
+- estimate c, get residual estimate of S_Y, outer product should be smooth now
 * do a gump
 
 * after propsp, look up LINPACK and how to use different eigens 
@@ -29,6 +29,63 @@
     - Honestly CBC looks a bit better than BC :) for M=100
     - for M=1... Honestly BC is better whatever but it WORKS
     
-#### Things to bring up
+#### Things to bring up in next meeting
 
 * standard error of $\tilde g$ is very small
+
+---
+
+# August 24
+
+* Alternative estimate of Y(t): x(t)/c(t) (don't use TFS, that's where you got stuck w indeces)
+    * this est might be better for detecting line components present in Y(t)
+* iteration: get g-hat from SBC and SCBC using same method to get the g which made those matrices
+* compare g to Azadeh's estimate (skye... do you think the panel might ask you if you've done this? Make sure you at least take a look)
+* compare TFS colMeans to multitaper of Y. Better in different contexts?
+
+**LITERATURE:** Senay 2018. Figure out BSS (see my current understanding of Glen's summary, below).
+
+* similar to classical stats' "independent component analysis"
+* suppose you have two observed series, and each is a lin combo of two subseries/signals
+* cross spectra should have 0's off diagonal, assuming the signals are uncorrelated
+* Senay diagonalizes the matrix $\begin{bmatrix}S_{xx} & S_{xy} \\ S_{yx} & S_{yy}\end{bmatrix}$ at each $(t,f)$ pair
+* corresponding SVD gives us weights (coefs) distinguishing the signals. weights assumed constant over time... what if they changed?
+    * two people talking on their own hot mics in the same room, mics picking up signals from both but at different amps
+    * what if the people moved around so those amps changed - p1 steps away from mic towards p2, etc. 
+    * brainwaves probably do this to electrodes
+
+**PAPER SUBMISSION**  
+ICASP: write up a paper on chapter 3 results for next week. Look at Azadeh's SSP for inspo. Cite Percy-Waldy 20' for multitaper.
+
+#### Skye's Wishlist
+
+* create a figure showing results for the Azadeh method of getting g
+    * show negatives?
+    * show U1 and V1?
+- get smoothed BC/CBC for AR(2), compare to multitaper
+* get y(t) from x(t)/c(t), multitaper, and compare to true psd
+* go through *Plotter_1.Rmd* and switch `lines()` to `sadd()` 
+* create BC/CBC for a gump
+
+#### Results so far
+
+* Azadeh's method works perfectly for the theoretical TFS, but somehow is negative when taken from the BC and/or CBC
+* colmeans work well for mean of 100 sims, undershoot a bit I think tho
+* UM... REALLY GOOD RESULTS FOR M=1 like wtf good
+
+#### Things to bring up in next meeting
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

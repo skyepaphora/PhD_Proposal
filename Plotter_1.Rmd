@@ -7,10 +7,10 @@ library(pbapply)
 library(kableExtra)
 library(itsmr)
 library(animation)
-library(fields)
+library(fields, quietly = TRUE, warn.conflicts = FALSE)
 
 ## --- Splot + Spalette ---------------------------- ##
-load(file = "C:/Users/skyep/Documents/Research/Plot_Animations/splot.RData")
+load("C:/Users/skyep/Documents/Research/Plot_Animations/splot.RData")
 ```
 
 
@@ -117,8 +117,6 @@ dev.off()
 
 ```
 
----
-
 ## UMP
 
 ```{r setupSgram_z}
@@ -181,7 +179,67 @@ dev.off()
 
 ```
 
----
+## GUMP
+
+```{r setupSgram_z}
+## --- Load 
+load("Data/GUMP_B100_mini.RData")
+bc.x  <- bc
+cbc.x <- cbc
+tru.x <- tru
+
+## --- Scaling & plot limits
+# check
+range(bc.x$mean);range(cbc.x$mean);range(tru.x$xtf2)
+
+bc.x$mean  <- bc.x$mean *1e2  # scale
+cbc.x$mean <- cbc.x$mean*1e2
+
+zlim.x <- range(tru.x$xtf2, bc.x$mean, cbc.x$mean)
+```
+
+```{r Sgram_z}
+
+png(filename = paste0("NewPlots/sgrams_",my.type,"_B",B,".png"),
+    width = 12.6, height = 4.2, units = "in", res = 200, bg = skrown$salt, pointsize = 8)
+## ----------------------------------------------------------------------------------
+
+  # Margins
+  par(mfrow = c(1,3), oma = c(0,3,0,5))
+  
+  # --- TRUE
+  image(x = Fs, y = t, z = t(tru.x$xtf2),
+        xlab = "", ylab = "", zlim = zlim.x,
+        las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$salt, lty = 2)
+  slab("True TFS: GUMP x(t)",
+       "","Frequency","Time"); gc()
+  
+  # --- BC
+  image(x = Fs, y = t, z = t(bc.x$mean),
+        xlab = "", ylab = "", zlim = zlim.x,
+        las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$salt, lty = 2)
+  slab("BCMTFSE:  GUMP x(t)",
+       "","Frequency","Time"); gc()
+  
+  # --- CBC
+  image(x = Fs, y = t, z = t(cbc.x$mean),
+        xlab = "", ylab = "", zlim = zlim.x,
+        las = 1, col = tim.colors()); sox()
+  abline(h = range(tb), col = skrown$salt, lty = 2)
+  slab("CBCMTFSE:  GUMP x(t)",
+       "","Frequency","Time"); gc()
+  
+  # --- Legend
+  par(oma = c(0,0,0,3))
+  image.plot(legend.only = TRUE,
+             zlim = zlim.x, legend.shrink = 1, legend.width = 2)
+
+## ----------------------------------------------------------------------------------
+dev.off()
+
+```
 
 # C estimators
 
@@ -406,19 +464,6 @@ dev.off()
 load("Data/gest_UMP_B400_rev_mini.RData")
 ```
 
-### Estimates of SY(f)
-
-```{r}
-## --- Sy(f) estimates
-# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
-# lines(yf.bc/max(yf.bc), col = "red")
-
-# splot(tru$yf/max(tru$yf), type = "l", lwd = 2)
-# lines(yf.cbc/max(yf.cbc), col = "red")
-```
-
-### Smoothed Spectrograms
-
 ```{r}
 png(filename = paste0("NewPlots/smoothgrams_UMP_B",B,rev,"_letterbox.png"),
     width = 12.6, height = 4.2, units = "in", res = 200, bg = skrown$salt, pointsize = 8)
@@ -468,8 +513,6 @@ dev.off()
 vers <- 1 + (gt[1] > gt[10])
 rev <- if(vers > 1){"_rev"} else {""}
 ```
-
-### Smoothed Spectrograms
 
 ```{r}
 png(filename = paste0("NewPlots/smoothgrams_UMP_B",B,rev,"_single.png"),
@@ -549,20 +592,54 @@ dev.off()
 ```
 
 
+# Spectrogram ColMeans for Stationary Series
 
+```{r}
+png(filename = paste0("NewPlots/smooth_yf_",my.type,"_B",B,".png"),
+width = 12, height = 5, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
+# ----------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
+    par(mfrow = c(1,2), mar = c(4,4,4.4,1))
+    
+    ## -------- M = 100 --------- ##
+    
+    # --- load
+    load("Data/AR2_B200_mini.RData")
+    
+    # --- Prep
+    lim <- range(yf.mtm, yf.bc, yf.cbc, tru$yf/1e2)
+    
+    # --- Plot
+    splot(Fs, tru$yf/1e2, ylim = lim, type = "l", lwd = 2, labs = 0)
+    lines(Fs, yf.mtm, col = skastel$green)
+    sadd (Fs, list(yf.bc, yf.cbc), type = "l", lwd = 2, col = list(skaturate$blue, skaturate$yellow))
+    slab("Spectrum Estimates for Stationary AR(2) Series",
+         "Smooth Estimates taken from Mean Spectrogram over M=100 Simulations",
+         "Frequency", bquote("Spectrum: "~S[Y]*"(f)"), yline = 2.5)
+    legend("topright", legend = c("Theoretical", "Smooth BC", "Smooth CBC", "MTM"),
+           lty = 1, lwd = 2, inset = 0.05,
+           col = c(skrown$B2, skaturate$blue, skaturate$yellow, skastel$green))
+    
+    ## --------- M = 1 --------- ##
+    
+    # --- load
+    load("Data/AR2_B200_samp.RData")
+    
+    # --- Prep
+    lim <- range(yf.mtm, yf.bc, yf.cbc, tru$yf/1e2)
+    
+    # --- Plot
+    splot(Fs, tru$yf/1e2, ylim = lim, type = "l", lwd = 2, labs = 0)
+    lines(Fs, yf.mtm, col = skastel$green)
+    sadd (Fs, list(yf.bc, yf.cbc), type = "l", lwd = 2, col = list(skaturate$blue, skaturate$yellow))
+    slab("Spectrum Estimates for Stationary AR(2) Series",
+         "All Estimates taken from a Single Simulation (M=1)",
+         "Frequency", bquote("Spectrum: "~S[Y]*"(f)"), yline = 2.5)
+    legend("topright", legend = c("Theoretical", "Smooth BC", "Smooth CBC", "MTM"), lty = 1, lwd = 2, inset = 0.05,
+           col = c(skrown$B2, skaturate$blue, skaturate$yellow, skastel$green))
+# ----------------------------------------------------------------------------------------
+dev.off()
+```
 
 
 
