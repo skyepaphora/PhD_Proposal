@@ -10,7 +10,7 @@ library(animation)
 library(fields, quietly = TRUE, warn.conflicts = FALSE)
 
 ## --- Splot + Spalette ---------------------------- ##
-load("C:/Users/skyep/Documents/Research/Plot_Animations/splot.RData")
+load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 ```
 
 
@@ -604,7 +604,7 @@ width = 12, height = 5, units = "in", res = 200, bg = skrown$salt, pointsize = 1
     ## -------- M = 100 --------- ##
     
     # --- load
-    load("Data/AR2_B200_mini.RData")
+    load("Data/AR2_B200_full.RData")
     
     # --- Prep
     lim <- range(yf.mtm, yf.bc, yf.cbc, tru$yf/1e2)
@@ -612,9 +612,11 @@ width = 12, height = 5, units = "in", res = 200, bg = skrown$salt, pointsize = 1
     # --- Plot
     splot(Fs, tru$yf/1e2, ylim = lim, type = "l", lwd = 2, labs = 0)
     lines(Fs, yf.mtm, col = skastel$green)
-    sadd (Fs, list(yf.bc, yf.cbc), type = "l", lwd = 2, col = list(skaturate$blue, skaturate$yellow))
+    sadd (Fs, list(yf.bc$mean, yf.cbc$mean), type = "l", lwd = 2, col = list(skaturate$blue, skaturate$yellow))
+    sadd (Fs, list(lcl.bc, lcl.cbc), type = "l", lwd = 1, col = list(skastel$blue, skastel$yellow))
+    sadd (Fs, list(ucl.bc, ucl.cbc), type = "l", lwd = 1, col = list(skastel$blue, skastel$yellow))
     slab("Spectrum Estimates for Stationary AR(2) Series",
-         "Smooth Estimates taken from Mean Spectrogram over M=100 Simulations",
+         "Mean over M=100 Simulations",
          "Frequency", bquote("Spectrum: "~S[Y]*"(f)"), yline = 2.5)
     legend("topright", legend = c("Theoretical", "Smooth BC", "Smooth CBC", "MTM"),
            lty = 1, lwd = 2, inset = 0.05,

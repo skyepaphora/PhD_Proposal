@@ -75,17 +75,46 @@ ICASP: write up a paper on chapter 3 results for next week. Look at Azadeh's SSP
 
 #### Things to bring up in next meeting
 
+# August 31
 
+PBC poly BC
+Apply stuff from section 4 to 1BC and 2BC
+that way it doesn't propose a new estimator, just considers it
+introduces via the system of approxes 10 thru 12, say PBC 1 uses f10-11 first terms only
 
+Combine sections 6 and 7 into a single section: conc and discussions
+rename "stationary foundation" to spectrum
+combine sections 5.2 and 5.3 (both about UMPs), eliminate section 5.1
 
+make sure to include azadeh's estimator, just multiply it by -1, use as a "baseline"
 
+try smooth yf for stationary with line components
+for proposal, yf might have robustness benefits
+careful to contextualize yf: better for stationary with naturally smooth spectrum (might not work if line component is present)
+    possible application: remove line components detected by harmonic f, then use yf to get spectrum for residuals
+    
+in ump case, don't worry about baseline for yf
 
+why are we doing the eigenval problem
+    hat Sy changes with respect to time due to noise and time boundary issue stuff
+    taking ratios takes into account all those specs, the cancel like unit conversion style
+    the ratios of the hat sy's form a distribution centered at 1
+    ** okay maybe this will improve the yf estimate from colsums, do it too
+      do the code
+      
+only do image plots for cbc bro
+to get se: get yf for each simulation and get standard error from THAT (you'll need trial object)
 
+#### Results so far
 
+* BC and CBC do not pick up line components at all :()
+* got sd for yf estimates (old verion, not eigen problem), it's fine
+* got yf estimate from eigenproblem (similarly to g est), it's way off by scale factor, even for stationary :( 
 
+#### Skye's Wishlist
 
-
-
-
+* Make a plot comparing gest to azadeh method
+* get plots for new results (except line component stuff fuck that)
+* create the image plots that you'll actually use in paper
 
 

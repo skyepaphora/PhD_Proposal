@@ -46,10 +46,12 @@ ar2 <- function(phi = c(0,0)){ (10^2)/Mod( 1 - phi[1]*exp(-i*2*pi*Fs) - phi[2]*(
 
 # Prep simulations
 set.seed(17)
-pb <- txtProgressBar(style = 3)
 
 # Simulate FUNCTION
-ccbc <- function(type = "noise", ct = rep(1,N), ct2 = rep(1,N), M = 100, seed = 0, B = 100, ar2 = c(0.5,-0.5), ar2.2 = c(0.7,-0.3)){ 
+ccbc <- function(type = "noise", M = 100, B = 100, seed = 0,
+                 ct = rep(1,N), ct2 = rep(1,N), 
+                 ar2 = c(0.5,-0.5), ar2.2 = c(0.7,-0.3),
+                 freq = NULL){ 
   
         # Prelims
         B2 <- ceiling(B/2)                               # Midpoint shift
@@ -90,11 +92,19 @@ ccbc <- function(type = "noise", ct = rep(1,N), ct2 = rep(1,N), M = 100, seed = 
   
         
   # Loop setup
-  if(seed > 0){ set.seed(seed) }; pb <- txtProgressBar(style = 3)
+  if(seed > 0){ set.seed(seed) }
+  pb <- txtProgressBar(style = 3)
   
   # Initialize arrays
   cbcmtfse.sims <- bcmtfse.sims <- array(dim = c(N,NF,M))
-    
+  
+  # Get signals --------- This is for storing to plot stuff later, might not need since we have freqs idk
+  if(!is.null(freq)){
+    st  <- list()
+    ind <- 1
+    for(f in freq){ st[[ind]] = cos(2*pi*Fs[f]*t); ind <- ind + 1 }
+    sig <- rowSums(matrix(unlist(st), nrow = N))
+    } else {st <- NULL; sig <- 0}
   
   ## --------- SIMULATE: loop begins HERE ------------ ##
   
@@ -102,7 +112,7 @@ ccbc <- function(type = "noise", ct = rep(1,N), ct2 = rep(1,N), M = 100, seed = 
   
     # Create: noise process, AR(2), or UMP
     if(type == "noise"){
-      xt <- rnorm(N, sd = 10)
+      xt <- rnorm(N, sd = 10) + cos(2*pi*Fs[400]*t)# sig
     } else if(type == "AR2"){
       xt <- arima.sim(model = list(ar = ar2, sd = 10), n = N)
     } else if(type == "UMP"){
@@ -172,11 +182,11 @@ ccbc <- function(type = "noise", ct = rep(1,N), ct2 = rep(1,N), M = 100, seed = 
   xtf2.true <- if(type == "GUMP"){outer(ct2^2, yf2.true)} else {NULL}
   
   # Save true vals
-  tru <- list(zf.true, ztf.true, yf.true, ytf.true, yf2.true, ytf2.true, xtf.true, xtf2.true)
-  names(tru) <- c("zf", "ztf", "yf", "ytf", "yf2", "ytf2", "xtf", "xtf2")
+  tru <- list(zf.true, ztf.true, yf.true, ytf.true, yf2.true, ytf2.true, xtf.true, xtf2.true, st)
+  names(tru) <- c("zf", "ztf", "yf", "ytf", "yf2", "ytf2", "xtf", "xtf2", "signals")
   
   # output
-  return(list(bc  = bcmtfse.sims,
+  return(list( bc = bcmtfse.sims,
               cbc = cbcmtfse.sims,
               tru = tru))
 }
@@ -186,8 +196,9 @@ ccbc <- function(type = "noise", ct = rep(1,N), ct2 = rep(1,N), M = 100, seed = 
 ## Simulate
 
 ```{r}
-my.type <- "GUMP"
-trial <- ccbc(type = my.type, ct = ct, ct2 = ct2, M = 100, seed = 17, B = B)
+my.type <- "noise"
+trial <- ccbc(type = my.type, M = 1, B = B, seed = 17,
+              ct = ct, ct2 = ct2)
 ```
 
 
