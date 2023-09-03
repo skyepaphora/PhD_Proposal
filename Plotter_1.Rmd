@@ -249,40 +249,8 @@ vers <- 1 + (gt[1] > gt[10])
 rev <- if(vers > 1){"_rev"} else {""}
 ```
 
-## Plotting g(t) obtained from Mean Spectrograms (CHEAT)
-
-```{r plot_compare, echo = FALSE, fig.dim = c(12,8)}
-png(filename = paste0("NewPlots/gest_UMP_B",B,"_B",B,"_rev.png"),
-# png(filename = paste0("NewPlots/gest_UMP_B",B,".png"),
-    width = 12.6, height = 9, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
-# ----------------------------------------------------------------------------------------
-par(mfrow = c(2,2), mar = c(4,4,4.4,1))
-lim <- range(ct, g.bc, g.cbc)
-# --- BC
-splot(t, ct^2 , type = "l", ylim = lim, colr = skrown$smoke, labs = FALSE, lwd = 2)
-lines(   g.bc , col = skaturate$blue, lwd = 2)
-slab(main = "Estimation of g(t) based on BC",
-     subb = bquote(hat(g)*" is the solution to:    (1/N)Ag = g"),
-     xlab = "Time", ylab = "g(t)")
-legend("top", legend = c("True g(t)", "BC", paste("B =",B)),
-       col = c("black", skaturate$blue),
-       lwd = c(2,2,NA), inset = 0.01)
-
-# --- CBC
-splot(t, ct^2 , type = "l", ylim = lim, colr = skrown$smoke, labs = FALSE, lwd = 2)
-lines(   g.cbc, col = skol$orange, lwd = 2)
-slab(main = "Estimation of g(t) based on CBC",
-     subb = bquote(hat(g)*" is the solution to:    (1/N)Ag = g"),
-     xlab = "Time", ylab = "g(t)")
-legend("top", legend = c("True g(t)", "CBC", paste("B =",B)),
-       col = c("black", skol$orange),
-       lwd = c(2,2,NA), inset = 0.01)
-# ----------------------------------------------------------------------------------------
-dev.off()
-
-```
-
-### Plotting g(t) obtained from individual sims
+#### Plotting g(t) obtained from Mean [DEFUNCT]
+## Plotting g(t) obtained from all sims
 
 ```{r}
 # load("Data/gest_UMP_B200_mini.RData")
@@ -454,6 +422,7 @@ dev.off()
 ```
 
 
+
 # Smoothed Spectrograms
 
 ## Not cheating
@@ -610,7 +579,7 @@ width = 12, height = 5, units = "in", res = 200, bg = skrown$salt, pointsize = 1
     lim <- range(yf.mtm, yf.bc, yf.cbc, tru$yf/1e2)
     
     # --- Plot
-    splot(Fs, tru$yf/1e2, ylim = lim, type = "l", lwd = 2, labs = 0)
+    splot(Fs, tru$yf/1e2, ylim = lim, type = "l", lwd = 2, labs = 0, colr = skrown$salt)
     lines(Fs, yf.mtm, col = skastel$green)
     sadd (Fs, list(yf.bc$mean, yf.cbc$mean), type = "l", lwd = 2, col = list(skaturate$blue, skaturate$yellow))
     sadd (Fs, list(lcl.bc, lcl.cbc), type = "l", lwd = 1, col = list(skastel$blue, skastel$yellow))

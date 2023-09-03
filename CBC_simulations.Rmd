@@ -112,7 +112,7 @@ ccbc <- function(type = "noise", M = 100, B = 100, seed = 0,
   
     # Create: noise process, AR(2), or UMP
     if(type == "noise"){
-      xt <- rnorm(N, sd = 10) + cos(2*pi*Fs[400]*t)# sig
+      xt <- rnorm(N, sd = 10) + sig # cos(2*pi*Fs[400]*t)
     } else if(type == "AR2"){
       xt <- arima.sim(model = list(ar = ar2, sd = 10), n = N)
     } else if(type == "UMP"){

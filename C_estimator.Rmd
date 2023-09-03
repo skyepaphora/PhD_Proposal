@@ -21,9 +21,46 @@ load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 
 ---
 
-# Previous Methods: SVD
+# GEST \& YEST Previous Methods: SVD
 
-### Estimating g(t): Based on Mean Results (Cheating)
+```{r}
+# load("Data/AR2_B200_full.RData")
+load("Data/UMP_B200_full.RData")
+```
+
+```{r}
+# --- Create Function for getting Azadeh's g (and sy)
+est.a <- function(sgram, est = "g"){
+  # SVD
+  duv <- svd(sgram,1,1)
+  
+  d <- duv$d
+  u <- duv$u
+  v <- duv$v
+  
+  # Normalize
+  bu <- 1/duv$u[1]
+  bv <- duv$d[1]/bu
+  
+  # Estimate g
+  g <- bu * duv$u
+  
+  # Estimate Sy
+  sy <- bv * duv$v
+  
+  # Re-normalize (optional)
+  # g  <- g /max(abs(g ))
+  # sy <- sy/max(abs(sy))
+  
+  # Return
+  return(if(est == "g"){g} else {sy})
+}
+
+# normalizing function
+normy <- function(x){x/max(abs(x))}
+```
+
+### Estimating g(t): Based on Mean Results (Cheating) [DEFUNCT]
 
 ```{r}
 load("Data/gest_UMP_B200_cheat.RData")
@@ -60,7 +97,47 @@ nag.tru <- ag.tru/max(abs(ag.tru))
 
 ---
 
-# Proposed Method (NEW)
+## GEST: Estimating g(t)
+
+```{r}
+# Estimate g
+
+ag.cbc.0  <- normy(est.a(cbc$mean))
+
+# plot(-ag.cbc.0)
+# lines(ct^2, lwd = 2, col = "red")
+
+ag.cbc  <- pbapply(trial$cbc, 3, est.a)
+ag <- -normy(rowMeans(ag.cbc))
+
+# plot(-normy(rowMeans(ag.cbc.1)))
+# lines(ct^2, lwd = 2, col = "red")
+
+```
+
+## YEST: Estimating Sy(f)
+
+```{r}
+# Estimate y
+
+ayf.cbc.0  <- est.a(cbc$mean, est = "sy")
+
+# plot(-normy(ayf.cbc.0))
+# lines(normy(tru$yf), lwd = 2, col = "red")
+
+ayf.cbc  <- pbapply(trial$cbc, 3, function(x){est.a(x, est = "sy")})
+# ayf <- list(mean = -normy(rowMeans(ayf.cbc)),
+#             se = apply(ayf.cbc, 1, function(x){}))
+
+# plot(-normy(rowMeans(ayf.cbc.1)))
+# lines(normy(tru$yf), lwd = 2, col = "red")
+
+```
+
+
+
+
+# GEST Proposed Method (NEW)
 
 ### Create function
 
@@ -69,7 +146,7 @@ gest <- function(sgram){
   N <- length(sgram[,1])
   A <- outer(1:N,1:N, function(l,j){rowSums(sgram)[l]/rowSums(sgram)[j]})
   G <- Mod(eigen(A/N)$vectors[,1])
-  G <- G/max(G)
+  # G <- G/max(G)
   return(G); gc()
 }
 ```
@@ -138,13 +215,13 @@ g.cbc$UCL <- g.cbc$mean + 2*g.cbc$se
 
 ```{r save_1}
 # save
-gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_rev_full.RData"))
+gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_full.RData"))
 
 # remove trial (large)
 rm(trial)
 
 # save
-gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_rev_mini.RData"))
+gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_mini.RData"))
 ```
 
 # Using g(t) to smooth spectrogram estimates
@@ -214,7 +291,7 @@ cbc.smooth <- outer(yf.cbc, gcbc.samp)
 # save.image("Data/gest_UMP_B400_rev_full.RData")
 ```
 
-# Column Means of Spectrograms for Stationary Series
+# YEST: Column Means of Spectrograms for Stationary Series
 
 ### Create function
 
@@ -525,4 +602,71 @@ lines(Fs, yf.cbc[my.t,], col = "goldenrod")
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# space
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hi
 

@@ -107,14 +107,49 @@ to get se: get yf for each simulation and get standard error from THAT (you'll n
 
 #### Results so far
 
-* BC and CBC do not pick up line components at all :()
+* BC and CBC do not pick up line components at all :(
 * got sd for yf estimates (old verion, not eigen problem), it's fine
 * got yf estimate from eigenproblem (similarly to g est), it's way off by scale factor, even for stationary :( 
+* actually got azadeh version of stuff, actually did my stuff too like i have results now for real
 
 #### Skye's Wishlist
 
 * Make a plot comparing gest to azadeh method
 * get plots for new results (except line component stuff fuck that)
 * create the image plots that you'll actually use in paper
+
+#### The Plan
+
+1. get and plot Azadeh Estimates of g, compare to mine [DONE]
+2. get and plot Azadeh Estimates of syf, compare to mine (NEW version)
+3. finalize image plots for paper
+    * CBC versus true TFS
+    * smoothed CBC
+
+#### Discussion
+
+1. I'm normalizing Azadeh's estimates so that they max out at 1. If I want the standard error, do I get that from the normalized versions? Does that defeat the purpose? 
+    * I'm normalizing the mean of the estimates, not averaging the normalized estimates
+2. Similarly, I should take the average of the smoothed sgrams and not smooth the average, yes?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
