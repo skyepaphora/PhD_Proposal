@@ -16,7 +16,7 @@ load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 # load("Data/gest_UMP_B200_full.RData")
 # load("Data/gest_UMP_B200_rev_full.RData")
 
-load("PaperData/UMP_B200_full_G.RData")
+load("PaperData/UMP_B200_full_S.RData")
 
 ## --- Get rid of 1BC stuff (if loading OLD data)
 # rm(bc, bc.samp, bc.smooth, g.bc, g.bc.full, gbc.samp, yf.bc); gc()
@@ -25,7 +25,7 @@ load("PaperData/UMP_B200_full_G.RData")
 # GEST
 
 ```{r}
-png(filename = paste0("PaperPlots/g_",my.type,"_B",B,".png"),
+png(filename = paste0("ICASSP/PaperPlots/g_",my.type,"_B",B,".png"),
 width = 12, height = 8, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ width = 12, height = 8, units = "in", res = 200, bg = skrown$salt, pointsize = 1
                   bquote(hat(g)~"(svd)"),
                   bquote(hat(g)~"(eigen)")),
           col = c(skrown$B2, skaturate$red, skaturate$blue),
-          lwd = c(2,2,1), inset = 0.01, y.intersp = 1.25, cex = 0.9)
+          lwd = 2, inset = 0.01, y.intersp = 1.25, cex = 0.9)
 
 # ---------------------------------------------------------------------------------
 dev.off()
@@ -63,7 +63,7 @@ dev.off()
 # YEST
 
 ```{r}
-png(filename = paste0("PaperPlots/yf_",my.type,"_B",B,".png"),
+png(filename = paste0("ICASSP/PaperPlots/yf_",my.type,"_B",B,".png"),
 width = 12, height = 8, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ width = 12, height = 8, units = "in", res = 200, bg = skrown$salt, pointsize = 1
     lim <- range(gt, syf, ayf)
 
     # --- True sy
-    splot(Fs, tru$yf , type = "l", ylim = lim, labs = 0, lwd = 2)
+    splot(Fs, normy(tru$yf), type = "l", ylim = lim, labs = 0, lwd = 2)
 
     # --- Azadeh's sy
     sadd(Fs, ayf, type = "l", col = skaturate$red, lwd = 2)
@@ -88,7 +88,7 @@ width = 12, height = 8, units = "in", res = 200, bg = skrown$salt, pointsize = 1
                   bquote(hat(S)[Y]*"(f)  (svd)"),
                   bquote(hat(S)[Y]*"(f)  (eigen)")),
           col = c(skrown$B2, skaturate$red, skaturate$blue),
-          lwd = c(2,2,1), inset = 0.01, y.intersp = 1.25, cex = 0.9)
+          lwd = 2, inset = 0.01, y.intersp = 1.25, cex = 0.9)
 
 # ---------------------------------------------------------------------------------
 dev.off()
@@ -98,7 +98,7 @@ dev.off()
 # Smooth Sgrams
 
 ```{r}
-png(filename = paste0("PaperPlots/yf_",my.type,"_B",B,"_true_",".png"),
+png(filename = paste0("ICASSP/PaperPlots/yf_",my.type,"_B",B,"_true_",".png"),
 width = 12, height = 8, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
@@ -115,7 +115,7 @@ width = 12, height = 8, units = "in", res = 200, bg = skrown$salt, pointsize = 1
                horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
     # --- Azadeh's sy
-    image(Fs, t, t(normy(asx)), zlim = zlim,
+    image(Fs, t, t(normy(ssx)), zlim = zlim,
     xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
     slab("no", "", "Frequency", "Time")
     image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
@@ -123,9 +123,9 @@ width = 12, height = 8, units = "in", res = 200, bg = skrown$salt, pointsize = 1
                horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
     # --- My sy
-    image(Fs, t, t(normy(ssx)), zlim = zlim,
+    image(Fs, t, t(normy(cbc.samp)), zlim = zlim,
     xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
-    slab("no", "", "Frequency", "Time")
+    slab("sure", "", "Frequency", "Time")
     image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
                legend.line = -3, legend.cex = 0.9,
                horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))

@@ -13,8 +13,6 @@ library(fields)       # Supplement for image plots: legends, better colour
 load("PaperData/UMP_B200_full.RData")
 
 # save.image(paste0("PaperData/",my.type,"_B",B,"_full.RData"))
-# save.image(paste0("PaperData/",my.type,"_B",B,"_full_G.RData"))
-# save.image(paste0("PaperData/",my.type,"_B",B,"_full_G_Yf.RData"))
 # save.image(paste0("PaperData/",my.type,"_B",B,"_full_S.RData"))
 ```
 
@@ -144,6 +142,22 @@ ssx <- pbapply( ssx.full, 1:2, mean)
 gc()
 ```
 
+
+### Single instance
+
+```{r}
+# Roll the 100-sided die
+set.seed(69)
+samp <- sample(1:M, 1)
+
+# Choose realizations, get corresponding g
+cbc.samp <- trial$cbc[,,samp]
+g.samp   <-  sg.full[,samp]
+yf.samp  <- syf.full[,samp]
+
+## --- CBC
+cbc.smooth <- outer(yf.samp, g.samp)
+```
 
 
 
