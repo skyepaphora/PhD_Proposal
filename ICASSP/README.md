@@ -80,6 +80,8 @@ Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/ma
 
 ## Paper
 
+* The template has two citation types. One for general references, I guess, and one for IEEE proceedings papers? So if I reference *old* IEEE papers I should use the latter? right? 
+
 ---
 
 ## What needs to be done

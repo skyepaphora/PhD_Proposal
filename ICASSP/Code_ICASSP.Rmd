@@ -111,7 +111,7 @@ syf <- normy(rowMeans(syf.full))
 ```
 
 
-# Smooth Sgrams
+# Smooth Specttograms
 
 ```{r}
 smoo <- function(g, yf){
@@ -162,9 +162,9 @@ cbc.smooth <- outer(yf.samp, g.samp)
 ```
 
 ```{r}
-# save.image(paste0("~/Research/PhD_Proposal/PaperData/",my.type,"_B",B,"_full_S.RData"))
-# rm(asx.full, ssx.full); gc()
-# save.image(paste0("~/Research/PhD_Proposal/PaperData/",my.type,"_B",B,"_reduced_S.RData"))
+save.image(paste0("~/Research/PhD_Proposal/PaperData/",my.type,"_B",B,"_full_S.RData"))
+rm(asx.full, ssx.full); gc()
+save.image(paste0("~/Research/PhD_Proposal/PaperData/",my.type,"_B",B,"_reduced_S.RData"))
 ```
 
 
