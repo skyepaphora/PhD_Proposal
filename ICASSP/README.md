@@ -1,0 +1,62 @@
+# ICASSP Paper Stuff
+
+Go to Overleaf to edit/view the actual paper.
+
+> **General Notes**
+>
+> All estimates are off by a scale factor, *obviously.* To get around this, I normalized each function (and its estimates) to max out at $1.$ The plots feature a comparison of these normalized estimates, not the originals: the general *shape* of the estimate is what's being compared.
+>
+> For each method, $\hat g$ is calculated using a single simulation. The plots show the mean result amongst *100 estimates of * $g$. It does **NOT** estimate $g$ based on the mean of the spectrogram results. The same goes for $S_Y(f)$ and its estimates.
+
+---
+
+## Estimating G
+
+#### Produced results using Azadeh's method (singular value decomposition)  
+
+* Have to multiply $\hat g(t)$ by -1
+* even then, at some times, $\hat g(t) < 0$. This is illegal, since $g$ is the square of a real-valued function, by definition.
+
+#### Produced results using our method (eigenvector problem)  
+
+* Always positive
+* Better on average than SVD method: less bias, also smoother
+
+#### Plotted results
+
+Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/main/ICASSP/PaperPlots) and look for filenames beginning with `g_`
+
+---
+
+## Estimating $S_Y(f)$
+
+#### Produced results using Azadeh's method (singular value decomposition)  
+
+* Azadeh outlines where this estimate comes from in section 4.3 of her thesis. It's similar to getting $\hat g$, but is based on $V_1$ instead of $U_1$.
+* Have to multiply $\hat S_Y(f)$ by -1, like we did for $\hat g(t)$.
+
+#### Produced results using our method (eigenvector problem)  
+
+* Performs Similarly to SVD method, on average, it seems.
+
+--- 
+
+## Smooth Spectrograms
+
+* Plotted outer product of $\hat g$ and $\hat S_Y(f)$; estimates taken from our method
+* Did this for each simulation, plotted average over all 100 smoothed spectrograms.
+* Also plotted results for a single simulation
+* Also plotted *un-smoothed* CBC results for comparison.
+
+
+
+
+
+
+
+
+
+
+
+
+
