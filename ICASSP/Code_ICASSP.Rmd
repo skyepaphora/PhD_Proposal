@@ -147,8 +147,7 @@ gc()
 
 ```{r}
 # Roll the 100-sided die
-set.seed(69)
-samp <- sample(1:M, 1)
+samp <- 96
 
 # Choose realizations, get corresponding g
 cbc.samp <- trial$cbc[,,samp]
@@ -159,7 +158,10 @@ yf.samp  <- syf.full[,samp]
 cbc.smooth <- outer(yf.samp, g.samp)
 ```
 
-
+```{r}
+# rm(asx.full, ssx.full); gc()
+# save.image(paste0("~/Research/PhD_Proposal/PaperData/",my.type,"_B",B,"_reduced_S.RData"))
+```
 
 
 

@@ -12,11 +12,7 @@ library(fields, quietly = TRUE, warn.conflicts = FALSE)
 load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 
 ## --- Data ---------------------------------------- ##
-# load("Data/gest_AR2_B200_full.RData")
-# load("Data/gest_UMP_B200_full.RData")
-# load("Data/gest_UMP_B200_rev_full.RData")
-
-load("PaperData/UMP_B200_full_S.RData")
+load("PaperData/UMP_B200_reduced_S.RData")
 
 ## --- Get rid of 1BC stuff (if loading OLD data)
 # rm(bc, bc.samp, bc.smooth, g.bc, g.bc.full, gbc.samp, yf.bc); gc()
@@ -98,34 +94,18 @@ dev.off()
 # Smooth Sgrams
 
 ```{r}
-png(filename = paste0("ICASSP/PaperPlots/yf_",my.type,"_B",B,"_true_",".png"),
-width = 12, height = 8, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
+png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_true",".png"),
+width = 6.5, height = 5, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(8,4.4,4.4,1), oma = c(2.5,0,0,0))
+    par(mar = c(8,4.4,4.4,2), oma = c(2.5,0,0,0))
     zlim <- range(normy(tru$xtf), normy(asx), normy(ssx))
 
     # --- True sx
     image(Fs, t, t(normy(tru$xtf)), zlim = zlim,
       xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
-    slab("True TFS", "", "Frequency", "Time")
-    image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
-               legend.line = -3, legend.cex = 0.9,
-               horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
-
-    # --- Azadeh's sy
-    image(Fs, t, t(normy(ssx)), zlim = zlim,
-    xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
-    slab("no", "", "Frequency", "Time")
-    image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
-               legend.line = -3, legend.cex = 0.9,
-               horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
-
-    # --- My sy
-    image(Fs, t, t(normy(cbc.samp)), zlim = zlim,
-    xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
-    slab("sure", "", "Frequency", "Time")
+    slab("True TFS", "UMP: Modulated Stationary AR(2)", "Frequency", "Time")
     image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
                legend.line = -3, legend.cex = 0.9,
                horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
@@ -134,7 +114,45 @@ width = 12, height = 8, units = "in", res = 200, bg = skrown$salt, pointsize = 1
 dev.off()
 ```
 
+```{r}
+png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_smooth_mean",".png"),
+width = 6.5, height = 5, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
+# ---------------------------------------------------------------------------------
 
+    # Prep
+    par(mar = c(8,4.4,4.4,2), oma = c(2.5,0,0,0))
+    zlim <- range(normy(tru$xtf), normy(asx), normy(ssx))
 
+    # --- Azadeh's sy
+    image(Fs, t, t(normy(ssx)), zlim = zlim,
+    xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+    slab("Smoothed 2-BC Spectrogram", "Mean over 100 Simulations", "Frequency", "Time")
+    image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
+               legend.line = -3, legend.cex = 0.9,
+               horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
+# ---------------------------------------------------------------------------------
+dev.off()
+```
+
+```{r}
+png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_smooth_sample",".png"),
+width = 6.5, height = 5, units = "in", res = 200, bg = skrown$salt, pointsize = 10)
+# ---------------------------------------------------------------------------------
+
+    # Prep
+    par(mar = c(8,4.4,4.4,2), oma = c(2.5,0,0,0))
+    zlim <- range(normy(tru$xtf), normy(asx), normy(ssx))
+
+    # --- My sy
+    image(Fs, t, t(normy(cbc.samp)), zlim = zlim,
+    xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+    slab("Smooth 2-BC Spectrogram", "Single Simulation", "Frequency", "Time")
+    image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
+               legend.line = -3, legend.cex = 0.9,
+               horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+# ---------------------------------------------------------------------------------
+dev.off()
+```
 
