@@ -28,6 +28,8 @@ $$
 
 Results computed for block-widths $B = 200, 300$.
 
+---
+
 ### Estimating G
 
 #### Produced results using Azadeh's method (singular value decomposition)  
