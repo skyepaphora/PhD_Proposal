@@ -71,6 +71,7 @@ Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/ma
 * Did this for each simulation, plotted average over all 100 smoothed spectrograms.
 * Also plotted results for a single simulation
 * Also plotted *un-smoothed* CBC results for comparison.
+* **Smoothed Result on average is not as good. BUT, seems to be much better for a single simulation.**
 
 #### Plotted results
 

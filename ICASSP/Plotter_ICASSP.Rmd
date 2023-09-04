@@ -12,8 +12,8 @@ library(fields, quietly = TRUE, warn.conflicts = FALSE)
 load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 
 ## --- Data (choose 1) ----------------------------- ##
-# load("PaperData/UMP_B200_reduced_S.RData")
-load("PaperData/UMP_B300_reduced_S.RData")
+load("PaperData/UMP_B200_reduced_S.RData")
+# load("PaperData/UMP_B300_reduced_S.RData")
 
 gt <- ct^2
 zlim <- range(normy(tru$xtf), normy(asx), normy(ssx))
@@ -27,6 +27,7 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
+    par(mar = c(4,3.5,4,0))
     lim <- range(gt, sg, ag)
 
     # --- True g
@@ -40,15 +41,16 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
     
     # Other lines
     abline(v = range(tb), col = skrown$B1, lty = 2)
+    abline(h = 0, col = skrown$B1, lty = 3)
     
     # Labels
     slab("Normalized Estimates of g(t)",
          bquote("Blockwidth B ="~.(B)*"; Mean result over 100 Simulations"), 
          "Time", "g(t)", yline = 2.5)
     legend("topright",
-       legend = c("True g(t)",
-                  bquote(hat(g)[1]~"(svd)"),
-                  bquote(hat(g)[2]~"(eigen)")),
+       legend = c("g(t)",
+                  bquote(hat(g)[1]),
+                  bquote(hat(g)[2])),
           col = c(skrown$B2, skaturate$red, skaturate$blue),
           lwd = 2, inset = 0.01, y.intersp = 1.25, cex = 0.9)
 
@@ -65,6 +67,7 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
+    par(mar = c(4,3.5,4,0))
     lim <- range(normy(tru$yf), syf, ayf)
 
     # --- True sy
@@ -77,13 +80,13 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
     sadd(Fs, syf, type = "l", col = skaturate$blue, lwd = 2)
     
     # Labels
-    slab(bquote("Normalized Estimates of"~S[Y]*"(f)"),
+    slab("Normalized Estimates of SY(f)",
          bquote("Stationary AR(2); Mean result over 100 Simulations"), 
          "Frequency", bquote("Spectrum"~S[Y]*"(f)"), yline = 2.5)
     legend("topright",
-       legend = c(bquote("True"~S[Y]*"(f)"),
-                  bquote(hat(S)[Y]*"(f)"[1]*" (svd)"),
-                  bquote(hat(S)[Y]*"(f)"[2]*" (eigen)")),
+       legend = c(bquote(S[Y]*"(f)"),
+                  bquote(hat(S)["Y, 1"]),
+                  bquote(hat(S)["Y, 2"])),
           col = c(skrown$B2, skaturate$red, skaturate$blue),
           lwd = 2, inset = 0.01, y.intersp = 1.25, cex = 0.9)
 
@@ -95,24 +98,24 @@ dev.off()
 # Smooth Sgrams
 
 ```{r TRUE-SGRAM}
-# png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_true",".png"),
-# width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
-# # ---------------------------------------------------------------------------------
-# 
-#     # Prep
-#     par(mar = c(4.4,4.4,4.4,1)) #, oma = c(2.5,0,0,0))
-#     zlim <- range(normy(tru$xtf), normy(asx), normy(ssx))
-# 
-#     # --- True sx
-#     image(Fs, t, t(normy(tru$xtf)), zlim = zlim,
-#       xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
-#     slab("True TFS", "UMP: Modulated Stationary AR(2)", "Frequency", "Time")
-#     # image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
-#     #            legend.line = -3, legend.cex = 0.9,
-#     #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
-# 
-# # ---------------------------------------------------------------------------------
-# dev.off()
+png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_true",".png"),
+width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
+# ---------------------------------------------------------------------------------
+
+    # Prep
+    par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+    zlim <- range(normy(tru$xtf), normy(asx), normy(ssx))
+
+    # --- True sx
+    image(Fs, t, t(normy(tru$xtf)), zlim = zlim,
+      xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+    slab("True TFS", "UMP: Modulated Stationary AR(2)", "Frequency", "Time")
+    # image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
+    #            legend.line = -3, legend.cex = 0.9,
+    #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+# ---------------------------------------------------------------------------------
+dev.off()
 ```
 
 ```{r}
@@ -121,7 +124,7 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4.4,4.4,4.4,1)) #, oma = c(2.5,0,0,0))
+    par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
 
     # --- Azadeh's sy
     image(Fs, t, t(normy(ssx)), zlim = zlim,
@@ -141,7 +144,7 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4.4,4.4,4.4,1)) #, oma = c(2.5,0,0,0))
+    par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
 
     # --- My sy
     image(Fs, t, (normy(cbc.smooth)), zlim = zlim,
@@ -156,17 +159,37 @@ dev.off()
 ```
 
 ```{r}
+png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_raw_mean",".png"),
+width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
+# ---------------------------------------------------------------------------------
+
+    # Prep
+    par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+
+    # --- My sy
+    image(Fs, t, t(normy(cbc$mean)), zlim = zlim,
+    xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+    slab("Raw 2-BC Spectrogram", "Mean over 100 Simulations", "Frequency", "Time")
+    # image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
+    #            legend.line = -3, legend.cex = 0.9,
+    #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+
+# ---------------------------------------------------------------------------------
+dev.off()
+```
+
+```{r}
 png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_raw_sample",".png"),
 width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4.4,4.4,4.4,1)) #, oma = c(2.5,0,0,0))
+    par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
 
     # --- My sy
     image(Fs, t, t(normy(cbc.samp)), zlim = zlim,
     xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
-    slab("Smooth 2-BC Spectrogram", "Single Simulation", "Frequency", "Time")
+    slab("Raw 2-BC Spectrogram", "Single Simulation", "Frequency", "Time")
     # image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
     #            legend.line = -3, legend.cex = 0.9,
     #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
