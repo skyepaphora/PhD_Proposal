@@ -12,6 +12,22 @@ Go to Overleaf to edit/view the actual paper.
 
 ## CODE
 
+NOTE: all code uses the UMP:  
+
+$$ 
+\begin{aligned} 
+    X(t) &= c(t)Y(t) \\ 
+    &\\
+    c(t) &= \exp\left(\frac{-(t-500)^2}{2(200)^2}\right)  \\ 
+    &\\
+    Y(t) &= 0.5 Y(t-1) - 0.5 Y(t-2) + z(t)                \\ 
+    &\\
+    z(t) &= w\big(0, \sigma_z^2 = 10^4\big). 
+\end{aligned} 
+$$
+
+Results computed for block-widths $B = 200, 300$.
+
 ### Estimating G
 
 #### Produced results using Azadeh's method (singular value decomposition)  
