@@ -62,10 +62,19 @@ Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/ma
 
 ## Paper
 
+---
 
 ## What needs to be done
 
+#### Standard error
+When I say "normalize," I mean dividing a function (example: $\hat g$) by its maximum value, so that the normalized range maxes out at 1.
+
+In general, I'm normalizing the average result over 100 *un-normalized* estimates. If I do it the other way around (ie: taking the average over 100 *normalized* estimates) then the final result is guaranteed to underestimate the true function. How do I calculate the standard error according to this method? I don't think it's correct to simply take the average standard error across all estimates and then normalize it in the same way. 
+
+Can standard error be omitted from the plots? Do we need to comment on this in the paper?
+
 #### references
+yeah, yeah
 
 #### rename estimates
 

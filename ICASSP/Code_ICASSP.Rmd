@@ -11,9 +11,7 @@ library(fields)       # Supplement for image plots: legends, better colour
 
 ```{r}
 load("PaperData/UMP_B200_full.RData")
-
-# save.image(paste0("PaperData/",my.type,"_B",B,"_full.RData"))
-# save.image(paste0("PaperData/",my.type,"_B",B,"_full_S.RData"))
+load("PaperData/UMP_B300_full.RData")
 ```
 
 # GEST 
@@ -118,24 +116,29 @@ syf <- normy(rowMeans(syf.full))
 ```{r}
 smoo <- function(g, yf){
   
+  # Dimensions for Array
   n  <- length( g[,1])
   nf <- length(yf[,1])
   m  <- length( g[1,])
   
+  # Initialize Array
   out <- array(0,c(n,nf,m))
   
+  # Smooth each Simulation's Spectrogram
   for(s in 1:m){
     out[,,s] <- outer(g[,m],yf[,m])
-  }
-  gc()
+  }; gc()
+  
   return(out)
 }
 ```
 
 ```{r}
+# Azadeh's results
 asx.full <- smoo(ag.full, ayf.full)
 asx <- pbapply( asx.full, 1:2, mean)
 
+# Skye's Results
 ssx.full <- smoo(sg.full, syf.full)
 ssx <- pbapply( ssx.full, 1:2, mean)
 
@@ -159,6 +162,7 @@ cbc.smooth <- outer(yf.samp, g.samp)
 ```
 
 ```{r}
+# save.image(paste0("~/Research/PhD_Proposal/PaperData/",my.type,"_B",B,"_full_S.RData"))
 # rm(asx.full, ssx.full); gc()
 # save.image(paste0("~/Research/PhD_Proposal/PaperData/",my.type,"_B",B,"_reduced_S.RData"))
 ```

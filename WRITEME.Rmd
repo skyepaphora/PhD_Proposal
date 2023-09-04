@@ -114,14 +114,14 @@ to get se: get yf for each simulation and get standard error from THAT (you'll n
 
 #### Skye's Wishlist
 
-* Make a plot comparing gest to azadeh method
-* get plots for new results (except line component stuff fuck that)
-* create the image plots that you'll actually use in paper
+- Make a plot comparing gest to azadeh method
+- get plots for new results (except line component stuff fuck that)
+- create the image plots that you'll actually use in paper
 
 #### The Plan
 
 1. get and plot Azadeh Estimates of g, compare to mine [DONE]
-2. get and plot Azadeh Estimates of syf, compare to mine (NEW version)
+2. get and plot Azadeh Estimates of syf, compare to mine (NEW version) [DONE]
 3. finalize image plots for paper
     * CBC versus true TFS
     * smoothed CBC

@@ -24,7 +24,7 @@ K  <- 7                         # Eigencoefs per frequency
 v  <- spec.mtm(ts(1:N), plot = FALSE)$mtm$dpss$v # DPSS (based on series length)
 
 ## --- Variables dependent on B (defined here for later use in plotting)
-B  <- 100                       # Block size (for sliding window)
+B  <- 300                       # Block size (for sliding window)
 B2 <- ceiling(B/2)              # Midpoint shift
 b  <- 1:(N-(B-1))               # block indices
 tb <- b + B2 - 1                # time in-block
@@ -96,7 +96,8 @@ ccbc <- function(type = "noise", M = 100, B = 100, seed = 0,
   pb <- txtProgressBar(style = 3)
   
   # Initialize arrays
-  cbcmtfse.sims <- bcmtfse.sims <- array(dim = c(N,NF,M))
+  cbcmtfse.sims <- # bcmtfse.sims <- 
+    array(dim = c(N,NF,M))
   
   # Get signals --------- This is for storing to plot stuff later, might not need since we have freqs idk
   if(!is.null(freq)){
@@ -106,24 +107,42 @@ ccbc <- function(type = "noise", M = 100, B = 100, seed = 0,
     sig <- rowSums(matrix(unlist(st), nrow = N))
     } else {st <- NULL; sig <- 0}
   
+  # Get series based on type
+    if(type == "noise"){
+      get <- function(){ return(rnorm(N, sd = 10) + sig) }
+    } else if(type == "AR2"){
+      get <- function(){ return(arima.sim(model = list(ar = ar2, sd = 10), n = N)) }
+    } else if(type == "UMP"){
+      get <- function(){
+          yt <- arima.sim(model = list(ar = ar2, sd = 10), n = N)  
+          return(ct*yt)
+      }
+    } else if(type == "GUMP"){
+      get <- function(){
+          yt1 <- arima.sim(model = list(ar = ar2  , sd = 10), n = N)
+          yt2 <- arima.sim(model = list(ar = ar2.2, sd = 10), n = N)
+          return(ct*yt1 + ct2*yt2)
+      }
+    } else {error}
+  
   ## --------- SIMULATE: loop begins HERE ------------ ##
   
   for(m in 1:M){
   
     # Create: noise process, AR(2), or UMP
-    if(type == "noise"){
-      xt <- rnorm(N, sd = 10) + sig # cos(2*pi*Fs[400]*t)
-    } else if(type == "AR2"){
-      xt <- arima.sim(model = list(ar = ar2, sd = 10), n = N)
-    } else if(type == "UMP"){
-      yt <- arima.sim(model = list(ar = ar2, sd = 10), n = N)
-      xt <- ct*yt
-    } else if(type == "GUMP"){
-      yt1 <- arima.sim(model = list(ar = ar2  , sd = 10), n = N)
-      yt2 <- arima.sim(model = list(ar = ar2.2, sd = 10), n = N)
-      xt <- ct*yt1 + ct2*yt2
-    } else {error}
-    
+    # if(type == "noise"){
+    #   xt <- rnorm(N, sd = 10) + sig # cos(2*pi*Fs[400]*t)
+    # } else if(type == "AR2"){
+    #   xt <- arima.sim(model = list(ar = ar2, sd = 10), n = N)
+    # } else if(type == "UMP"){
+    #   yt <- arima.sim(model = list(ar = ar2, sd = 10), n = N)
+    #   xt <- ct*yt
+    # } else if(type == "GUMP"){
+    #   yt1 <- arima.sim(model = list(ar = ar2  , sd = 10), n = N)
+    #   yt2 <- arima.sim(model = list(ar = ar2.2, sd = 10), n = N)
+    #   xt <- ct*yt1 + ct2*yt2
+    # } else {error}
+    xt <- get()
     
     # Sliding window: full window included
     sw <- (B/K) * Mod( sapply(b, function(p){
@@ -136,7 +155,7 @@ ccbc <- function(type = "noise", M = 100, B = 100, seed = 0,
     setTxtProgressBar(pb, (m-0.5)/M)
     
     # Modify (linear) storing midpoints
-    bcmtfse.sims[tb,,m] <- (K/mval[1]) * t(sapply(b, function(p){mvec[,1] %*% matrix(sw[,p], ncol = NF)})) / w0.0
+    # bcmtfse.sims[tb,,m] <- (K/mval[1]) * t(sapply(b, function(p){mvec[,1] %*% matrix(sw[,p], ncol = NF)})) / w0.0
   
     # Modify (quadratic) storing midpoints
     cbcmtfse.sims[tb,,m] <- t(sapply(b, function(p){ B*(a(sw,2,p)*w0.2 - a(sw,0,p)*w2.2) / d.02 }))
@@ -153,8 +172,8 @@ ccbc <- function(type = "noise", M = 100, B = 100, seed = 0,
     rm(sw); gc()
     
     # BCMTFSE (Boundary Corrected Modified Time Frequency Spectrum Estimate)
-    bcmtfse.sims[1:(tb[1]-1),,m]   <- t(sapply((tb[1]-1):1, function(h){ bcmtfse.sims[tb[1],,m] - h*tdtfse.start }))
-    bcmtfse.sims[(max(tb)+1):N,,m] <- t(sapply(1:(B2-(B2 != B/2)), function(h){ bcmtfse.sims[max(tb),,m] + h*tdtfse.end }))
+    # bcmtfse.sims[1:(tb[1]-1),,m]   <- t(sapply((tb[1]-1):1, function(h){ bcmtfse.sims[tb[1],,m] - h*tdtfse.start }))
+    # bcmtfse.sims[(max(tb)+1):N,,m] <- t(sapply(1:(B2-(B2 != B/2)), function(h){ bcmtfse.sims[max(tb),,m] + h*tdtfse.end }))
     
     
     # CBCMTFSE (Curvy Boundary Corrected Modified Time Frequency Spectrum Estimate)
@@ -186,7 +205,7 @@ ccbc <- function(type = "noise", M = 100, B = 100, seed = 0,
   names(tru) <- c("zf", "ztf", "yf", "ytf", "yf2", "ytf2", "xtf", "xtf2", "signals")
   
   # output
-  return(list( bc = bcmtfse.sims,
+  return(list(#bc = bcmtfse.sims,
               cbc = cbcmtfse.sims,
               tru = tru))
 }
@@ -196,30 +215,30 @@ ccbc <- function(type = "noise", M = 100, B = 100, seed = 0,
 ## Simulate
 
 ```{r}
-my.type <- "noise"
-trial <- ccbc(type = my.type, M = 1, B = B, seed = 17,
-              ct = ct, ct2 = ct2)
+my.type <- "UMP"
+trial <- ccbc(type = my.type, M = 100, B = B, seed = 17, ct = ct); gc()
 ```
 
 
 ```{r}
 ## --- Stats --------- ##
-cbc <- bc <- list()
+cbc <- # bc <- 
+  list()
 tru <- trial$tru; 
 
-bc$mean  <- pbapply(trial$bc, 1:2, mean); gc()
-bc$se    <- pbapply(trial$bc, 1:2, sd)/sqrt(M); gc()
+# bc$mean  <- pbapply(trial$bc, 1:2, mean); gc()
+# bc$se    <- pbapply(trial$bc, 1:2, sd)/sqrt(M); gc()
 
 cbc$mean <- pbapply(trial$cbc, 1:2, mean); gc()
 cbc$se   <- pbapply(trial$cbc, 1:2, sd)/sqrt(M); gc()
 
 
 ## --- Save! --------- ##
-save.image(paste0("Data/",my.type,"_B",B,"_full.RData"))
+# save.image(paste0("Data/",my.type,"_B",B,"_full.RData"))
 
-rm(trial); gc() # discard individual simulations, keep stats
+# rm(trial); gc() # discard individual simulations, keep stats
 
-save.image(paste0("Data/",my.type,"_B",B,"_mini.RData"))
+# save.image(paste0("Data/",my.type,"_B",B,"_mini.RData"))
 ```
 
 
