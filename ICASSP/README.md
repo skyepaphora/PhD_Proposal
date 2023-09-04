@@ -10,7 +10,9 @@ Go to Overleaf to edit/view the actual paper.
 
 ---
 
-## Estimating G
+## CODE
+
+### Estimating G
 
 #### Produced results using Azadeh's method (singular value decomposition)  
 
@@ -28,7 +30,7 @@ Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/ma
 
 ---
 
-## Estimating $S_Y(f)$
+### Estimating $S_Y(f)$
 
 #### Produced results using Azadeh's method (singular value decomposition)  
 
@@ -39,18 +41,37 @@ Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/ma
 
 * Performs Similarly to SVD method, on average, it seems.
 
+#### Plotted results
+
+Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/main/ICASSP/PaperPlots) and look for filenames beginning with `yf_`
+
 --- 
 
-## Smooth Spectrograms
+### Smooth Spectrograms
 
 * Plotted outer product of $\hat g$ and $\hat S_Y(f)$; estimates taken from our method
 * Did this for each simulation, plotted average over all 100 smoothed spectrograms.
 * Also plotted results for a single simulation
 * Also plotted *un-smoothed* CBC results for comparison.
 
+#### Plotted results
+
+Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/main/ICASSP/PaperPlots) and look for filenames beginning with `sx_`
+
+---
+
+## Paper
 
 
+## What needs to be done
 
+#### references
+
+#### rename estimates
+
+* Unless I'm mistaken, Glen proposes we call the BCMTFSE and CBCMTFSE the 1-BC and 2-BC, respectively (and for general polynomials of order $p$, the $p$-BC). My issue with this: the "$p$-Boundary Corrected" *what?* We talked forever about how spectrograms are TFS estimates and you said to take out the word spectrogram, but now it's just "$p$-Boundary Corrected" which means nothing out of context.
+* What do we call our $\hat g$? What do we call our $\hat Y$?
+* I'm calling the new spectrogram the "Time Smoothed" Spectrogram. Time smoothing can apply to any spectrogram of a UMP.
 
 
 
