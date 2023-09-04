@@ -69,9 +69,15 @@ Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/ma
 
 #### rename estimates
 
-* Unless I'm mistaken, Glen proposes we call the BCMTFSE and CBCMTFSE the 1-BC and 2-BC, respectively (and for general polynomials of order $p$, the $p$-BC). My issue with this: the "$p$-Boundary Corrected" *what?* We talked forever about how spectrograms are TFS estimates and you said to take out the word spectrogram, but now it's just "$p$-Boundary Corrected" which means nothing out of context.
+* Unless I'm mistaken, Glen proposes we call the BCMTFSE and CBCMTFSE the 1-BC and 2-BC, respectively (and for general polynomials of order $p$, the $p$-BC). My issue with this: the $p$-"Boundary Corrected" *what?* We talked forever about how spectrograms are TFS estimates and you said to take out the word spectrogram, but now it's just $p$-"Boundary Corrected" which means nothing out of context.
 * What do we call our $\hat g$? What do we call our $\hat Y$?
 * I'm calling the new spectrogram the "Time Smoothed" Spectrogram. Time smoothing can apply to any spectrogram of a UMP.
+
+#### Formatting
+
+* the titles suck, I know, please help
+* why is Wesley's name and info weirdly offset? 
+* make equations small enough to fit in a column
 
 
 
