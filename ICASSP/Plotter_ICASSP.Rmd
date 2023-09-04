@@ -27,7 +27,7 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4,3.5,4,0))
+    par(mar = c(4,3.6,4,0))
     lim <- range(gt, sg, ag)
 
     # --- True g
@@ -67,7 +67,7 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4,3.5,4,0))
+    par(mar = c(4,3.6,4,0))
     lim <- range(normy(tru$yf), syf, ayf)
 
     # --- True sy
