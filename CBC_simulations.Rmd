@@ -24,7 +24,7 @@ K  <- 7                         # Eigencoefs per frequency
 v  <- spec.mtm(ts(1:N), plot = FALSE)$mtm$dpss$v # DPSS (based on series length)
 
 ## --- Variables dependent on B (defined here for later use in plotting)
-B  <- 300                       # Block size (for sliding window)
+B  <- 200                       # Block size (for sliding window)
 B2 <- ceiling(B/2)              # Midpoint shift
 b  <- 1:(N-(B-1))               # block indices
 tb <- b + B2 - 1                # time in-block
@@ -43,9 +43,6 @@ ar2 <- function(phi = c(0,0)){ (10^2)/Mod( 1 - phi[1]*exp(-i*2*pi*Fs) - phi[2]*(
 ## BCMTFSE \& CBCMTFSE: Function
 
 ```{r bcmtfse_cbcmtfse_sims}
-
-# Prep simulations
-set.seed(17)
 
 # Simulate FUNCTION
 ccbc <- function(type = "noise", M = 100, B = 100, seed = 0,

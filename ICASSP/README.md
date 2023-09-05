@@ -33,12 +33,10 @@ Results computed for block-widths $B = 200, 300$.
 ### Estimating G
 
 #### Produced results using Azadeh's method (singular value decomposition)  
-
 * Have to multiply $\hat g(t)$ by -1
 * even then, at some times, $\hat g(t) < 0$. This is illegal, since $g$ is the square of a real-valued function, by definition.
 
 #### Produced results using our method (eigenvector problem)  
-
 * Always positive
 * Better on average than SVD method: less bias, also smoother
 
@@ -51,22 +49,18 @@ Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/ma
 ### Estimating $S_Y(f)$
 
 #### Produced results using Azadeh's method (singular value decomposition)  
-
 * Azadeh outlines where this estimate comes from in section 4.3 of her thesis. It's similar to getting $\hat g$, but is based on $V_1$ instead of $U_1$.
 * Have to multiply $\hat S_Y(f)$ by -1, like we did for $\hat g(t)$.
 
-#### Produced results using our method (eigenvector problem)  
-
+#### Produced results using our method (eigenvalue problem)  
 * Performs Similarly to SVD method, on average, it seems.
 
 #### Plotted results
-
 Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/main/ICASSP/PaperPlots) and look for filenames beginning with `yf_`
 
 --- 
 
 ### Smooth Spectrograms
-
 * Plotted outer product of $\hat g$ and $\hat S_Y(f)$; estimates taken from our method
 * Did this for each simulation, plotted average over all 100 smoothed spectrograms.
 * Also plotted results for a single simulation
@@ -81,39 +75,33 @@ Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/ma
 
 ## Paper
 
-* The template has two citation types. One for general references, I guess, and one for IEEE proceedings papers? So if I reference *old* IEEE papers I should use the latter? right? 
+#### Standard error
+* Talked about this, will consider for proposal, not paper
+
+#### rename estimates
+* For polynomials of order $p$, the estimator which uses the NSQI-based boundary correction for the SWHRS will be called the $p$-BC.
+* Azadeh's estimates for $g$ and $S_Y(f)$ will be denoted with a subscript $1$. Mine will have a subscript of $2$.
+
+#### Formatting
+* smaller plots
+* got rid of the $\hat y(t) = x(t)/\hat c(t)$ stuff
 
 ---
 
 ## What needs to be done
 
-#### Standard error
-When I say "normalize," I mean dividing a function (example: $\hat g$) by its maximum value, so that the normalized range maxes out at 1.
-
-In general, I'm normalizing the average result over 100 *un-normalized* estimates. If I do it the other way around (ie: taking the average over 100 *normalized* estimates) then the final result is guaranteed to underestimate the true function. How do I calculate the standard error according to this method? I don't think it's correct to simply take the average standard error across all estimates and then normalize it in the same way. 
-
-Can standard error be omitted from the plots? Do we need to comment on this in the paper?
-
 #### references
+* The template has two citation types. One for general references, I guess, and one for IEEE proceedings papers? So if I reference *old* IEEE papers I should use the latter? right? 
 * Having trouble sourcing an expression for the HRS that matches the one in Azadeh's thesis - equation 3.20
     - checked thomson 93 and 98
     - maybe for now I'll just reference Azadeh idk
 
-#### rename estimates
-
-* Unless I'm mistaken, Glen proposes we call the BCMTFSE and CBCMTFSE the 1-BC and 2-BC, respectively (and for general polynomials of order $p$, the $p$-BC). My issue with this: the $p$-"Boundary Corrected" *what?* We talked forever about how spectrograms are TFS estimates and you said to take out the word spectrogram, but now it's just $p$-"Boundary Corrected" which means nothing out of context.
-* What do we call our $\hat g$? What do we call our $\hat Y$?
-* I'm calling the new spectrogram the "Time Smoothed" Spectrogram. Time smoothing can apply to any spectrogram of a UMP.
-
 #### Formatting
-
 * the titles suck, I know, please help
 * why is Wesley's name and info weirdly offset? 
 * make equations small enough to fit in a column
 * too long - can't fit all figures
 * some figures seem to clip off the text in adjacent columns
-
-
 
 
 

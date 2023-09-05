@@ -16,20 +16,22 @@ load("PaperData/UMP_B200_reduced_S.RData")
 # load("PaperData/UMP_B300_reduced_S.RData")
 
 gt <- ct^2
-zlim <- range(normy(tru$xtf), normy(asx), normy(ssx))
+zlim <- 0:1 # range(normy(tru$xtf), normy(cbc$mean), normy(ssx), normy(cbc.smooth), normy(cbc.samp))
 ```
 
-# GEST
+# GEST \& YEST
 
 ```{r}
-png(filename = paste0("ICASSP/PaperPlots/g_",my.type,"_B",B,".png"),
-width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
+png(filename = paste0("ICASSP/PaperPlots/gyf_",my.type,"_B",B,".png"),
+width = 5.5, height = 7, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4,3.6,4,0))
-    lim <- range(gt, sg, ag)
+    par(mfrow = c(2,1), mar = c(4,3.6,4,0))
 
+## ------------ GEST
+    lim <- range(gt, sg, ag)
+    
     # --- True g
     splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
 
@@ -55,19 +57,16 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
           lwd = 2, inset = 0.01, y.intersp = 1.25, cex = 0.9)
 
 # ---------------------------------------------------------------------------------
-dev.off()
-```
+# dev.off()
 
-
-# YEST
-
-```{r}
-png(filename = paste0("ICASSP/PaperPlots/yf_",my.type,"_B",B,".png"),
-width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
+## ------------ YEST
+    
+# png(filename = paste0("ICASSP/PaperPlots/yf_",my.type,"_B",B,".png"),
+# width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4,3.6,4,0))
+    # par(mar = c(4,3.6,4,0))
     lim <- range(normy(tru$yf), syf, ayf)
 
     # --- True sy
@@ -80,7 +79,7 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
     sadd(Fs, syf, type = "l", col = skaturate$blue, lwd = 2)
     
     # Labels
-    slab("Normalized Estimates of SY(f)",
+    slab(bquote(bold("Normalized Estimates of"~S[Y]*"(f)")),
          bquote("Stationary AR(2); Mean result over 100 Simulations"), 
          "Frequency", bquote("Spectrum"~S[Y]*"(f)"), yline = 2.5)
     legend("topright",
@@ -98,14 +97,15 @@ dev.off()
 # Smooth Sgrams
 
 ```{r TRUE-SGRAM}
-png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_true",".png"),
-width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
+png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_smooths",".png"),
+width = 5.5, height = 12, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
-    zlim <- range(normy(tru$xtf), normy(asx), normy(ssx))
+    par(mfrow = c(3,1), mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
 
+## ------------ TRUE
+    
     # --- True sx
     image(Fs, t, t(normy(tru$xtf)), zlim = zlim,
       xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
@@ -115,16 +115,16 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
     #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
 # ---------------------------------------------------------------------------------
-dev.off()
-```
-
-```{r}
-png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_smooth_mean",".png"),
-width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
+# dev.off()
+# 
+# # ------------ MEAN
+#     
+# png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_smooth_mean",".png"),
+# width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+    # par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
 
     # --- Azadeh's sy
     image(Fs, t, t(normy(ssx)), zlim = zlim,
@@ -135,21 +135,21 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
     #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
 # ---------------------------------------------------------------------------------
-dev.off()
-```
-
-```{r}
-png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_smooth_sample",".png"),
-width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
+# dev.off()
+# 
+# # ------------ SAMPLE
+#     
+# png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_smooth_sample",".png"),
+# width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+    # par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
 
     # --- My sy
     image(Fs, t, (normy(cbc.smooth)), zlim = zlim,
     xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
-    slab("Smooth 2-BC Spectrogram", "Single Simulation", "Frequency", "Time")
+    slab("Smoothed 2-BC Spectrogram", "Single Simulation", "Frequency", "Time")
     # image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
     #            legend.line = -3, legend.cex = 0.9,
     #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
@@ -159,12 +159,13 @@ dev.off()
 ```
 
 ```{r}
-png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_raw_mean",".png"),
-width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
+png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_raws",".png"),
+width = 5.5, height = 8, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep
-    par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+    par(mfrow = c(2,1), mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+    zlim <- range(normy(tru$xtf), normy(cbc$mean), normy(ssx))
 
     # --- My sy
     image(Fs, t, t(normy(cbc$mean)), zlim = zlim,
@@ -175,12 +176,12 @@ width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
     #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
 # ---------------------------------------------------------------------------------
-dev.off()
-```
-
-```{r}
-png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_raw_sample",".png"),
-width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
+# dev.off()
+# 
+# # ------------ SAMPLE
+#     
+# png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_raw_sample",".png"),
+# width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
     # Prep

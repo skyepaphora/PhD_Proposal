@@ -132,13 +132,28 @@ to get se: get yf for each simulation and get standard error from THAT (you'll n
     * I'm normalizing the mean of the estimates, not averaging the normalized estimates
 2. Similarly, I should take the average of the smoothed sgrams and not smooth the average, yes?
 
+# September 5th
+
+#### To do (paper)
+- change SY(f) to $S_Y(f)$ in 2d plots
+* check results for B=50 using new code, make sure something's not wonky
+* take out stuff about $\hat y(t) = x(t)/\hat c(t)$
+- all titles "smoothed" not "smooth"
+- make 2x1, 3x1 columns for plots in fig1 and fig2/3, respectively
+* take out eq tags for eqs not referenced in the doc
+
+#### To consider
+* mean smoothed is better symmetric
+  - pinpoints location of maximum power better
+* call em smoothed g and smoothed sy
 
 
+#### for proposal maybe
+* put $\hat y(t) = x(t)/\hat c(t)$ on the $S_Y(f)$ plot
 
+In general, I'm normalizing the average result over 100 *un-normalized* estimates. If I do it the other way around (ie: taking the average over 100 *normalized* estimates) then the final result is guaranteed to underestimate the true function. How do I calculate the standard error according to this method? I don't think it's correct to simply take the average standard error across all estimates and then normalize it in the same way. When I say "normalize," I mean dividing a function (example: $\hat g$) by its maximum value, so that the normalized range maxes out at 1.
 
-
-
-
+* instead, normalize by t=500
 
 
 
