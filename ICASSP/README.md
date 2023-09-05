@@ -95,7 +95,9 @@ In general, I'm normalizing the average result over 100 *un-normalized* estimate
 Can standard error be omitted from the plots? Do we need to comment on this in the paper?
 
 #### references
-yeah, yeah
+* Having trouble sourcing an expression for the HRS that matches the one in Azadeh's thesis - equation 3.20
+    - checked thomson 93 and 98
+    - maybe for now I'll just reference Azadeh idk
 
 #### rename estimates
 
@@ -108,7 +110,8 @@ yeah, yeah
 * the titles suck, I know, please help
 * why is Wesley's name and info weirdly offset? 
 * make equations small enough to fit in a column
-
+* too long - can't fit all figures
+* some figures seem to clip off the text in adjacent columns
 
 
 
