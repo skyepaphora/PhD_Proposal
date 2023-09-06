@@ -143,8 +143,7 @@ to get se: get yf for each simulation and get standard error from THAT (you'll n
 * take out eq tags for eqs not referenced in the doc
 
 #### To consider
-* mean smoothed is better symmetric
-  - pinpoints location of maximum power better
+* mean smoothed is more symmetric and pinpoints location of maximum power better than raw
 * call em smoothed g and smoothed sy
 
 

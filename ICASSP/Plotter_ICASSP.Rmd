@@ -9,29 +9,34 @@ library(animation)
 library(fields, quietly = TRUE, warn.conflicts = FALSE)
 
 ## --- Splot + Spalette ---------------------------- ##
-load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
+load("~/Research/Skyes_Toolbox/splot.RData")
+load("~/Research/PhD_Proposal/ICASSP/PaperData/AR2_B200_full_yf.RData")
 
 ## --- Data (choose 1) ----------------------------- ##
-load("PaperData/UMP_B200_reduced_S.RData")
-# load("PaperData/UMP_B300_reduced_S.RData")
+# load("ICASSP/PaperData/UMP_B200_reduced_S.RData")
 
-gt <- ct^2
-zlim <- 0:1 # range(normy(tru$xtf), normy(cbc$mean), normy(ssx), normy(cbc.smooth), normy(cbc.samp))
+## --- Common z-axis limits
+zlim <- 0:1 
 ```
 
 # GEST \& YEST
 
 ```{r}
+# png(filename = paste0("ICASSP/PaperPlots/latticePlots/gyf_",my.type,"_B",B,".png"),
+# width = 5.44, height = 7, units = "in", res = 200, pointsize = 10)
+# # ---------------------------------------------------------------------------------
+#     # Prep 2
+#     par(mfrow = c(2,1), mar = c(4.2,4,4.2,0)) #, oma = c(2.5,0,0,0)) # par(mar = c(4.2,3.6,3.8,0), mfrow = c(2,1))
+
 png(filename = paste0("ICASSP/PaperPlots/g_",my.type,"_B",B,".png"),
 width = 7, height = 4, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
-
-    # Prep
-    par(mar = c(4,3.6,4,0))# , mfrow = c(2,1))
+# Prep 1
+par(mar = c(4,3.6,4,0))
 
 ## ------------ GEST
     lim <- range(gt, sg, ag)
-    
+
     # --- True g
     splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
 
@@ -40,21 +45,21 @@ width = 7, height = 4, units = "in", res = 200, pointsize = 10)
 
     # --- My g
     sadd(t, sg, type = "l", col = skaturate$blue, lwd = 2)
-    
+
     # Other lines
     abline(v = range(tb), col = skrown$B1, lty = 2)
     abline(h = 0, col = skrown$B1, lty = 3)
-    
+
     # Labels
     slab("Normalized Estimates of g(t)",
-         bquote("Blockwidth B ="~.(B)*"; Mean result over 100 Simulations"), 
+         bquote("Blockwidth B ="~.(B)*"; Mean result over 100 Simulations"),
          "Time", "g(t)", yline = 2.5)
     legend("topright",
        legend = c("g(t)",
                   bquote(hat(g)[1]),
                   bquote(hat(g)[2])),
           col = c(skrown$B2, skaturate$red, skaturate$blue),
-          lwd = 2, inset = 0.01, y.intersp = 1.25, cex = 0.9)
+          lwd = 2, inset = 0.01*1:2, y.intersp = 1.25, cex = 1.1)
 
 # ---------------------------------------------------------------------------------
 dev.off()
@@ -65,8 +70,9 @@ png(filename = paste0("ICASSP/PaperPlots/yf_",my.type,"_B",B,".png"),
 width = 7, height = 4, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 
-    # Prep
-    # par(mar = c(4,3.6,4,0))
+# Prep 1
+par(mar = c(4,3.6,4,0))
+
     lim <- range(normy(tru$yf), syf, ayf)
 
     # --- True sy
@@ -87,22 +93,31 @@ width = 7, height = 4, units = "in", res = 200, pointsize = 10)
                   bquote(hat(S)["Y, 1"]),
                   bquote(hat(S)["Y, 2"])),
           col = c(skrown$B2, skaturate$red, skaturate$blue),
-          lwd = 2, inset = 0.01, y.intersp = 1.25, cex = 0.9)
+          lwd = 2, inset = 0.01*1:2, y.intersp = 1.25, cex = 1.1)
 
 # ---------------------------------------------------------------------------------
-dev.off()
+# dev.off()
 ```
 
 
-# Smooth Sgrams
+# Smooth Spectrograms
 
-```{r TRUE-SGRAM}
-png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_smooths",".png"),
-width = 5.5, height = 12, units = "in", res = 200, pointsize = 10)
+```{r}
+png(filename = paste0("ICASSP/PaperPlots/latticePlots/sx_",my.type,"_B",B,"_smooths",".png"),
+width = 6, height = 10, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
+#
+# Prep 3
+par(mfrow = c(3,1), mar = c(4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+# zlim <- 0:1
 
-    # Prep
-    par(mfrow = c(3,1), mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+# png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_true",".png"),
+# width = 7, height = 4, units = "in", res = 200, pointsize = 10)
+# # ---------------------------------------------------------------------------------
+# 
+# # Prep 1
+# par(mar = c(4,4,3,0)) #, oma = c(2.5,0,0,0))
+zlim <- range(normy(tru$xtf))
 
 ## ------------ TRUE
     
@@ -114,17 +129,18 @@ width = 5.5, height = 12, units = "in", res = 200, pointsize = 10)
     #            legend.line = -3, legend.cex = 0.9,
     #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
-# ---------------------------------------------------------------------------------
+# # ---------------------------------------------------------------------------------
 # dev.off()
 # 
 # # ------------ MEAN
-#     
+# 
 # png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_smooth_mean",".png"),
-# width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
-# ---------------------------------------------------------------------------------
-
-    # Prep
-    # par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+# width = 7, height = 4, units = "in", res = 200, pointsize = 10)
+# # ---------------------------------------------------------------------------------
+# 
+# # Prep 1
+# par(mar = c(4,4,3,0)) #, oma = c(2.5,0,0,0))
+zlim <- range(normy(ssx))
 
     # --- Azadeh's sy
     image(Fs, t, t(normy(ssx)), zlim = zlim,
@@ -134,17 +150,18 @@ width = 5.5, height = 12, units = "in", res = 200, pointsize = 10)
     #            legend.line = -3, legend.cex = 0.9,
     #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
-# ---------------------------------------------------------------------------------
+# # ---------------------------------------------------------------------------------
 # dev.off()
 # 
 # # ------------ SAMPLE
-#     
+# 
 # png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_smooth_sample",".png"),
-# width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
-# ---------------------------------------------------------------------------------
-
-    # Prep
-    # par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+# width = 7, height = 4, units = "in", res = 200, pointsize = 10)
+# # ---------------------------------------------------------------------------------
+# #
+# # Prep 1
+# par(mar = c(4,4,3,0)) #, oma = c(2.5,0,0,0))
+zlim <- range(normy(cbc.smooth))
 
     # --- My sy
     image(Fs, t, (normy(cbc.smooth)), zlim = zlim,
@@ -158,14 +175,23 @@ width = 5.5, height = 12, units = "in", res = 200, pointsize = 10)
 dev.off()
 ```
 
-```{r}
-png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_raws",".png"),
-width = 5.5, height = 8, units = "in", res = 200, pointsize = 10)
-# ---------------------------------------------------------------------------------
+# Raw Spectrograms
 
-    # Prep
-    par(mfrow = c(2,1), mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
-    zlim <- 0:1 #range(normy(tru$xtf), normy(cbc$mean), normy(ssx))
+```{r}
+png(filename = paste0("ICASSP/PaperPlots/latticePlots/sx_",my.type,"_B",B,"_raws",".png"),
+width = 5.44, height = 7, units = "in", res = 200, pointsize = 10)
+# ---------------------------------------------------------------------------------
+# Prep 2
+par(mfrow = c(2,1), mar = c(4.2,4,4.2,0)) #, oma = c(2.5,0,0,0))
+# zlim <- 0:1
+
+# png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_raw_mean",".png"),
+# width = 7, height = 4, units = "in", res = 200, pointsize = 10)
+# # ---------------------------------------------------------------------------------
+# #
+# # Prep 1
+# par(mar = c(4,4,3,0)) #, oma = c(2.5,0,0,0))
+zlim <- range(normy(cbc$mean))
 
     # --- My sy
     image(Fs, t, t(normy(cbc$mean)), zlim = zlim,
@@ -175,17 +201,18 @@ width = 5.5, height = 8, units = "in", res = 200, pointsize = 10)
     #            legend.line = -3, legend.cex = 0.9,
     #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
-# ---------------------------------------------------------------------------------
+# # ---------------------------------------------------------------------------------
 # dev.off()
 # 
 # # ------------ SAMPLE
-#     
+# 
 # png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_B",B,"_raw_sample",".png"),
-# width = 5.5, height = 5, units = "in", res = 200, pointsize = 10)
-# ---------------------------------------------------------------------------------
-
-    # Prep
-    par(mar = c(4.4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
+# width = 7, height = 4, units = "in", res = 200, pointsize = 10)
+# # ---------------------------------------------------------------------------------
+# 
+# # Prep 1
+# par(mar = c(4,4,3,0)) #, oma = c(2.5,0,0,0))
+zlim <- range(normy(cbc.samp))
 
     # --- My sy
     image(Fs, t, t(normy(cbc.samp)), zlim = zlim,
@@ -198,3 +225,85 @@ width = 5.5, height = 8, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 dev.off()
 ```
+
+
+#### Stationary
+
+```{r}
+myf.full <- pbapply(trial$cbc, 3, colMeans)
+myf <- rowMeans(myf.full)
+```
+
+```{r}
+png(filename = paste0("ICASSP/PaperPlots/yf_",my.type,"_B",B,".png"),
+width = 7, height = 4, units = "in", res = 200, pointsize = 10)
+# ---------------------------------------------------------------------------------
+# Prep 1
+par(mar = c(4,3.6,4,0))
+
+    lim <- range((tru$yf)/1e2, yf.mtm, myf)
+    
+    # --- True sy
+    splot(Fs, (tru$yf)/1e2, type = "l", ylim = lim, labs = 0, lwd = 2)
+    
+    # --- MTM
+    sadd(Fs, yf.mtm, col = skastel$green, type = "l", lwd =2)
+    
+    # --- Colmeans
+    sadd(Fs, myf, col = skaturate$yellow, type = "l", lwd =2)
+# ---------------------------------------------------------------------------------
+dev.off()
+```
+
+
+
+
+```{r}
+samp <- 96
+
+# Choose realizations, get corresponding yf
+cbc.samp <- trial$cbc[,,samp]
+myf.samp  <- myf.full[,samp]
+```
+
+
+```{r}
+png(filename = paste0("ICASSP/PaperPlots/yf_",my.type,"_B",B,".png"),
+width = 7, height = 4, units = "in", res = 200, pointsize = 10)
+# ---------------------------------------------------------------------------------
+# Prep 1
+par(mar = c(4,3.6,4,0))
+
+    lim <- range((tru$yf)/1e2, yf.mtm, myf.samp)
+    
+    # --- True sy
+    splot(Fs, (tru$yf)/1e2, type = "l", ylim = lim, labs = 0, lwd = 2)
+    
+    # --- MTM
+    sadd(Fs, yf.mtm, col = skastel$purple, type = "l", lwd =1)
+    
+    # --- Colmeans
+    sadd(Fs, myf, col = skaturate$yellow, type = "l", lwd =2)
+    
+    # Labels
+    slab(bquote(bold("Estimates of stationary"~S[X]*"(f)")),
+         bquote("AR-2; SINGLE Simulation"), 
+         "Frequency", bquote("Spectrum"~S[X]*"(f)"), yline = 2.5)
+    legend("topright",
+       legend = c(bquote(S[X]*"(f)"),
+                  "multitaper",
+                  "2-BC colMeans"),
+          col = c(skrown$B2, skastel$purple, skaturate$yellow),
+          lwd = c(2,1,2), inset = 0.01*1:2, y.intersp = 1.25, cex = 1.1)
+    
+    # ---------------------------------------------------------------------------------
+dev.off()
+```
+
+
+
+
+
+
+
+

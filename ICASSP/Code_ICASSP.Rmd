@@ -10,8 +10,9 @@ library(fields)       # Supplement for image plots: legends, better colour
 ```
 
 ```{r}
-# load("PaperData/UMP_B200_full.RData")
-# load("PaperData/UMP_B300_full.RData")
+# load("ICASSP/PaperData/AR2_B200_full.RData")
+# load("ICASSP/PaperData/UMP_B200_full.RData")
+# load("ICASSP/PaperData/UMP_B300_full.RData")
 ```
 
 # GEST 

@@ -1,3 +1,13 @@
+# Meeting with Glen
+
+* What plots do I use? Scale defined by range of estimates? OR common scale on [0,1]?
+* Should I uhh take the mean of the columns? Rather than colsums? what about for g?
+
+
+
+
+
+
 # ICASSP Paper Stuff
 
 Go to Overleaf to edit/view the actual paper.
