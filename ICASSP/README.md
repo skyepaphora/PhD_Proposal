@@ -79,7 +79,7 @@ Go to [This Folder](https://github.com/Skyepaphora-Griffith/PhD_Proposal/tree/ma
 * Talked about this, will consider for proposal, not paper
 
 #### rename estimates
-* For polynomials of order $p$, the estimator which uses the NSQI-based boundary correction for the SWHRS will be called the $p$-BC.
+* For polynomials of order $p$, the estimator which uses NSQI-based boundary correction for the SWHRS will be called the $p$-BC.
 * Azadeh's estimates for $g$ and $S_Y(f)$ will be denoted with a subscript $1$. Mine will have a subscript of $2$.
 
 #### Formatting
