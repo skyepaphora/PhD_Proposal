@@ -1,0 +1,672 @@
+---
+output: html_document
+---
+
+
+## Prelims
+
+```{r packages, warning=FALSE, message=FALSE}
+## --- Packages 
+library(multitaper)   
+library(pbapply)      # Progress bar for apply() functions
+library(kableExtra)   
+library(itsmr)        # Time series stuff, convenient for ARMA
+library(animation)    # For creating gifs
+library(fields)       # Supplement for image plots: legends, better colour
+
+## --------- TEMPORARY --------- ##
+load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
+## --------- --------- --------- ##
+```
+
+---
+
+# GEST \& YEST Previous Methods: SVD
+
+```{r}
+# load("Data/AR2_B200_full.RData")
+load("Data/UMP_B200_full.RData")
+```
+
+```{r}
+# --- Create Function for getting Azadeh's g (and sy)
+est.a <- function(sgram, est = "g"){
+  # SVD
+  duv <- svd(sgram,1,1)
+  
+  d <- duv$d
+  u <- duv$u
+  v <- duv$v
+  
+  # Normalize
+  bu <- 1/duv$u[1]
+  bv <- duv$d[1]/bu
+  
+  # Estimate g
+  g <- bu * duv$u
+  
+  # Estimate Sy
+  sy <- bv * duv$v
+  
+  # Re-normalize (optional)
+  # g  <- g /max(abs(g ))
+  # sy <- sy/max(abs(sy))
+  
+  # Return
+  return(if(est == "g"){g} else {sy})
+}
+
+# normalizing function
+normy <- function(x){x/max(abs(x))}
+```
+
+### Estimating g(t): Based on Mean Results (Cheating) [DEFUNCT]
+
+```{r}
+load("Data/gest_UMP_B200_cheat.RData")
+```
+
+```{r}
+# original code: EstModFunc-count1.Rmd
+
+# Singular Value decomposition
+bc.svd  <- svd( bc$mean,1,1)
+cbc.svd <- svd(cbc$mean,1,1)
+tru.svd <- svd(tru$xtf ,1,1)
+
+# Normalize
+bc.bu <- 1/bc.svd$u[1]        # so that buU[1] = 1
+bc.bv <- bc.svd$d[1]/bc.bu    # d1/bu; now bubv = d1
+
+cbc.bu <- 1/cbc.svd$u[1]
+cbc.bv <- cbc.svd$d[1]/cbc.bu
+
+tru.bu <- 1/tru.svd$u[1]
+tru.bv <- tru.svd$d[1]/tru.bu
+
+# Estimate C
+ag.bc  <-  bc.bu* bc.svd$u
+ag.cbc <- cbc.bu*cbc.svd$u
+ag.tru <- tru.bu*tru.svd$u
+
+# normalize again
+nag.bc  <- ag.bc /max(abs(ag.bc))
+nag.cbc <- ag.cbc/max(abs(ag.cbc))
+nag.tru <- ag.tru/max(abs(ag.tru))
+```
+
+---
+
+## GEST: Estimating g(t)
+
+```{r}
+# Estimate g
+
+ag.cbc.0  <- normy(est.a(cbc$mean))
+
+# plot(-ag.cbc.0)
+# lines(ct^2, lwd = 2, col = "red")
+
+ag.cbc  <- pbapply(trial$cbc, 3, est.a)
+ag <- -normy(rowMeans(ag.cbc))
+
+# plot(-normy(rowMeans(ag.cbc.1)))
+# lines(ct^2, lwd = 2, col = "red")
+
+```
+
+## YEST: Estimating Sy(f)
+
+```{r}
+# Estimate y
+
+ayf.cbc.0  <- est.a(cbc$mean, est = "sy")
+
+# plot(-normy(ayf.cbc.0))
+# lines(normy(tru$yf), lwd = 2, col = "red")
+
+ayf.cbc  <- pbapply(trial$cbc, 3, function(x){est.a(x, est = "sy")})
+# ayf <- list(mean = -normy(rowMeans(ayf.cbc)),
+#             se = apply(ayf.cbc, 1, function(x){}))
+
+# plot(-normy(rowMeans(ayf.cbc.1)))
+# lines(normy(tru$yf), lwd = 2, col = "red")
+
+```
+
+
+
+
+# GEST Proposed Method (NEW)
+
+### Create function
+
+```{r}
+gest <- function(sgram){
+  N <- length(sgram[,1])
+  A <- outer(1:N,1:N, function(l,j){rowSums(sgram)[l]/rowSums(sgram)[j]})
+  G <- Mod(eigen(A/N)$vectors[,1])
+  # G <- G/max(G)
+  return(G); gc()
+}
+```
+
+### Estimating g(t): Based on Mean Results (Cheating)
+
+```{r}
+## --- Load Data (choose 1)
+load(file = "Data/UMP_B200_mini.RData")       
+load(file = "Data/UMP_B200_mini_rev.RData")   
+load(file = "Data/UMP_B400_mini_rev.RData")
+```
+
+```{r get_c_est}
+# Squared Modulating Function
+gt <- ct^2
+
+# Stats
+g.bc  <- list(mean = gest( bc$mean),
+                se = gest( bc$se))
+g.cbc <- list(mean = gest(cbc$mean),
+                se = gest(cbc$se))
+
+# Store Confidence Intervals
+g.bc$LCL <- g.bc$mean - 2*g.bc$se
+g.bc$UCL <- g.bc$mean + 2*g.bc$se
+
+g.cbc$LCL <- g.cbc$mean - 2*g.cbc$se
+g.cbc$UCL <- g.cbc$mean + 2*g.cbc$se
+
+# save
+save.image(paste0("Data/gest_",my.type,"_B",B,"_cheat.RData"))
+```
+
+### Estimating g(t): Based on ALL Results
+
+```{r}
+## --- Load Data (choose 1)
+load(file = "Data/AR2_B200_full.RData")       
+load(file = "Data/UMP_B200_full.RData")       
+load(file = "Data/UMP_B200_full_rev.RData")   
+load(file = "Data/UMP_B400_full_rev.RData")
+```
+
+```{r}
+# Squared Modulating Function
+gt <- ct^2
+
+# FULL --- (warning: long-ish runtime)
+g.bc.full  <- pbapply(trial$bc, 3, gest); gc()
+g.cbc.full <- pbapply(trial$cbc,3, gest); gc()
+
+# STATS
+g.bc  <- list(mean = pbapply( g.bc.full, 1, mean),
+                se = pbapply( g.bc.full, 1, sd)/sqrt(M))
+g.cbc <- list(mean = pbapply(g.cbc.full, 1, mean),
+                se = pbapply(g.cbc.full, 1, sd)/sqrt(M))
+
+# Store Confidence Intervals
+g.bc$LCL <- g.bc$mean - 2*g.bc$se
+g.bc$UCL <- g.bc$mean + 2*g.bc$se
+
+g.cbc$LCL <- g.cbc$mean - 2*g.cbc$se
+g.cbc$UCL <- g.cbc$mean + 2*g.cbc$se
+```
+
+```{r save_1}
+# save
+gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_full.RData"))
+
+# remove trial (large)
+rm(trial)
+
+# save
+gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_mini.RData"))
+```
+
+# Using g(t) to smooth spectrogram estimates
+
+### Cheating (M=100)
+
+```{r}
+load("Data/gest_UMP_B200_cheat.RData")
+```
+
+```{r}
+yf.bc <- colMeans(bc$mean)
+bc.smooth <- outer(yf.bc, g.bc$mean)
+```
+
+
+### Only cheating with spectrograms, got g for every simulation
+
+```{r}
+## --- Load
+# load("Data/gest_UMP_B200_mini.RData")
+# load("Data/gest_UMP_B200_rev_mini.RData")
+# load("Data/gest_UMP_B400_rev_mini.RData")
+
+## --- BC
+yf.bc <- colMeans(bc$mean)
+bc.smooth <- outer(yf.bc, g.bc$mean)
+
+## --- CBC
+yf.cbc <- colMeans(cbc$mean)
+cbc.smooth <- outer(yf.cbc, g.cbc$mean)
+
+# Save
+# save.image("Data/gest_UMP_B200_mini.RData")
+# save.image("Data/gest_UMP_B200_rev_mini.RData")
+# save.image("Data/gest_UMP_B400_rev_mini.RData")
+```
+
+### Single instance: REALLY not cheating
+
+```{r}
+# load("Data/gest_UMP_B200_full.RData")
+# load("Data/gest_UMP_B200_rev_full.RData")
+# load("Data/gest_UMP_B400_rev_full.RData")
+
+# Roll the 100-sided die
+set.seed(17)
+samp <- sample(1:M, 1)
+
+# Choose realizations, get corresponding g
+bc.samp  <- trial$bc[,,samp]
+gbc.samp <- g.bc.full[,samp]
+
+cbc.samp  <- trial$cbc[,,samp]
+gcbc.samp <- g.cbc.full[,samp]
+
+## --- BC
+yf.bc <- colMeans(bc.samp)
+bc.smooth <- outer(yf.bc, gbc.samp)
+
+## --- CBC
+yf.cbc <- colMeans(cbc.samp)
+cbc.smooth <- outer(yf.cbc, gcbc.samp)
+
+# save.image("Data/gest_UMP_B200_full.RData")
+# save.image("Data/gest_UMP_B200_rev_full.RData")
+# save.image("Data/gest_UMP_B400_rev_full.RData")
+```
+
+# YEST: Column Means of Spectrograms for Stationary Series
+
+### Create function
+
+```{r}
+yest <- function(sgram, normalize = FALSE){
+  N <- length(sgram[1,])
+  A <- outer(1:NF,1:NF, function(l,j){colSums(sgram)[l]/colSums(sgram)[j]})
+  S <- Mod(eigen(A/N)$vectors[,1])
+  if(normalize){S <- S/max(S)}
+  return(S); gc()
+}
+```
+
+#### Extreme cheat (cloned from what I'm doing with g right now)
+
+```{r get_c_est}
+# Squared Modulating Function
+# gt <- ct^2
+
+# Stats
+sy.bc  <- list(mean = yest( bc$mean),
+                 se = yest( bc$se))
+sy.cbc <- list(mean = yest(cbc$mean),
+                 se = yest(cbc$se))
+
+# Store Confidence Intervals
+sy.bc$LCL <- sy.bc$mean - 2*sy.bc$se
+sy.bc$UCL <- sy.bc$mean + 2*sy.bc$se
+
+sy.cbc$LCL <- sy.cbc$mean - 2*sy.cbc$se
+sy.cbc$UCL <- sy.cbc$mean + 2*sy.cbc$se
+
+# save
+save.image(paste0("Data/yest_",my.type,"_B",B,"_cheat.RData"))
+```
+
+### Cheating
+
+```{r}
+load("Data/AR2_B200_full.RData")
+```
+
+```{r}
+# Time Series for MTM
+set.seed(68)
+yt <- arima.sim(model = list(ar = c(0.5,-0.5), sd = 10), n = N)
+
+# Spectrum Estimates
+yf.mtm <- spec.mtm(yt,plot = FALSE)$spec
+# yf.bc  <- colMeans( bc$mean) # no
+# yf.cbc <- colMeans(cbc$mean) # no
+
+yf.bc.sims  <- t(pbapply(trial$bc , 3, colMeans))
+yf.cbc.sims <- t(pbapply(trial$cbc, 3, colMeans))
+
+yf.bc  <- list(mean = colMeans(yf.bc.sims),
+               se   = apply( yf.bc.sims, 2, sd)/sqrt(M))
+yf.cbc <- list(mean = colMeans(yf.cbc.sims),
+               se   = apply(yf.cbc.sims, 2, sd)/sqrt(M))
+
+# Standard Error
+# se.bc  <- apply(bc$mean,2,sd)/sqrt(N)
+# se.cbc <- apply(bc$mean,2,sd)/sqrt(N)
+
+# +/- 2*SE
+ucl.bc <- yf.bc$mean + 2*yf.bc$se # se.bc
+lcl.bc <- yf.bc$mean - 2*yf.bc$se # se.bc
+
+ucl.cbc <- yf.cbc$mean + 2*yf.cbc$se # se.cbc 
+lcl.cbc <- yf.cbc$mean - 2*yf.cbc$se # se.cbc
+
+gc(); save.image("Data/AR2_B200_full.RData")
+```
+
+### Not cheating
+
+```{r}
+## --- Load 
+load("Data/AR2_B200_full.RData")
+```
+
+```{r}
+
+# Roll Die
+set.seed(68); samp <- sample(1:M, 1)
+
+# Time Series for MTM
+set.seed(68)
+yt <- arima.sim(model = list(ar = c(0.5,-0.5), sd = 10), n = N)
+
+# Spectrum Estimates
+yf.mtm <- spec.mtm(yt,plot = FALSE)$spec
+yf.bc  <- colMeans(trial$bc [,,samp])
+yf.cbc <- colMeans(trial$cbc[,,samp])
+
+# Standard Error
+se.bc  <- apply(trial$bc [,,samp],2,sd)/sqrt(N)
+se.cbc <- apply(trial$cbc[,,samp],2,sd)/sqrt(N)
+
+# +/- 2*SE
+ucl.bc <- yf.bc + 2*se.bc
+lcl.bc <- yf.bc - 2*se.bc
+
+ucl.cbc <- yf.cbc + 2*se.cbc
+lcl.cbc <- yf.cbc - 2*se.cbc
+
+# SAVE
+rm(trial); gc()
+save.image("Data/AR2_B200_samp.RData")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Messy stuff
+
+### Return to Spectrogram
+
+```{r f_domain}
+# control
+ct.bc  <- rowSums(bc$mean)/rowSums(bc$mean)[1]
+ct.cbc <- rowSums(cbc$mean)/rowSums(cbc$mean)[1]
+
+# True vals
+yt <- arima.sim(model = list(ar = c(0.8,-0.4), sd = 100), n = N)
+xt <- ct*yt
+
+# Estimated AR(2)
+yt.bc.control  <- xt/ct.bc
+yt.cbc.control <- xt/ct.cbc
+
+yt.bc  <- xt/(C.bc+1)   # +1 in denominator so that it's positive
+yt.cbc <- xt/(C.cbc+1)  # not rigorous just desperate
+
+# estimated spectra of S(f)
+yf.mtm <- spec.mtm(ts(yt), plot = FALSE)$spec
+
+yf.bc.control  <- spec.mtm(ts(yt.bc.control) , plot = FALSE)$spec
+yf.cbc.control <- spec.mtm(ts(yt.cbc.control), plot = FALSE)$spec
+
+yf.bc.con.scale  <- spec.mtm(ts(yt.bc.control) , plot = FALSE)$spec   / 1e1
+yf.cbc.con.scale <- spec.mtm(ts(yt.cbc.control), plot = FALSE)$spec   / 1e1
+
+yf.bc  <- spec.mtm(ts(yt.bc) , plot = FALSE)$spec
+yf.cbc <- spec.mtm(ts(yt.cbc), plot = FALSE)$spec
+
+yf.bc.scale  <- spec.mtm(ts(yt.bc) , plot = FALSE)$spec   /2
+yf.cbc.scale <- spec.mtm(ts(yt.cbc), plot = FALSE)$spec   /2
+
+limes.control <- range(yf.mtm, yf.bc.control, yf.cbc.control)
+limes.con.scale <- range(yf.mtm, yf.bc.con.scale, yf.cbc.con.scale)
+limes <- range(yf.mtm, yf.bc, yf.cbc)
+limes.scale <- range(yf.mtm, yf.bc.scale, yf.cbc.scale) 
+
+```
+
+```{r, fig.dim = c(12,8), echo = FALSE}
+
+# ---  Plots ------------ ## 
+par(mar = c(4,5,4,1))
+
+# -- Control 
+splot(Fs, yf.true/1e4, type = "l", colr = skrown$salt, ylim = limes.control)
+lines(Fs, yf.mtm)
+lines(Fs, yf.bc.control , col = skaturate$blue)
+lines(Fs, yf.cbc.control, col = skol$orange)
+
+slab(main = "Spectrum estimates using y = x/c",
+     subb = bquote(hat(c)*" is: rowsums, normalized by rowsum at t = 1"),
+     xlab = "frequency", ylab = "y(f)")
+
+legend("top", legend = c("BC", "CBC", "mtm"),
+        col = c(skaturate$blue, skol$orange, "black"),
+       lwd = 2, inset = 0.01)
+
+# -- Control (scaled)
+splot(Fs, yf.true/1e4, type = "l", colr = skrown$salt, ylim = limes.con.scale)
+lines(Fs, yf.mtm)
+lines(Fs, yf.bc.con.scale , col = skaturate$blue)
+lines(Fs, yf.cbc.con.scale, col = skol$orange)
+
+slab(main = "Spectrum estimates using y = x/c",
+     subb = "rowsums, normalized by rowsum at t = 1, SCALED down (1/10)",
+     xlab = "frequency", ylab = "y(f)")
+
+legend("top", legend = c("BC", "CBC", "mtm"),
+        col = c(skaturate$blue, skol$orange, "black"),
+       lwd = 2, inset = 0.01)
+
+# -- Proposed method
+splot(Fs, yf.true/1e4, type = "l", colr = skrown$salt, ylim = limes)
+lines(Fs, yf.mtm, col = skrown$B2)
+lines(Fs, yf.bc , col = skaturate$blue)
+lines(Fs, yf.cbc, col = skol$orange)
+
+slab(main = "Spectrum estimates using y = x/c",
+     subb = bquote(hat(c)*" is solution to Ac = 0"),
+     xlab = "frequency", ylab = "y(f)")
+
+legend("top", legend = c("BC", "CBC", "mtm"),
+        col = c(skaturate$blue, skol$orange, "black"),
+       lwd = 2, inset = 0.01)
+
+# -- Proposed method SCALED
+splot(Fs, yf.true/1e4, type = "l", colr = skrown$salt, ylim = limes.scale)
+lines(Fs, yf.mtm, col = skrown$B2)
+lines(Fs, yf.bc.scale , col = skaturate$blue)
+lines(Fs, yf.cbc.scale, col = skol$orange)
+
+slab(main = "Spectrum estimates using y = x/c",
+     subb = bquote(hat(c)*" is solution to Ac = 0, SCALED down (1/2)"),
+     xlab = "frequency", ylab = "y(f)")
+
+legend("top", legend = c("BC", "CBC", "mtm"),
+        col = c(skaturate$blue, skol$orange, "black"),
+       lwd = 2, inset = 0.01)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r animation plot, eval = FALSE, echo = FALSE}
+yf.bc  <-  bc$mean/C.bc
+yf.cbc <- cbc$mean/C.cbc
+yf.n   <-  bc$mean/ct^2
+
+
+# image.plot(yf.n)
+p <- 0
+pb <- txtProgressBar(style = 3)
+
+saveGIF({  for (my.t in seq(1,N,by = 5)) {
+
+splot(Fs, yf.true/1e3, type = "l", lwd = 2)
+lines(Fs, yf.bc[my.t,], col = "blue")
+lines(Fs, yf.cbc[my.t,], col = "goldenrod")
+
+  gc()
+    p <- p+1
+    setTxtProgressBar(pb, p/500)
+
+    } },
+  
+  # --- GIF details
+  interval   = 0.1,
+  movie.name = paste0("~/Plots/test_1.gif"),
+  ani.height = 668, ani.width = 1080); gc()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# space
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hi
+
