@@ -1,8 +1,8 @@
-# CBC_Simulations.Rmd
+# pBC_Simulator.Rmd
 
 ### TFS Estimators
 
-The file *CBC_Simulations.Rmd* produces a simulated ensemble of time series, and estimates the time-frequency spectra (TFS) of each series.
+The file *pBC_Simulator.Rmd* produces a simulated ensemble of time series, and estimates the time-frequency spectra (TFS) of each series.
 
 **BCTMFSE:** the **B**oundary **C**orrected **M**odified **T**ime **F**requency **S**pectrum **E**stimate
 
@@ -12,13 +12,15 @@ Both estimates are based on a smoothed version of a multitaper-based TFS estimat
 called the *Sliding Window High Resolution Spectrogram.*
 
 
-### What time series are we working with?
+### Default Parameters
 
-These estimates are flexible, aimed at general non-stationary series. For the simulations which produced the plots in the "Plot" folder of this repository, we simulate the UMP, $X(t)$:
+These estimates are flexible, aimed at general non-stationary series. For the simulations which produced the plots in this repository, we generally simulate the UMP, $X(t)$:
 
 $$
 \begin{aligned}
-    X(t) &= \exp\left(\frac{-(t-500)^2}{2(200)^2}\right) Y(t)  \\ 
+    X(t) &= c(t)Y(t)  \\ 
+    &\\
+    c(t) &= \exp\left(\frac{-(t-500)^2}{2(200)^2}\right) 
     &\\
     Y(t) &= 0.5 Y(t-1) - 0.5 Y(t-2) + z(t)                                        \\ 
     &\\
@@ -26,11 +28,11 @@ $$
 \end{aligned}
 $$
 
-Above, note that $Y$ is a stationary AR(2) process, and $z$ is purely white noise.
+Above, note that $Y$ is a stationary AR(2) process, and $z$ is white noise.
 
 ---
 
-# C_estimator.Rmd
+# smooth_estimators.Rmd
 
 ### Previous Methods: SVD (Azadeh)
 

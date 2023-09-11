@@ -39,10 +39,6 @@ est.a <- function(sgram, est = "g"){
   # Estimate Sy
   sy <- bv * duv$v
   
-  # Re-normalize (optional)
-  # g  <- g /max(abs(g ))
-  # sy <- sy/max(abs(sy))
-  
   # Return
   return(if(est == "g"){g} else {sy})
 }
@@ -112,7 +108,7 @@ syf <- normy(rowMeans(syf.full))
 ```
 
 
-# Smooth Specttograms
+# Smooth Spectrograms
 
 ```{r}
 smoo <- function(g, yf){
