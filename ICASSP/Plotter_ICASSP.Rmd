@@ -10,10 +10,10 @@ library(fields, quietly = TRUE, warn.conflicts = FALSE)
 
 ## --- Splot + Spalette ---------------------------- ##
 load("~/Research/Skyes_Toolbox/splot.RData")
-load("~/Research/PhD_Proposal/ICASSP/PaperData/AR2_B200_full_yf.RData")
+# load("~/Research/PhD_Proposal/ICASSP/PaperData/AR2_B200_full_yf.RData")
 
 ## --- Data (choose 1) ----------------------------- ##
-# load("ICASSP/PaperData/UMP_B200_reduced_S.RData")
+load("ICASSP/PaperData/UMP_B200_reduced_S.RData")
 
 ## --- Common z-axis limits
 zlim <- 0:1 
@@ -103,13 +103,18 @@ par(mar = c(4,3.6,4,0))
 # Smooth Spectrograms
 
 ```{r}
-png(filename = paste0("ICASSP/PaperPlots/latticePlots/sx_",my.type,"_B",B,"_smooths",".png"),
+png(filename = paste0("ICASSP/PaperPlots/commonZrange/sx_",my.type,"_B",B,"_smooths3",".png"),
 width = 6, height = 10, units = "in", res = 200, pointsize = 10)
 # ---------------------------------------------------------------------------------
 #
 # Prep 3
 par(mfrow = c(3,1), mar = c(4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
-# zlim <- 0:1
+zlim <- 0:1
+# png(filename = paste0("ICASSP/PaperPlots/commonZrange/sx_",my.type,"_B",B,"_smooths2",".png"),
+# width = 5.44, height = 7, units = "in", res = 200, pointsize = 10)
+# # ---------------------------------------------------------------------------------
+# # Prep 2
+# par(mfrow = c(2,1), mar = c(4.2,4,4.2,0)) #, oma = c(2.5,0,0,0))
 
 # png(filename = paste0("ICASSP/PaperPlots/sx_",my.type,"_true",".png"),
 # width = 7, height = 4, units = "in", res = 200, pointsize = 10)
@@ -117,7 +122,7 @@ par(mfrow = c(3,1), mar = c(4,4.4,4.4,0)) #, oma = c(2.5,0,0,0))
 # 
 # # Prep 1
 # par(mar = c(4,4,3,0)) #, oma = c(2.5,0,0,0))
-zlim <- range(normy(tru$xtf))
+# zlim <- range(normy(tru$xtf))
 
 ## ------------ TRUE
     
@@ -140,15 +145,15 @@ zlim <- range(normy(tru$xtf))
 # 
 # # Prep 1
 # par(mar = c(4,4,3,0)) #, oma = c(2.5,0,0,0))
-zlim <- range(normy(ssx))
+# zlim <- range(normy(ssx))
 
-    # --- Azadeh's sy
-    image(Fs, t, t(normy(ssx)), zlim = zlim,
-    xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
-    slab("Smoothed 2-BC Spectrogram", "Mean over 100 Simulations", "Frequency", "Time")
-    # image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
-    #            legend.line = -3, legend.cex = 0.9,
-    #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
+    # # --- mean smooth
+    # image(Fs, t, t(normy(ssx)), zlim = zlim,
+    # xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+    # slab("Smoothed 2-BC Spectrogram", "Mean over 100 Simulations", "Frequency", "Time")
+    # # image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
+    # #            legend.line = -3, legend.cex = 0.9,
+    # #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
 # # ---------------------------------------------------------------------------------
 # dev.off()
@@ -161,16 +166,31 @@ zlim <- range(normy(ssx))
 # #
 # # Prep 1
 # par(mar = c(4,4,3,0)) #, oma = c(2.5,0,0,0))
-zlim <- range(normy(cbc.smooth))
+# zlim <- range(normy(cbc.smooth))
 
-    # --- My sy
+    # --- smooth samp
     image(Fs, t, (normy(cbc.smooth)), zlim = zlim,
     xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
-    slab("Smoothed 2-BC Spectrogram", "Single Simulation", "Frequency", "Time")
+    slab("Smoothed 2-BCE Spectrogram", "Single Simulation", "Frequency", "Time")
     # image.plot(legend.only = TRUE, legend.lab = "Power", zlim = zlim,
     #            legend.line = -3, legend.cex = 0.9,
     #            horizontal  = TRUE, smallplot  = c(0.11,0.96,0,0.05))
 
+    
+    # --- raw samp
+    image(Fs, t, t(normy(cbc.samp)), zlim = zlim,
+    xlab = "", ylab = "", las = 1, col = tim.colors()); sox(); gc()
+    slab("Raw 2-BCE Spectrogram", "Single Simulation", "Frequency", "Time")
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 # ---------------------------------------------------------------------------------
 dev.off()
 ```
