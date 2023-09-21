@@ -154,6 +154,19 @@ In general, I'm normalizing the average result over 100 *un-normalized* estimate
 
 * instead, normalize by t=500
 
+# September 12th
+
+#### Skye's Agenda
+
+* I've updated all the code, gotten nice results/plots, backed up
+    - New data offsets c(t) so that it isn't symmetric about t=500. This leaves different curvature in the time-boundary regions, which is especially distinct if we modulate by 1-c(t)
+    - i also have some basic results for a GUMP-2
+* Today my goal is to get a full draft of chapter 3 done
+* Then I'm going to go through and update chapter 2 with the literature used throughout chapter 3
+* Wednesday through Friday I'm going to aim to finish chapter 4 and update chapter 2 accordingly
+* Going to an engagement party this weekend, but only for the weekend like I'll work Friday and we leave at 4pm, then I'm back Monday morning
+
+# September 21st
 
 
 

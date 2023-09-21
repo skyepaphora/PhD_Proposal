@@ -20,8 +20,8 @@ library(fields)       # Supplement for image plots: legends, better colour
 ```
 
 ```{r}
-# load("Data/AR2_B200_full.RData")
-load("Data/UMP_B200_full.RData")
+# load("Data/B300_c1_UMP_full.RData")
+load("Data/B300_c3_UMP_full.RData")
 ```
 
 ---
@@ -63,7 +63,7 @@ normy <- function(x){x/max(abs(x))}
 ag.full <- pbapply(trial$bc2, 3, est.a); gc()
 
 # Normalized Average
-ag  <- -normy(rowMeans(ag.full))
+ag  <- normy(rowMeans(ag.full))
 ```
 
 ### YEST: Estimating Sy(f)
@@ -242,9 +242,9 @@ bc2.smooth <- outer(yf.samp, g.samp)
 ```
 
 ```{r save2}
-# save.image(paste0("~/Research/PhD_Proposal/PaperData/",my.type,"_B",B,"_full_S.RData"))
-# rm(asx.full, ssx.full); gc()
-# save.image(paste0("~/Research/PhD_Proposal/PaperData/",my.type,"_B",B,"_reduced_S.RData"))
+save.image(paste0("Data/","B",B,"_",cc,"_",my.type,"_full_S-2bc.RData"))
+rm(asx.full, ssx.full); gc()
+save.image(paste0("Data/","B",B,"_",cc,"_",my.type,"_reduced_S-2bc.RData"))
 ```
 
 
