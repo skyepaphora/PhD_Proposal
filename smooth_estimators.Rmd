@@ -20,8 +20,10 @@ library(fields)       # Supplement for image plots: legends, better colour
 ```
 
 ```{r}
+load("Data/B200_c1_UMP_full.RData")
+# load("Data/B200_c3_UMP_full.RData")
 # load("Data/B300_c1_UMP_full.RData")
-load("Data/B300_c3_UMP_full.RData")
+# load("Data/B300_c3_UMP_full.RData")
 ```
 
 ---
@@ -104,7 +106,7 @@ yest <- function(sgram, normalize = FALSE){
 sg.full <- pbapply(trial$bc2, 3, gest); gc()
 
 # Normalized Average
-sg  <- normy(rowMeans(ag.full))
+sg  <- normy(rowMeans(sg.full))
 ```
 
 ### YEST: Estimating Sy(f)
