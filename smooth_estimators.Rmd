@@ -149,12 +149,9 @@ syf <- normy(rowMeans(syf.full))
 # gc(); save.image(paste0("Data/gest_",my.type,"_B",B,"_mini.RData"))
 ```
 
-### Stats + MTM [better]
+### MTM               ... and stats [better]
 
 ```{r}
-
-# Roll Die
-set.seed(68); samp <- sample(1:M, 1)
 
 # Time Series for MTM
 set.seed(68)
@@ -163,27 +160,29 @@ yt <- arima.sim(model = list(ar = c(0.5,-0.5), sd = 10), n = N)
 # Spectrum Estimates
 yf.mtm <- spec.mtm(yt,plot = FALSE)$spec
 
-
-# ~~~ 1-BC
-  yf.bc1 <- colMeans(trial$bc1[,,samp])
-
-  # Standard Error
-  se.bc1 <- apply(trial$bc1[,,samp],2,sd)/sqrt(N)
-
-  # +/- 2*SE
-  ucl.bc1 <- yf.bc1+ 2*se.bc1
-  lcl.bc1 <- yf.bc1- 2*se.bc1
-
-
-# ~~~ 2-BC
-  yf.bc2 <- colMeans(trial$bc2[,,samp])
-
-  # Standard Error
-  se.bc2 <- apply(trial$bc2[,,samp],2,sd)/sqrt(N)
-
-  # +/- 2*SE
-  ucl.bc2 <- yf.bc2 + 2*se.bc2
-  lcl.bc2 <- yf.bc2 - 2*se.bc2
+# Roll Die
+# set.seed(68); samp <- sample(1:M, 1)
+# 
+# # ~~~ 1-BC
+#   yf.bc1 <- colMeans(trial$bc1[,,samp])
+# 
+#   # Standard Error
+#   se.bc1 <- apply(trial$bc1[,,samp],2,sd)/sqrt(N)
+# 
+#   # +/- 2*SE
+#   ucl.bc1 <- yf.bc1+ 2*se.bc1
+#   lcl.bc1 <- yf.bc1- 2*se.bc1
+# 
+# 
+# # ~~~ 2-BC
+#   yf.bc2 <- colMeans(trial$bc2[,,samp])
+# 
+#   # Standard Error
+#   se.bc2 <- apply(trial$bc2[,,samp],2,sd)/sqrt(N)
+# 
+#   # +/- 2*SE
+#   ucl.bc2 <- yf.bc2 + 2*se.bc2
+#   lcl.bc2 <- yf.bc2 - 2*se.bc2
 
 # SAVE
 # rm(trial); gc()
