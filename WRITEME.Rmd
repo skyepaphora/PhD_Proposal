@@ -166,7 +166,30 @@ In general, I'm normalizing the average result over 100 *un-normalized* estimate
 * Wednesday through Friday I'm going to aim to finish chapter 4 and update chapter 2 accordingly
 * Going to an engagement party this weekend, but only for the weekend like I'll work Friday and we leave at 4pm, then I'm back Monday morning
 
-# September 21st
+# October 6th
+* stuff for intro to 4.2
+    - Read papers Glen put in the slack
+    - Do a connected papers on Senay
+* you need to show comprehension (breadth)
+
+* (26) is like a time-dep eigencoef
+* why is senay
+    - uses tapers to reduce leakage
+
+* Talk about wavelets
+    - don't explain them just say that they exist, I'm aware of them
+    - "here's a bunch of papers that do this: blablabla"
+    
+* Data analysis
+    - what data is relevant
+    - Seismic for UMPS (put this first)
+    - list some papers that have used real data
+    - how do I obtain real data? Say you don't know
+
+* bundle coherence into BSS section
+    - Extend our estimates of the evolutionary spectrum to the cross case
+    - repeat "definition was proposed in melard and schutter ..." from senay, part before eq (5)
+    
 
 
 
