@@ -208,7 +208,7 @@ p.bc <- function(p = 2, type = "noise", B = 100, M = 100, seed = 0,
 # Simulate
 
 ```{r}
-my.type <- "UMP"
+my.type <- "AR2"
 trial <- p.bc(p = 1:2, type = my.type, M = M, B = B, seed = 68, ct = ct); gc()
 ```
 
@@ -227,10 +227,10 @@ pbc$bc2$se   <- pbapply(trial$bc2, 1:2, sd)/sqrt(M); gc()
 
 ```{r save0}
 ## --- Save! --------- ##
-save.image(paste0("Data/","B",B,"_",cc,"_",my.type,"_full.RData"))
+save.image(paste0("Data/",my.type,"_B",B,"_",cc,"_full.RData"))
 
 rm(trial); gc() # discard individual simulations, keep stats
 
-save.image(paste0("Data/","B",B,"_",cc,"_",my.type,"_mini.RData"))
+save.image(paste0("Data/",my.type,"_B",B,"_",cc,"_mini.RData"))
 ```
 
