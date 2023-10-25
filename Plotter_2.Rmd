@@ -22,7 +22,7 @@ load("~/Research/Skyes_Toolbox/splot.RData")
 zlim <- 0:1 
 
 ## --- sgram legend placement
-leggo <- list(single = c(0.925,0.95,0.1,0.925),
+leggo <- list(single = c(0.925,0.95,0.1,0.925),aa
               double.h = c(0.9,0.94,0.1,0.925))
 ```
 

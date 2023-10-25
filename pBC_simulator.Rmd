@@ -38,6 +38,11 @@ ct3  <- 1 - ct1                       # reversed
 ct <- ct1 ; cc <- "c1"                # --- choose!
 gt <- ct^2                            # squared (estimated later via S_X)
 
+## --- Parameters for Azadeh's Example 4 AR(2) non-stationary series
+psi.1 <- 0.2                            
+psi.2 <- t(t(0.1*sin(2*pi*(0.001)*t)))
+a.12  <- t(t(psi.1*(1 - psi.2)))
+
 ## --- Function: true spectral density of an AR(2) series (sd = 10 is fixed)
 ar2 <- function(phi = c(0,0)){ (10^2)/Mod( 1 - phi[1]*exp(-i*2*pi*Fs) - phi[2]*(exp(-i*4*pi*Fs)))^2 }
 ```
@@ -100,16 +105,16 @@ p.bc <- function(p = 2, type = "noise", B = 100, M = 100, seed = 0,
   
   
         # Get signals --------- This is for storing to plot stuff later, might not need since we have freqs idk
-        if(!is.null(freq)){
-          st  <- list()
-          ind <- 1
-          for(f in freq){ st[[ind]] = cos(2*pi*Fs[f]*t); ind <- ind + 1 }
-          sig <- rowSums(matrix(unlist(st), nrow = N))
-          } else {st <- NULL; sig <- 0}
+        # if(!is.null(freq)){
+        #   st  <- list()
+        #   ind <- 1
+        #   for(f in freq){ st[[ind]] = cos(2*pi*Fs[f]*t); ind <- ind + 1 }
+        #   sig <- rowSums(matrix(unlist(st), nrow = N))
+        #   } else {st <- NULL; sig <- 0}
   
   # Get series based on type
     if(type == "noise"){
-      get <- function(){ return(rnorm(N, sd = 10) + sig) }
+      get <- function(){ return(rnorm(N, sd = 10))}# + sig) }
     } else if(type == "AR2"){
       get <- function(){ return(arima.sim(model = list(ar = ar2, sd = 10), n = N)) }
     } else if(type == "UMP"){
@@ -122,6 +127,11 @@ p.bc <- function(p = 2, type = "noise", B = 100, M = 100, seed = 0,
           yt1 <- arima.sim(model = list(ar = ar2  , sd = 10), n = N)
           yt2 <- arima.sim(model = list(ar = ar2.2, sd = 10), n = N)
           return(ct*yt1 + ct2*yt2)
+      }
+    } else if(type == "other"){
+      get <- function(){
+        z <- rnorm(N+2,0,10)
+        x <- z[3:(N+2)] + a.12*z[2:(N+1)] + psi.2*z[1:N]
       }
     } else {error}
   
@@ -180,21 +190,29 @@ p.bc <- function(p = 2, type = "noise", B = 100, M = 100, seed = 0,
   } # -------------------------- loop ends -------------------------- #
   
   # TRUE values
-  zf.true  <- rep(10^2,NF)
-  ztf.true <- outer(rep(1,N), zf.true)
+  #zf.true  <- rep(10^2,NF)
+  #ztf.true <- outer(rep(1,N), zf.true)
   
   yf.true  <- if(type != "noise"){ar2(ar2)  } else {NULL}
   ytf.true <- if(type != "noise"){outer(rep(1,N), yf.true )} else {NULL}
   
-  yf2.true  <- if(type == "GUMP"){ar2(ar2.2)} else {NULL}
-  ytf2.true <- if(type == "GUMP"){outer(rep(1,N), yf2.true)} else {NULL}
+  # yf2.true  <- if(type == "GUMP"){ar2(ar2.2)} else {NULL}
+  # ytf2.true <- if(type == "GUMP"){outer(rep(1,N), yf2.true)} else {NULL}
   
-  xtf.true  <- if((type == "UMP") || (type == "GUMP")){outer(ct^2, yf.true)} else {NULL}
-  xtf2.true <- if(type == "GUMP"){outer(ct2^2, yf2.true)} else {NULL}
+  xtf.true  <- if(type == "AR2"){ ytf.true
+        } else if(type == "UMP"){ outer(ct^2, yf.true)
+        } else { # if(type == "other"){
+            1e2/(Mod(1 - (a.12)%*%exp(-i*2*pi*Fs) - psi.2%*%exp(-i*2*pi*Fs*2))^2)
+        } else {NULL}
+  # xtf2.true <- if(type == "GUMP"){outer(ct2^2, yf2.true)} else {NULL}
   
   # Save true vals
-  tru <- list(zf.true, ztf.true, yf.true, ytf.true, yf2.true, ytf2.true, xtf.true, xtf2.true, st)
-  names(tru) <- c("zf", "ztf", "yf", "ytf", "yf2", "ytf2", "xtf", "xtf2", "signals")
+  tru <- list(#zf.true, ztf.true,
+              yf.true, ytf.true, # yf2.true, ytf2.true,
+              xtf.true)#, xtf2.true,
+  names(tru) <- c(#"zf", "ztf",
+                  "yf", "ytf", #"yf2", "ytf2",
+                  "xtf") #, "xtf2",
   
   # output
   return(list(bc1 = bc1.sims,
@@ -208,7 +226,7 @@ p.bc <- function(p = 2, type = "noise", B = 100, M = 100, seed = 0,
 # Simulate
 
 ```{r}
-my.type <- "AR2"
+my.type <- "other"
 trial <- p.bc(p = 1:2, type = my.type, M = M, B = B, seed = 68, ct = ct); gc()
 ```
 
@@ -227,10 +245,14 @@ pbc$bc2$se   <- pbapply(trial$bc2, 1:2, sd)/sqrt(M); gc()
 
 ```{r save0}
 ## --- Save! --------- ##
-save.image(paste0("Data/",my.type,"_B",B,"_",cc,"_full.RData"))
+save.image(paste0("Data/",my.type,
+                  if(my.type=="UMP"){paste0("_",cc)}else{NULL},
+                  "_B",B,"___full.RData"))
 
 rm(trial); gc() # discard individual simulations, keep stats
 
-save.image(paste0("Data/",my.type,"_B",B,"_",cc,"_mini.RData"))
+save.image(paste0("Data/",my.type,
+                  if(my.type=="UMP"){paste0("_",cc)}else{NULL},
+                  "_B",B,"___mini.RData"))
 ```
 
