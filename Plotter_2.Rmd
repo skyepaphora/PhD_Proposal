@@ -22,7 +22,7 @@ load("~/Research/Skyes_Toolbox/splot.RData")
 zlim <- 0:1 
 
 ## --- sgram legend placement
-leggo <- list(single = c(0.925,0.95,0.1,0.925),aa
+leggo <- list(single = c(0.925,0.95,0.1,0.925),
               double.h = c(0.9,0.94,0.1,0.925))
 ```
 
@@ -30,7 +30,10 @@ leggo <- list(single = c(0.925,0.95,0.1,0.925),aa
 
 ```{r}
 # --- Prep 2
-png(filename = paste0("FinalPlots/gyf_",my.type,"_B",B,"_",cc,".png"),
+png(filename = paste0("FinalPlots/G-YF___",
+                      my.type,
+                      if(my.type=="UMP"){paste0("_",cc)}else{NULL},
+                      "_B",B,".png"),
 width = 17, height = 8*0.8, units = "in", res = 200, pointsize = 10)
 par(mfrow = c(1,2), mar = c(4,6.5,3,2.5))
 # ---------------------------------------------------------------------------------
@@ -49,7 +52,7 @@ par(mfrow = c(1,2), mar = c(4,6.5,3,2.5))
     splot(t, gt , type = "l", ylim = lim, labs = 0, lwd = 2)
 
     # --- Azadeh's g
-    sadd(t, -ag, type = "l", col = skaturate$red, lwd = 2)
+    sadd(t, ag, type = "l", col = skaturate$red, lwd = 2)
 
     # --- My g
     sadd(t, sg, type = "l", col = skaturate$blue, lwd = 2)

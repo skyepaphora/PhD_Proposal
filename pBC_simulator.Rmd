@@ -24,7 +24,7 @@ K  <- 7                         # Eigencoefs per frequency
 v  <- spec.mtm(ts(1:N), plot = FALSE)$mtm$dpss$v # DPSS (based on series length)
 
 ## --- Variables dependent on B (defined here for later use in plotting)
-B  <- 200                       # Block size (for sliding window)
+B  <- 100                       # Block size (for sliding window)
 B2 <- ceiling(B/2)              # Midpoint shift
 b  <- 1:(N-(B-1))               # block indices
 tb <- b + B2 - 1                # time in-block
@@ -203,7 +203,7 @@ p.bc <- function(p = 2, type = "noise", B = 100, M = 100, seed = 0,
         } else if(type == "UMP"){ outer(ct^2, yf.true)
         } else { # if(type == "other"){
             1e2/(Mod(1 - (a.12)%*%exp(-i*2*pi*Fs) - psi.2%*%exp(-i*2*pi*Fs*2))^2)
-        } else {NULL}
+        }
   # xtf2.true <- if(type == "GUMP"){outer(ct2^2, yf2.true)} else {NULL}
   
   # Save true vals
@@ -226,8 +226,8 @@ p.bc <- function(p = 2, type = "noise", B = 100, M = 100, seed = 0,
 # Simulate
 
 ```{r}
-my.type <- "other"
-trial <- p.bc(p = 1:2, type = my.type, M = M, B = B, seed = 68, ct = ct); gc()
+my.type <- "UMP"
+trial <- p.bc(p = 1:2, type = my.type, M = M, B = B, seed = 70, ct = ct); gc()
 ```
 
 ```{r}
@@ -255,4 +255,20 @@ save.image(paste0("Data/",my.type,
                   if(my.type=="UMP"){paste0("_",cc)}else{NULL},
                   "_B",B,"___mini.RData"))
 ```
+
+
+```{r}
+# Save trials only
+
+## --- BEFORE RUNNING: REMOVE ALL VARIABLES EXCEPT 
+## --- trial, my.type, cc, B
+
+gc(); my.type; cc; B
+save.image(paste0("Data/",my.type,
+                  if(my.type=="UMP"){paste0("_",cc)}else{NULL},
+                  "_B",B,"___trial.RData"))
+```
+
+
+
 

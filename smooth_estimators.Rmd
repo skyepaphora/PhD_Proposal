@@ -20,10 +20,11 @@ library(fields)       # Supplement for image plots: legends, better colour
 ```
 
 ```{r}
-load("Data/B200_c1_UMP_full.RData")
-# load("Data/B200_c3_UMP_full.RData")
-# load("Data/B300_c1_UMP_full.RData")
-# load("Data/B300_c3_UMP_full.RData")
+load("Data/UMP_c1_B200___mini.RData"); load("Data/UMP_c1_B200___trial.RData")
+# load("Data/UMP_c1_B300___full.RData"); load("Data/UMP_c1_B300___trial.RData")
+# load("Data/UMP_c3_B200___full.RData"); load("Data/UMP_c3_B200___trial.RData")
+# load("Data/UMP_c3_B300___full.RData"); load("Data/UMP_c3_B300___trial.RData")
+sheck <- c(my.type, cc, B)
 ```
 
 ---
@@ -55,27 +56,31 @@ est.a <- function(sgram, est = "g"){
 }
 
 # normalizing function
-normy <- function(x){x/max(abs(x))}
+normy <- function(x){abs(x/max(abs(x)))}
 ```
 
 ### GEST: Estimating g(t)
 
 ```{r}
 # ALL results
-ag.full <- pbapply(trial$bc2, 3, est.a); gc()
+ag.full.1 <- pbapply(trial$bc1, 3, est.a); gc()
+# ag.full.2 <- pbapply(trial$bc2, 3, est.a); gc()
 
 # Normalized Average
-ag  <- normy(rowMeans(ag.full))
+ag.1  <- rowMeans(ag.full.1)
+# ag.2  <- rowMeans(ag.full.2)
 ```
 
 ### YEST: Estimating Sy(f)
 
 ```{r}
 # ALL results
-ayf.full <- pbapply(trial$bc2, 3, function(x){est.a(x, est = "sy")}); gc()
+ayf.full.1 <- pbapply(trial$bc1, 3, function(x){est.a(x, est = "sy")}); gc()
+# ayf.full.2 <- pbapply(trial$bc2, 3, function(x){est.a(x, est = "sy")}); gc()
 
 # Normalized Average
-ayf <- -normy(rowMeans(ayf.full))
+ayf.1 <- rowMeans(ayf.full.1)
+# ayf.2 <- rowMeans(ayf.full.2)
 ```
 
 ---
@@ -90,11 +95,10 @@ gest <- function(sgram){
   return(G); gc()
 }
 
-yest <- function(sgram, normalize = FALSE){
+yest <- function(sgram){
   N <- length(sgram[1,])
   A <- outer(1:NF,1:NF, function(l,j){colSums(sgram)[l]/colSums(sgram)[j]})
   S <- Mod(eigen(A/NF)$vectors[,1])
-  if(normalize){S <- S/max(S)}
   return(S); gc()
 }
 ```
@@ -103,20 +107,24 @@ yest <- function(sgram, normalize = FALSE){
 
 ```{r}
 # ALL results
-sg.full <- pbapply(trial$bc2, 3, gest); gc()
+sg.full.1 <- pbapply(trial$bc1, 3, gest); gc()
+sg.full.2 <- pbapply(trial$bc2, 3, gest); gc()
 
 # Normalized Average
-sg  <- normy(rowMeans(sg.full))
+sg.1  <- rowMeans(sg.full.1)
+sg.2  <- rowMeans(sg.full.2)
 ```
 
 ### YEST: Estimating Sy(f)
 
 ```{r}
 # ALL results
-syf.full <- pbapply(trial$bc2, 3, yest); gc()
+syf.full.1 <- pbapply(trial$bc1, 3, yest); gc()
+syf.full.2 <- pbapply(trial$bc2, 3, yest); gc()
 
 # Normalized Average
-syf <- normy(rowMeans(syf.full))
+syf.1 <- normy(rowMeans(syf.full.1))
+syf.2 <- normy(rowMeans(syf.full.2))
 ```
 
 ### Stats [not currently in use]
@@ -154,14 +162,15 @@ syf <- normy(rowMeans(syf.full))
 ### MTM               ... and stats [better]
 
 ```{r}
-
 # Time Series for MTM
 set.seed(68)
 yt <- arima.sim(model = list(ar = c(0.5,-0.5), sd = 10), n = N)
 
 # Spectrum Estimates
-yf.mtm <- spec.mtm(yt,plot = FALSE)$spec
+yf.mtm <- spec.mtm(yt, plot = FALSE)$spec
+```
 
+```{r mtmStats}
 # Roll Die
 # set.seed(68); samp <- sample(1:M, 1)
 # 
@@ -216,13 +225,19 @@ smoo <- function(g, yf){
 ```
 
 ```{r}
-# Azadeh's results
-asx.full <- smoo(ag.full, ayf.full)
-asx <- pbapply( asx.full, 1:2, mean)
+# --- Azadeh's results
+asx.full.1 <- smoo(ag.full.1, ayf.full.1)
+asx.full.2 <- smoo(ag.full.2, ayf.full.2)
 
-# Skye's Results
-ssx.full <- smoo(sg.full, syf.full)
-ssx <- pbapply( ssx.full, 1:2, mean)
+asx.1 <- pbapply( asx.full.1, 1:2, mean); rm(asx.full.1); gc()
+asx.2 <- pbapply( asx.full.2, 1:2, mean); rm(asx.full.2); gc()
+
+# --- Skye's Results
+ssx.full.1 <- smoo(sg.full.1, syf.full.1)
+ssx.full.2 <- smoo(sg.full.2, syf.full.2)
+
+ssx.1 <- pbapply( ssx.full.1, 1:2, mean); rm(ssx.full.1); gc()
+ssx.2 <- pbapply( ssx.full.2, 1:2, mean); rm(ssx.full.2); gc()
 
 gc()
 ```
@@ -231,21 +246,34 @@ gc()
 
 ```{r}
 # Roll the 100-sided die
-samp <- 96
+samp <- 96  # (or don't)
 
 # Choose realizations, get corresponding g
+bc1.samp <- trial$bc1[,,samp]
 bc2.samp <- trial$bc2[,,samp]
-g.samp   <-   sg.full[, samp]
-yf.samp  <-  syf.full[, samp]
+
+g.samp.1   <-   sg.full.1[, samp]
+g.samp.2   <-   sg.full.2[, samp]
+
+yf.samp.1  <-  syf.full.1[, samp]
+yf.samp.2  <-  syf.full.2[, samp]
 
 ## --- 2-BC
-bc2.smooth <- outer(yf.samp, g.samp)
+bc1.smooth <- outer(yf.samp.1, g.samp.1)
+bc2.smooth <- outer(yf.samp.2, g.samp.2)
 ```
 
-```{r save2}
-save.image(paste0("Data/","B",B,"_",cc,"_",my.type,"_full_S-2bc.RData"))
-rm(asx.full, ssx.full); gc()
-save.image(paste0("Data/","B",B,"_",cc,"_",my.type,"_reduced_S-2bc.RData"))
+```{r prepSave}
+rm(trial); gc()
+rm(pbc,tru,p.bc,v,vb,ar2,normy,Fs,ct,ct1,ct2,ct3,gt,tb,i,B2,FF,K,M,N,NF,w,b,t); gc()
+my.type; cc; B
+```
+
+```{r saveFinal}
+save.image(paste0("Data/",my.type,
+                  if(my.type=="UMP"){paste0("_",cc)}else{NULL},
+                  "_B",B,
+                  "___S.RData"))
 ```
 
 
