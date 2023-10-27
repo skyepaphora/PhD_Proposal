@@ -31,7 +31,7 @@ load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 ```{r setup_pbcGram}
 ## --- Load 
 # load(file = "Data/AR2_B200___mini.RData")
-load(file = "Data/UMP_c1_B100___mini.RData")
+# load(file = "Data/UMP_c1_B100___mini.RData")
 # load(file = "Data/UMP_c1_B200___mini.RData")
 # load(file = "Data/UMP_c1_B300___mini.RData")
 # load(file = "Data/UMP_c3_B200___mini.RData")
@@ -48,18 +48,15 @@ leggo <- list(single = c(0.925 ,0.95 ,0.1 ,0.925),
 ## --- Normalizing function
 kable(data.frame(range(tru$xtf),range(pbc$bc1$mean),range(pbc$bc2$mean)), format = "pipe")
 
-normy <- function(x){x/max(abs(x))} # generic 0-1
 normy <- function(x){x*1e2*(x>=0)}  # AR, UMP
 # normy <- function(x){x*(x>=0)}      # other (non-stationary AR)
 
 ## --- Common z-axis limits
-# zlim <- 0:1 
-zlim <- c(0,max(normy(pbc$bc1$mean),normy(pbc$bc2$mean),tru$xtf)) # 
-zlim <- c(range(normy(pbc$bc1$mean),normy(pbc$bc2$mean),tru$xtf)) #; zlim <- c(0,max(tru$xtf))
+# zlim <- c(0,max(normy(pbc$bc1$mean),normy(pbc$bc2$mean),tru$xtf))
+zlim <- c(range(normy(pbc$bc1$mean),normy(pbc$bc2$mean),tru$xtf)) 
 
-tix <- round(seq(0,zlim[2],length.out=7))         # legend ticks [0,max]
+# tix <- round(seq(0,zlim[2],length.out=7))         # legend ticks [0,max]
 tix <- round(seq(zlim[1],zlim[2],length.out=7))   # legend ticks [range]
-
 ```
 
 ```{r pbcGram_GO}

@@ -29,33 +29,33 @@ sheck <- c(my.type, cc, B)
 ```
 
 ### SVD error prep [source:https://github.com/thibautjombart/adegenet/issues/214]
-```{r}
-## Store the svd function, but with LINPACK = T as default:
-svd <- function (x, nu = min(n, p), nv = min(n, p), LINPACK = TRUE)
-{
-  print("LINPACK:"); print(LINPACK)  ## added so you can see it's changed
-  x <- as.matrix(x)
-  if (any(!is.finite(x)))
-    stop("infinite or missing values in 'x'")
-  dx <- dim(x)
-  n <- dx[1L]
-  p <- dx[2L]
-  if (!n || !p)
-    stop("a dimension is zero")
-  La.res <- La.svd(x, nu, nv)   ## your problem line
-  res <- list(d = La.res$d)
-  if (nu)
-    res$u <- La.res$u
-  if (nv) {
-    if (is.complex(x))
-      res$v <- Conj(t(La.res$vt))
-    else res$v <- t(La.res$vt)
-  }
-  res
-}
-
-## Over-write current svd fn with new version:
-assignInNamespace("svd", svd, "base")
+```{r svd error}
+# ## Store the svd function, but with LINPACK = T as default:
+# svd <- function (x, nu = min(n, p), nv = min(n, p), LINPACK = TRUE)
+# {
+#   print("LINPACK:"); print(LINPACK)  ## added so you can see it's changed
+#   x <- as.matrix(x)
+#   if (any(!is.finite(x)))
+#     stop("infinite or missing values in 'x'")
+#   dx <- dim(x)
+#   n <- dx[1L]
+#   p <- dx[2L]
+#   if (!n || !p)
+#     stop("a dimension is zero")
+#   La.res <- La.svd(x, nu, nv)   ## your problem line
+#   res <- list(d = La.res$d)
+#   if (nu)
+#     res$u <- La.res$u
+#   if (nv) {
+#     if (is.complex(x))
+#       res$v <- Conj(t(La.res$vt))
+#     else res$v <- t(La.res$vt)
+#   }
+#   res
+# }
+# 
+# ## Over-write current svd fn with new version:
+# assignInNamespace("svd", svd, "base")
 ```
 
 ---
