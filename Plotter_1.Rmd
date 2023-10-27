@@ -128,30 +128,38 @@ dev.off()
 
 ```{r setup_smooGram}
 ## --- Load 
-# load(file = "Data/UMP_c1_B200___reduced_S-2bc.RData")
-load(file = "Data/UMP_c1_B300___reduced_S-2bc.RData"); gc()
-# load(file = "Data/UMP_c3_B200___reduced_S-2bc.RData")
-# load(file = "Data/UMP_c3_B300___reduced_S-2bc.RData"); gc()
+load("Data/UMP_c1_B100___S.RData"); load("Data/UMP_c1_B100___mini.RData"); gc()
+# load("Data/UMP_c1_B200___S.RData"); load("Data/UMP_c1_B200___mini.RData"); gc()
+# load("Data/UMP_c1_B300___S.RData"); load("Data/UMP_c1_B300___mini.RData"); gc()
+# load("Data/UMP_c3_B200___S.RData"); load("Data/UMP_c3_B200___mini.RData"); gc()
+# load("Data/UMP_c3_B300___S.RData"); load("Data/UMP_c3_B300___mini.RData"); gc()
 
 ## --- sgram legend placement
 leggo <- c(0.85 ,0.9 ,0.15,0.875)
 
 ## --- Normalizing function
-normy <- function(x){x/max(abs(x))} # generic 0-1
-normy <- function(x){x*1e2*(x>=0)}  # AR, UMP
-normy <- function(x){x*(x>=0)}      # other (non-stationary AR)
+# normy <- function(x){x*1e3*(x>=0)}  # works for UMP -- if not applied to samp
+# normy <- function(x){x*2e3*(x>=0)} 
 normy <- function(x){abs(x/max(abs(x)))}
 
-## --- Common z-axis limits
-# zlim <- 0:1 
-zlim <- c(0,max(normy(bc2.samp),normy(bc2.smooth),normy(ssx))) # 
-zlim <- c(range(normy(bc2.samp),normy(bc2.smooth),normy(ssx))) #
+## --- BC Type
+# poly <- 1
+poly <- 2
 
-tix <- round(seq(0,zlim[2],length.out=7))         # legend ticks [0,max]
-tix <- round(seq(zlim[1],zlim[2],length.out=7))   # legend ticks [range]
+    if(poly == 1){
+      samp <- bc1.samp; smooth <- bc1.smooth; ssx <- ssx.1;
+    } else {
+      samp <- bc2.samp; smooth <- bc2.smooth; ssx <- ssx.2;
+    }
+
+## --- Common z-axis limits
+zlim <- c(range(normy(samp),normy(smooth),normy(ssx))) #
+
+tix <- round(seq(zlim[1],zlim[2],length.out=7),2)   # legend ticks [range]
 
 # --- Check limits
-kable(data.frame(range(bc2.samp),range(bc2.smooth),range(ssx)), format = "pipe")
+kable(data.frame(range(samp),range(smooth),range(ssx)), format = "pipe")
+kable(data.frame(range(samp),range(normy(smooth)),range(normy(ssx))), format = "pipe")
 ```
 
 ```{r smooGram_GO}
@@ -160,29 +168,29 @@ wid <- 8
 png(filename = paste0("FinalPlots/Sx___",my.type,
                       if(my.type=="UMP"){paste0("_",cc)}else{NULL},
                       "_B",B,
-                      "___smooth-3.png"),
+                      "___",poly,"-BC.png"),
 width = wid, height = wid/3, units = "in", res = 400, pointsize = 9)
 par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
 # ---------------------------------------------------------------------------------
 
   ## --- raw 2-BC
-  image(x = Fs, y = t, z = t(normy(bc2.samp)),
+  image(x = Fs, y = t, z = t(normy(samp)),
         xlab = "", ylab = "", zlim = zlim,
-        las = 1, yaxt = 'n', col = tim.colors()); sox()
+        las = 1, col = tim.colors()); sox()
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
-       "Unsmoothed 2-BC: Example B",
+       bquote(bold("Unsmoothed")~bold(.(as.character(poly)))*bold("-BC: Example B")),
        # "Smoothed 2-BC: Example C",
        bquote("Single simulation;"~bold("B =")~bold(.(as.character(B))) ),
-       "Frequency","", mline = 2, cex.factor = 0.9)
+       "Frequency","Time", mline = 2, yline = 2.5, cex.factor = 0.9)
   
     ## --- smooth 2-BC
-  image(x = Fs, y = t, z = (normy(bc2.smooth)),
+  image(x = Fs, y = t, z = (normy(smooth)),
         xlab = "", ylab = "", zlim = zlim,
         las = 1, yaxt = 'n', col = tim.colors()); sox()
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
-       "Smoothed 2-BC: Example B",
+       bquote(bold("Smoothed")~bold(.(as.character(poly)))*bold("-BC: Example B")),
        # "Smoothed 2-BC: Example C",
        bquote("Single simulation;"~bold("B =")~bold(.(as.character(B))) ),
        "Frequency","", mline = 2, cex.factor = 0.9)
@@ -193,7 +201,7 @@ par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
         las = 1, yaxt = 'n', col = tim.colors()); sox()
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
-       "Smoothed 2-BC: Example B",
+       bquote(bold("Smoothed")~bold(.(as.character(poly)))*bold("-BC: Example B")),
        # "Smoothed 2-BC: Example C",
        bquote("Average over M ="~.(M)~"simulations;"~bold("B =")~bold(.(as.character(B))) ),
        "Frequency","", mline = 2, cex.factor = 0.9)
@@ -216,29 +224,29 @@ dev.off()
 
 ```{r setup_gyf}
 ## --- Load 
-load("Data/UMP_c1_B200___S-2bc.RData"); load("Data/UMP_c1_B200___mini.RData"); gc()
-# load("Data/UMP_c1_B300___S-2bc.RData"); load("Data/UMP_c1_B300___mini.RData"); gc()
-# load("Data/UMP_c3_B200___S-2bc.RData"); load("Data/UMP_c3_B200___mini.RData"); gc()
-# load("Data/UMP_c3_B300___S-2bc.RData"); load("Data/UMP_c3_B300___mini.RData"); gc()
+# load("Data/UMP_c1_B200___S.RData"); load("Data/UMP_c1_B200___mini.RData"); gc()
+# load("Data/UMP_c1_B300___S.RData"); load("Data/UMP_c1_B300___mini.RData"); gc()
+# load("Data/UMP_c3_B200___S.RData"); load("Data/UMP_c3_B200___mini.RData"); gc()
+# load("Data/UMP_c3_B300___S.RData"); load("Data/UMP_c3_B300___mini.RData"); gc()
 
 ## --- BC Type
-poly <- 1
-# poly <- 2
+# poly <- 1
+poly <- 2
 
-if(poly == 1){
-  ag <- ag.1; ayf <- ayf.1
-  sg <- sg.1; syf <- syf.1
-}else{
-  ag <- ag.2; ayf <- ayf.2
-  sg <- sg.2; syf <- syf.2
-}
+    if(poly == 1){
+      ag <- ag.1; ayf <- ayf.1
+      sg <- sg.1; syf <- syf.1
+    } else {
+      ag <- ag.2; ayf <- ayf.2
+      sg <- sg.2; syf <- syf.2
+    }
 
 ## --- Normalizing function
 normy <- function(x){abs(x/max(abs(x)))}
 
 ## --- Common limits
-glim <- range(gt,  -sg, -ag )
-flim <- range(normy(tru$yf), syf, ayf)
+glim <- range(gt,  normy(sg), normy(ag) )
+flim <- range(normy(tru$yf), normy(syf), normy(ayf))
 
 # --- Check limits
 kable(data.frame(range(gt),range(sg),range(ag),range(normy(tru$yf)),range(syf),range(ayf)), format = "pipe")
@@ -247,7 +255,7 @@ kable(data.frame(range(gt),range(sg),range(ag),range(normy(tru$yf)),range(syf),r
 ```{r}
 # --- Prep 2
 wid <- 8
-png(filename = paste0("FinalPlots/TEST---G-YF___",
+png(filename = paste0("FinalPlots/G-YF___",
                       my.type,
                       if(my.type=="UMP"){paste0("_",cc)}else{NULL},
                       "_B",B,
@@ -261,11 +269,11 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
     # --- True g
     splot(t, gt , type = "l", ylim = glim, labs = 0, lwd = 2)
 
-    # --- Azadeh's g
-    sadd(t, -ag, type = "l", col = skaturate$red, lwd = 2)
-
     # --- My g
-    sadd(t, -sg, type = "l", col = skaturate$blue, lwd = 2)
+    sadd(t, normy(sg), type = "l", col = skaturate$blue, lwd = 2)
+    
+    # --- Azadeh's g
+    sadd(t, normy(ag), type = "l", col = skaturate$red, lwd = 1)
 
     # Other lines
     abline(v = range(tb), col = skrown$B1, lty = 2)
@@ -282,19 +290,22 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
                   bquote(hat(g)[2]*"(t)"),
                   "T(B) range"),
           col = c(skrown$B2, skaturate$red, skaturate$blue, skrown$B1),
-          lwd = c(2,2,2,1), lty = c(1,1,1,2),
+          lwd = c(2,1,2,1), lty = c(1,1,1,2),
         inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
 
 
 ## --------- Sy(f) --------- ##
     # --- True sy
     splot(Fs, normy(tru$yf), type = "l", ylim = flim, labs = 0, lwd = 2)
-
-    # --- Azadeh's sy
-    sadd(Fs, ayf, type = "l", col = skaturate$red, lwd = 2)
+    
+    # --- Multitaper
+    # sadd(Fs, yf.mtm, type = "l", col = skaturate$green, lwd = 1)
 
     # --- My sy
-    sadd(Fs, syf, type = "l", col = skaturate$blue, lwd = 2)
+    sadd(Fs, normy(syf), type = "l", col = skaturate$blue, lwd = 2)
+    
+    # --- Azadeh's sy
+    sadd(Fs, normy(ayf), type = "l", col = skaturate$red, lwd = 1)
     
     # Labels
     slab(
@@ -303,10 +314,11 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
          "Frequency", bquote("Spectrum"~S[Y]*"(f)"), yline = 2.5, cex.factor = 1.2)
     legend("topright",
        legend = c(bquote(S[Y]*"(f)"),
-                  bquote(hat(S)["Y, 1"]*"(f)"),
-                  bquote(hat(S)["Y, 2"]*"(f)")),
+                  bquote(hat(S)["Y, 1"]),
+                  bquote(hat(S)["Y, 2"])),#,
+                  # bquote(hat(S)["Y, Multitaper"])),
           col = c(skrown$B2, skaturate$red, skaturate$blue),
-          lwd = 2, inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
+          lwd = c(2,1,2), inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
 
 # ---------------------------------------------------------------------------------
 dev.off()

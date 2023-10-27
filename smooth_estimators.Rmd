@@ -20,14 +20,55 @@ library(fields)       # Supplement for image plots: legends, better colour
 ```
 
 ```{r}
-load("Data/UMP_c1_B200___mini.RData"); load("Data/UMP_c1_B200___trial.RData")
+load("Data/UMP_c1_B100___mini.RData"); load("Data/UMP_c1_B100___trial.RData")
+# load("Data/UMP_c1_B200___mini.RData"); load("Data/UMP_c1_B200___trial.RData")
 # load("Data/UMP_c1_B300___full.RData"); load("Data/UMP_c1_B300___trial.RData")
 # load("Data/UMP_c3_B200___full.RData"); load("Data/UMP_c3_B200___trial.RData")
 # load("Data/UMP_c3_B300___full.RData"); load("Data/UMP_c3_B300___trial.RData")
 sheck <- c(my.type, cc, B)
 ```
 
+### SVD error prep [source:https://github.com/thibautjombart/adegenet/issues/214]
+```{r}
+## Store the svd function, but with LINPACK = T as default:
+svd <- function (x, nu = min(n, p), nv = min(n, p), LINPACK = TRUE)
+{
+  print("LINPACK:"); print(LINPACK)  ## added so you can see it's changed
+  x <- as.matrix(x)
+  if (any(!is.finite(x)))
+    stop("infinite or missing values in 'x'")
+  dx <- dim(x)
+  n <- dx[1L]
+  p <- dx[2L]
+  if (!n || !p)
+    stop("a dimension is zero")
+  La.res <- La.svd(x, nu, nv)   ## your problem line
+  res <- list(d = La.res$d)
+  if (nu)
+    res$u <- La.res$u
+  if (nv) {
+    if (is.complex(x))
+      res$v <- Conj(t(La.res$vt))
+    else res$v <- t(La.res$vt)
+  }
+  res
+}
+
+## Over-write current svd fn with new version:
+assignInNamespace("svd", svd, "base")
+```
+
 ---
+
+## Sample a single instance
+```{r}
+# Roll the 100-sided die
+samp <- 96  # (or don't)
+
+# Choose realizations
+bc1.samp <- trial$bc1[,,samp]
+bc2.samp <- trial$bc2[,,samp]
+```
 
 # GEST \& YEST Previous Methods: SVD
 
@@ -64,11 +105,11 @@ normy <- function(x){abs(x/max(abs(x)))}
 ```{r}
 # ALL results
 ag.full.1 <- pbapply(trial$bc1, 3, est.a); gc()
-# ag.full.2 <- pbapply(trial$bc2, 3, est.a); gc()
+ag.full.2 <- pbapply(trial$bc2, 3, est.a); gc()
 
 # Normalized Average
 ag.1  <- rowMeans(ag.full.1)
-# ag.2  <- rowMeans(ag.full.2)
+ag.2  <- rowMeans(ag.full.2)
 ```
 
 ### YEST: Estimating Sy(f)
@@ -76,11 +117,11 @@ ag.1  <- rowMeans(ag.full.1)
 ```{r}
 # ALL results
 ayf.full.1 <- pbapply(trial$bc1, 3, function(x){est.a(x, est = "sy")}); gc()
-# ayf.full.2 <- pbapply(trial$bc2, 3, function(x){est.a(x, est = "sy")}); gc()
+ayf.full.2 <- pbapply(trial$bc2, 3, function(x){est.a(x, est = "sy")}); gc()
 
 # Normalized Average
 ayf.1 <- rowMeans(ayf.full.1)
-# ayf.2 <- rowMeans(ayf.full.2)
+ayf.2 <- rowMeans(ayf.full.2)
 ```
 
 ---
@@ -125,6 +166,11 @@ syf.full.2 <- pbapply(trial$bc2, 3, yest); gc()
 # Normalized Average
 syf.1 <- normy(rowMeans(syf.full.1))
 syf.2 <- normy(rowMeans(syf.full.2))
+```
+
+### Remove TRIAL
+```{r}
+rm(trial); gc()
 ```
 
 ### Stats [not currently in use]
@@ -242,16 +288,9 @@ ssx.2 <- pbapply( ssx.full.2, 1:2, mean); rm(ssx.full.2); gc()
 gc()
 ```
 
-### Single instance
+### Single instance construction
 
 ```{r}
-# Roll the 100-sided die
-samp <- 96  # (or don't)
-
-# Choose realizations, get corresponding g
-bc1.samp <- trial$bc1[,,samp]
-bc2.samp <- trial$bc2[,,samp]
-
 g.samp.1   <-   sg.full.1[, samp]
 g.samp.2   <-   sg.full.2[, samp]
 
@@ -264,9 +303,8 @@ bc2.smooth <- outer(yf.samp.2, g.samp.2)
 ```
 
 ```{r prepSave}
-rm(trial); gc()
 rm(pbc,tru,p.bc,v,vb,ar2,normy,Fs,ct,ct1,ct2,ct3,gt,tb,i,B2,FF,K,M,N,NF,w,b,t); gc()
-my.type; cc; B
+sheck
 ```
 
 ```{r saveFinal}
