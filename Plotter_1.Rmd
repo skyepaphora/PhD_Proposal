@@ -17,7 +17,6 @@ load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 
 
 
-
 # Spectrograms
 
 ## PBCs : 1 x 3 lattice
@@ -37,8 +36,9 @@ load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 # load(file = "Data/UMP_c3_B200___mini.RData")
 # load(file = "Data/UMP_c3_B300___mini.RData")
 # load(file = "Data/UMP_c3_B400___mini.RData")
-# load(file = "Data/other_B100___mini.RData")
+load(file = "Data/other_B100___mini.RData")
 # load(file = "Data/other_B200___mini.RData")
+# load(file = "Data/other_B400___mini.RData")
 
 ## --- sgram legend placement
 leggo <- list(single = c(0.925 ,0.95 ,0.1 ,0.925),
@@ -48,8 +48,8 @@ leggo <- list(single = c(0.925 ,0.95 ,0.1 ,0.925),
 ## --- Normalizing function
 kable(data.frame(range(tru$xtf),range(pbc$bc1$mean),range(pbc$bc2$mean)), format = "pipe")
 
-normy <- function(x){x*1e2*(x>=0)}  # AR, UMP
-# normy <- function(x){x*(x>=0)}      # other (non-stationary AR)
+# normy <- function(x){x*1e2*(x>=0)}  # AR, UMP
+normy <- function(x){x*(x>=0)}      # other (non-stationary AR)
 
 ## --- Common z-axis limits
 # zlim <- c(0,max(normy(pbc$bc1$mean),normy(pbc$bc2$mean),tru$xtf))
@@ -76,9 +76,9 @@ par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
        # "Example A   [AR(2)]",
-       "Example B   [UMP]",
+       # "Example B   [UMP]",
        # "Example C   [UMP]",
-       # "Example D [Non-Stationary]",
+       "Example D [Non-Stationary]",
        bquote("True"~"Time-Frequency Spectrum"),"Frequency","Time", yline = 2.5, mline = 2, cex.factor = 0.9)
 
   ## --- 1-BC
@@ -88,9 +88,9 @@ par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
        # "1-BC: Example A",
-       "1-BC: Example B",
+       # "1-BC: Example B",
        # "1-BC: Example C",
-       # "1-BC: Example D",
+       "1-BC: Example D",
        bquote("Average over M ="~.(M)~"simulations;"~bold("B =")~bold(.(as.character(B))) ),
        "Frequency","", mline = 2, cex.factor = 0.9)
 
@@ -101,9 +101,9 @@ par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
        # "2-BC: Example A",
-       "2-BC: Example B",
+       # "2-BC: Example B",
        # "2-BC: Example C",
-       # "2-BC: Example D",
+       "2-BC: Example D",
        bquote("Average over M ="~.(M)~"simulations;"~bold("B =")~bold(.(as.character(B))) ),
        "Frequency","", mline = 2, cex.factor = 0.9)
   
@@ -221,13 +221,14 @@ dev.off()
 
 ```{r setup_gyf}
 ## --- Load 
+# load("Data/AR2_B200___S.RData"); load("Data/AR2_B200___mini.RData"); gc()
 # load("Data/UMP_c1_B200___S.RData"); load("Data/UMP_c1_B200___mini.RData"); gc()
 # load("Data/UMP_c1_B300___S.RData"); load("Data/UMP_c1_B300___mini.RData"); gc()
 # load("Data/UMP_c3_B200___S.RData"); load("Data/UMP_c3_B200___mini.RData"); gc()
 # load("Data/UMP_c3_B300___S.RData"); load("Data/UMP_c3_B300___mini.RData"); gc()
 
 ## --- BC Type
-# poly <- 1
+poly <- 1
 poly <- 2
 
     if(poly == 1){
@@ -264,7 +265,14 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
 
 ## --------- G --------- ##
     # --- True g
-    splot(t, gt , type = "l", ylim = glim, labs = 0, lwd = 2)
+    splot(t,
+            # rep(1,N),                                           # AR(2)
+            gt ,
+          type = "l",
+          # ylim = c(0.5,1.5),                                    # AR(2); p=1
+          # ylim = c(0,1.75),                                     # AR(2); p=2
+          ylim = glim,
+          labs = 0, lwd = 2)
 
     # --- My g
     sadd(t, normy(sg), type = "l", col = skaturate$blue, lwd = 2)
@@ -278,10 +286,16 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
 
     # Labels
     slab(
-         "Normalized Estimates of g(t): Example B",
-         bquote("Average over M ="~.(M)~"simulations;"~bold("B =")~bold(.(as.character(B))) ),
+         # "Normalized Estimates of g(t): Example A",
+         # "Normalized Estimates of g(t): Example B",
+         "Normalized Estimates of g(t): Example C",
+         bquote("Average over M ="~.(M)~"simulations;"~
+                  bold("B =")~bold(.(as.character(B)))*";"~
+                  bold("p =")~bold(.(as.character(poly)))),
          "Time", "g(t)", yline = 2.5, mline = 2, cex.factor = 1.2)
-    legend("topright",
+    legend(
+           # "topright",
+           "top",                                             # for ex C only
        legend = c("g(t)",
                   bquote(hat(g)[1]*"(t)"),
                   bquote(hat(g)[2]*"(t)"),
@@ -306,8 +320,12 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
     
     # Labels
     slab(
-         bquote(bold("Normalized Estimates of"~S[Y]*"(f): Example B")),
-         bquote("Average over M ="~.(M)~"simulations;"~bold("B =")~bold(.(as.character(B))) ), 
+         # bquote(bold("Normalized Estimates of"~S[Y]*"(f): Example A")),
+         # bquote(bold("Normalized Estimates of"~S[Y]*"(f): Example B")),
+         bquote(bold("Normalized Estimates of"~S[Y]*"(f): Example C")),
+         bquote("Average over M ="~.(M)~"simulations;"~
+                  bold("B =")~bold(.(as.character(B)))*";"~
+                  bold("p =")~bold(.(as.character(poly)))),
          "Frequency", bquote("Spectrum"~S[Y]*"(f)"), yline = 2.5, cex.factor = 1.2)
     legend("topright",
        legend = c(bquote(S[Y]*"(f)"),
@@ -839,23 +857,20 @@ dev.off()
 
 ```{r}
 ## --- Choose your series
-load("C:/Users/skyep/Documents/Research/PhD_Proposal/Data/")
+# load("C:/Users/skyep/Documents/Research/PhD_Proposal/Data/")
 ```
 
 ```{r ani_prep}
 ## --- Plot Prep ---------------- ###
 
 # Confidence Intervals (if it were Gaussian... isn't it more chi^2?)
-bc.low   <-  bc$mean - 2* bc$se
-bc.high  <-  bc$mean + 2* bc$se
-cbc.low  <- cbc$mean - 2*cbc$se
-cbc.high <- cbc$mean + 2*cbc$se
+bc1.low  <- pbc$bc1$mean - 2* pbc$bc1$se
+bc1.high <- pbc$bc1$mean + 2* pbc$bc1$se
+bc2.low  <- pbc$bc2$mean - 2* pbc$bc2$se
+bc2.high <- pbc$bc2$mean + 2* pbc$bc2$se
 
 # ylims
-ylim <- range(bc.low, cbc.low, bc.high, cbc.high)
-
-# Spectrogram limit
-zlim <- range(xtf.true/1e4, bc$mean, cbc$mean)
+ylim.tx <- range(bc1.low, bc2.low, bc1.high, bc2.high, tru$xtf)
 ```
 
 ```{r f_domain_gif}
@@ -868,37 +883,47 @@ pb <- txtProgressBar(style = 3)
 saveGIF({  for (my.t in seq(1,N,by = 5)) {
   
   # --- True Plot
-  splot(Fs, ztf.true[my.t,]/1e4, type = "l", ylim = ylim.tx, lwd = 2, colr = "#FCF8F8"); gc()
+  splot(Fs, tru$xtf[my.t,], type = "l", ylim = ylim.tx, lwd = 2, colr = "#FCF8F8"); gc()
   
   # --- Means
-  lines(Fs,  bc$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc
-  lines(Fs, cbc$mean[my.t,], col = "goldenrod"  , lwd = 2) # Cbc  
+  lines(Fs, pbc$bc1$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc
+  lines(Fs,pbc$bc2$mean[my.t,], col = "goldenrod"  , lwd = 2) # Cbc  
   
   # --- Standard Errors
-  lines(Fs, bc.low [my.t,] , col = skol$blue  , lwd = 1)                     
-  lines(Fs, bc.high[my.t,] , col = skol$blue  , lwd = 1)                     
-  
-  lines(Fs, cbc.low [my.t,], col = skol$orange, lwd = 1)                     
-  lines(Fs, cbc.high[my.t,], col = skol$orange, lwd = 1)                     
+  lines(Fs, bc1.low [my.t,] , col = skol$blue  , lwd = 1)
+  lines(Fs, bc1.high[my.t,] , col = skol$blue  , lwd = 1)
+
+  lines(Fs, bc2.low [my.t,], col = skol$orange, lwd = 1)
+  lines(Fs, bc2.high[my.t,], col = skol$orange, lwd = 1)
   
   # --- Labels
-  slab(main = "Spectrogram Estimates: UMP: c(t)*AR(2)",
-       subb = bquote("c(t) = exp{ (-t-500)"^2*"/(2(200"^2*")) }        Blockwidth B ="~.(B)),
+  slab(main = "Spectrogram Estimates: example D", # UMP: c(t)*AR(2)",
+       # subb = bquote(#"c(t) = exp{ (-t-500)"^2*"/(2(200"^2*")) }       "*
+                     # "Blockwidth B ="~.(B)),
        xlab = "Frequency",
        ylab = bquote(hat(S)[X]~"(t = "*.(my.t)*", f)")); gc()
   
   
   ## --- Legends (& other graphics) --------------------------- ##
   legend("topright",
-         legend = c("means","mean +/- 2se","",
-                    "True spectrum at t",
-                    "BCMTFSE",
-                    "CBCMTFSE"),
-         lty = c( 1, 1,NA,    1,NA,NA),
-         lwd = c( 3, 1,NA,   NA,NA,NA),
-         pch = c(NA,NA,NA,   19,19,19),
+         legend = c("means",
+                    #"mean +/- 2se","",
+                    "True",
+                    "1-BC",
+                    "2-BC"),
+         lty = c( 1, 
+                  #1,NA,
+                  1,NA,NA),
+         lwd = c( 3, 
+                  #1,NA,
+                  NA,NA,NA),
+         pch = c(NA,
+                 #NA,NA,
+                 19,19,19),
          
-         col = c(skol$brown4, skol$brown4, skol$brown4,     skol$brown4,"dodgerblue2","goldenrod"),
+         col = c(skol$brown4, 
+                 # skol$brown4, skol$brown4,
+                 skol$brown4,"dodgerblue2","goldenrod"),
          bg  = "white",
          inset = c(0.01,0.02)
     )
@@ -909,7 +934,7 @@ saveGIF({  for (my.t in seq(1,N,by = 5)) {
   
   gc()
     p <- p+1
-    setTxtProgressBar(pb, p/500)
+    setTxtProgressBar(pb, p/length(seq(1,N,by = 5)))
 
     } },
   
