@@ -24,7 +24,7 @@ K  <- 7                         # Eigencoefs per frequency
 v  <- spec.mtm(ts(1:N), plot = FALSE)$mtm$dpss$v # DPSS (based on series length)
 
 ## --- Variables dependent on B (defined here for later use in plotting)
-B  <- 200                       # Block size (for sliding window)
+B  <- 300                       # Block size (for sliding window)
 B2 <- ceiling(B/2)              # Midpoint shift
 b  <- 1:(N-(B-1))               # block indices
 tb <- b + B2 - 1                # time in-block
@@ -35,7 +35,7 @@ vb <- spec.mtm(ts(1:B), plot = FALSE)$mtm$dpss$v # DPSS (based on block size)
 ct1  <- exp((-(t-450)^2)/(2*(200^2))) # default
 ct2  <- sqrt(1 + t/200)               # alternate
 ct3  <- 1 - ct1                       # reversed
-ct <- ct1 ; cc <- "c3"                # --- choose!
+ct <- ct1 ; cc <- "c1"                # --- choose!
 gt <- ct^2                            # squared (estimated later via S_X)
 
 ## --- Parameters for Azadeh's Example 4 AR(2) non-stationary series

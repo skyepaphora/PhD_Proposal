@@ -194,7 +194,11 @@ In general, I'm normalizing the average result over 100 *un-normalized* estimate
 
 
 
+# Nov 10
 
+* In ch.4 section 4, talk about the data you're interested in, who has studied it, where you'll get it from
+* Talk to DAVE R about getting data
+* talk about deriving a (better) test for stationary/ump in section 4.1, using improved estimates of g,SY
 
 
 
