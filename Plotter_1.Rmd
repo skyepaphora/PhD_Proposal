@@ -21,22 +21,17 @@ load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 
 ## PBCs : 1 x 3 lattice
 
-```{r reset_tru}
-# tru1 <- list(yf = tru$yf, ytf = tru$ytf, xtf = tru$xtf)
-# all(tru$yf == tru1$yf);all(tru$ytf == tru1$ytf);all(tru$xtf == tru1$xtf)
-# tru <- tru1; rm(tru1)
-```
-
 ```{r setup_pbcGram}
 ## --- Load 
 # load(file = "Data/AR2_B200___mini.RData")
 # load(file = "Data/UMP_c1_B100___mini.RData")
+load(file = "Data/UMP_c1_B150___mini.RData")
 # load(file = "Data/UMP_c1_B200___mini.RData")
 # load(file = "Data/UMP_c1_B300___mini.RData")
 # load(file = "Data/UMP_c3_B200___mini.RData")
 # load(file = "Data/UMP_c3_B300___mini.RData")
 # load(file = "Data/UMP_c3_B400___mini.RData")
-load(file = "Data/other_B100___mini.RData")
+# load(file = "Data/other_B100___mini.RData")
 # load(file = "Data/other_B200___mini.RData")
 # load(file = "Data/other_B400___mini.RData")
 
@@ -48,8 +43,8 @@ leggo <- list(single = c(0.925 ,0.95 ,0.1 ,0.925),
 ## --- Normalizing function
 kable(data.frame(range(tru$xtf),range(pbc$bc1$mean),range(pbc$bc2$mean)), format = "pipe")
 
-# normy <- function(x){x*1e2*(x>=0)}  # AR, UMP
-normy <- function(x){x*(x>=0)}      # other (non-stationary AR)
+normy <- function(x){x*1e2*(x>=0)}  # AR, UMP
+# normy <- function(x){x*(x>=0)}      # other (non-stationary AR)
 
 ## --- Common z-axis limits
 # zlim <- c(0,max(normy(pbc$bc1$mean),normy(pbc$bc2$mean),tru$xtf))
@@ -76,9 +71,9 @@ par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
        # "Example A   [AR(2)]",
-       # "Example B   [UMP]",
+       "Example B   [UMP]",
        # "Example C   [UMP]",
-       "Example D [Non-Stationary]",
+       # "Example D [Non-Stationary]",
        bquote("True"~"Time-Frequency Spectrum"),"Frequency","Time", yline = 2.5, mline = 2, cex.factor = 0.9)
 
   ## --- 1-BC
@@ -88,9 +83,9 @@ par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
        # "1-BC: Example A",
-       # "1-BC: Example B",
+       "1-BC: Example B",
        # "1-BC: Example C",
-       "1-BC: Example D",
+       # "1-BC: Example D",
        bquote("Average over M ="~.(M)~"simulations;"~bold("B =")~bold(.(as.character(B))) ),
        "Frequency","", mline = 2, cex.factor = 0.9)
 
@@ -101,9 +96,9 @@ par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
        # "2-BC: Example A",
-       # "2-BC: Example B",
+       "2-BC: Example B",
        # "2-BC: Example C",
-       "2-BC: Example D",
+       # "2-BC: Example D",
        bquote("Average over M ="~.(M)~"simulations;"~bold("B =")~bold(.(as.character(B))) ),
        "Frequency","", mline = 2, cex.factor = 0.9)
   
@@ -125,9 +120,11 @@ dev.off()
 
 ```{r setup_smooGram}
 ## --- Load 
+# load("Data/AR2_B200___S.RData"); load("Data/AR2_B200___mini.RData")
 # load("Data/UMP_c1_B100___S.RData"); load("Data/UMP_c1_B100___mini.RData"); gc()
+load("Data/UMP_c1_B150___S.RData"); load("Data/UMP_c1_B150___mini.RData"); gc()
 # load("Data/UMP_c1_B200___S.RData"); load("Data/UMP_c1_B200___mini.RData"); gc()
-load("Data/UMP_c1_B300___S.RData"); load("Data/UMP_c1_B300___mini.RData"); gc()
+# load("Data/UMP_c1_B300___S.RData"); load("Data/UMP_c1_B300___mini.RData"); gc()
 # load("Data/UMP_c3_B200___S.RData"); load("Data/UMP_c3_B200___mini.RData"); gc()
 # load("Data/UMP_c3_B300___S.RData"); load("Data/UMP_c3_B300___mini.RData"); gc()
 
@@ -141,7 +138,7 @@ normy <- function(x){abs(x/max(abs(x)))}
 
 ## --- BC Type
 poly <- 1
-poly <- 2
+# poly <- 2
 
     if(poly == 1){
       samp <- bc1.samp; smooth <- bc1.smooth; ssx <- ssx.1;
@@ -177,7 +174,6 @@ par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
        bquote(bold("Unsmoothed")~bold(.(as.character(poly)))*bold("-BC: Example B")),
-       # "Smoothed 2-BC: Example C",
        bquote("Single simulation;"~bold("B =")~bold(.(as.character(B))) ),
        "Frequency","Time", mline = 2, yline = 2.5, cex.factor = 0.9)
   
@@ -187,8 +183,7 @@ par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
         las = 1, yaxt = 'n', col = tim.colors()); sox()
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
-       bquote(bold("Smoothed")~bold(.(as.character(poly)))*bold("-BC: Example B")),
-       # "Smoothed 2-BC: Example C",
+       bquote(bold("Smoothed")~bold(.(as.character(poly)))*bold("-BC: Example C")),
        bquote("Single simulation;"~bold("B =")~bold(.(as.character(B))) ),
        "Frequency","", mline = 2, cex.factor = 0.9)
   
@@ -198,8 +193,7 @@ par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
         las = 1, yaxt = 'n', col = tim.colors()); sox()
   abline(h = range(tb), col = skrown$salt, lty = 2)
   slab(
-       bquote(bold("Smoothed")~bold(.(as.character(poly)))*bold("-BC: Example B")),
-       # "Smoothed 2-BC: Example C",
+       bquote(bold("Smoothed")~bold(.(as.character(poly)))*bold("-BC: Example C")),
        bquote("Average over M ="~.(M)~"simulations;"~bold("B =")~bold(.(as.character(B))) ),
        "Frequency","", mline = 2, cex.factor = 0.9)
 

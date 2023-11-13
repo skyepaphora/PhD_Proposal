@@ -21,8 +21,9 @@ library(fields)       # Supplement for image plots: legends, better colour
 
 ```{r}
 # load("Data/UMP_c1_B100___trial.RData")
+load("Data/UMP_c1_B150___trial.RData")
 # load("Data/UMP_c1_B200___trial.RData")
-load("Data/UMP_c1_B300___trial.RData")
+# load("Data/UMP_c1_B300___trial.RData")
 # load("Data/UMP_c3_B200___trial.RData")
 # load("Data/UMP_c3_B300___trial.RData")
 sheck <- c(my.type, cc, B)
