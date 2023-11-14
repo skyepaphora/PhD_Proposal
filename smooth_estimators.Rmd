@@ -20,8 +20,9 @@ library(fields)       # Supplement for image plots: legends, better colour
 ```
 
 ```{r}
+load("Data/AR2_B200___trial.RData")
 # load("Data/UMP_c1_B100___trial.RData")
-load("Data/UMP_c1_B150___trial.RData")
+# load("Data/UMP_c1_B150___trial.RData")
 # load("Data/UMP_c1_B200___trial.RData")
 # load("Data/UMP_c1_B300___trial.RData")
 # load("Data/UMP_c3_B200___trial.RData")
@@ -169,6 +170,17 @@ syf.1 <- normy(rowMeans(syf.full.1))
 syf.2 <- normy(rowMeans(syf.full.2))
 ```
 
+### YF Colmeans: the simple approach
+
+```{r}
+# yf.cmFull.1 <- pbapply(trial$bc1, 3, colMeans)
+# yf.cmFull.2 <- pbapply(trial$bc2, 3, colMeans)
+# 
+# yf.cm.1 <- rowMeans(yf.cmFull.1)
+# yf.cm.2 <- rowMeans(yf.cmFull.2)
+```
+
+
 ### Remove TRIAL
 ```{r}
 rm(trial); gc()
@@ -289,9 +301,34 @@ ssx.2 <- pbapply( ssx.full.2, 1:2, mean); rm(ssx.full.2); gc()
 gc()
 ```
 
+```{r AR2only}
+if(my.type == "AR2"){
+not.stationary <- list(asx.1,asx.2)
+
+g.full <- matrix(1, nrow = length(ag.full.1[,1]), ncol = length(ag.full.1[1,]))
+
+# --- Azadeh's results
+asx.full.1 <- smoo(g.full, ayf.full.1)
+asx.full.2 <- smoo(g.full, ayf.full.2)
+
+asx.1 <- pbapply( asx.full.1, 1:2, mean); rm(asx.full.1); gc()
+asx.2 <- pbapply( asx.full.2, 1:2, mean); rm(asx.full.2); gc()
+
+# --- Skye's Results
+ssx.simp.full.1 <- smoo(g.full, syf.full.1)
+ssx.simp.full.2 <- smoo(g.full, syf.full.2)
+
+ssx.simp.1 <- pbapply( ssx.simp.full.1, 1:2, mean); rm(ssx.simp.full.1); gc()
+ssx.simp.2 <- pbapply( ssx.simp.full.2, 1:2, mean); rm(ssx.simp.full.2); gc()
+
+}
+```
+
 ### Single instance construction
 
 ```{r}
+samp <- 50
+
 g.samp.1   <-   sg.full.1[, samp]
 g.samp.2   <-   sg.full.2[, samp]
 
@@ -301,6 +338,10 @@ yf.samp.2  <-  syf.full.2[, samp]
 ## --- 2-BC
 bc1.smooth <- outer(yf.samp.1, g.samp.1)
 bc2.smooth <- outer(yf.samp.2, g.samp.2)
+
+bc1.simp.smooth <- outer(yf.samp.1, g.ar[,1])
+bc2.simp.smooth <- outer(yf.samp.2, g.ar[,1])
+
 ```
 
 ```{r prepSave}
