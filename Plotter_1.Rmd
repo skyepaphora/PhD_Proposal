@@ -346,7 +346,79 @@ dev.off()
 
 ## Comparing Stationary est Yf to Multitaper
 
+```{r}
+flim.1 <- range(normy(tru$yf), normy(syf.1), yf.mtm/4)
+```
 
+```{r}
+# --- Prep 2
+wid <- 8
+png(filename = paste0("FinalPlots/MG-YF___",
+                      my.type,
+                      # if(my.type=="UMP"){paste0("_",cc)}else{NULL},
+                      "_B",B,
+                      ".png"),
+width = wid, height = wid/2.25, units = "in", res = 400, pointsize = 9)
+par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
+# ---------------------------------------------------------------------------------
+
+## --------- 1-BC --------- ##
+    # --- True sy
+    splot(Fs, normy(tru$yf), type = "l", ylim = flim.1, labs = 0, lwd = 2)
+    
+    # --- Multitaper
+    sadd(Fs, yf.mtm/4, type = "l", col = skaturate$green, lwd = 1)
+
+    # --- My sy
+    sadd(Fs, normy(syf.1), type = "l", col = skaturate$blue, lwd = 2)
+    
+    # --- Azadeh's sy
+    # sadd(Fs, normy(ayf), type = "l", col = skaturate$red, lwd = 1)
+    
+    # Labels
+    slab(
+         bquote(bold("Normalized "~hat(S)[Y]*"(f) and Multitaper: Example A")),
+         bquote("Average over M ="~.(M)~"simulations;"~
+                  bold("B =")~bold(.(as.character(B)))*";"~
+                  bold("p = 1")),
+         "Frequency", bquote("Spectrum"~S[Y]*"(f)"), yline = 2.5, cex.factor = 1.2)
+    legend("topright",
+       legend = c(bquote(S[Y]*"(f)"),
+                  bquote(hat(S)["Y, 2"])),
+                  bquote(hat(S)["Y, Multitaper"]),
+          col = c(skrown$B2, skaturate$blue, skaturate$green),
+          lwd = c(2,2,1), inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
+    
+## --------- 2-BC --------- ##
+    # --- True sy
+    splot(Fs, normy(tru$yf), type = "l", ylim = flim, labs = 0, lwd = 2)
+    
+    # --- Multitaper
+    # sadd(Fs, yf.mtm, type = "l", col = skaturate$green, lwd = 1)
+
+    # --- My sy
+    sadd(Fs, normy(syf), type = "l", col = skaturate$blue, lwd = 2)
+    
+    # --- Azadeh's sy
+    sadd(Fs, normy(ayf), type = "l", col = skaturate$red, lwd = 1)
+    
+    # Labels
+    slab(
+         bquote(bold("Normalized Estimates of"~S[Y]*"(f): Example A")),
+         bquote("Average over M ="~.(M)~"simulations;"~
+                  bold("B =")~bold(.(as.character(B)))*";"~
+                  bold("p = 2")),
+         "Frequency", bquote("Spectrum"~S[Y]*"(f)"), yline = 2.5, cex.factor = 1.2)
+    legend("topright",
+       legend = c(bquote(S[Y]*"(f)"),
+                  bquote(hat(S)["Y, 1"]),
+                  bquote(hat(S)["Y, 2"])),#,
+                  # bquote(hat(S)["Y, Multitaper"])),
+          col = c(skrown$B2, skaturate$red, skaturate$blue),
+          lwd = c(2,1,2), inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
+# ---------------------------------------------------------------------------------
+dev.off()
+```
 
 
 
