@@ -203,7 +203,8 @@ In general, I'm normalizing the average result over 100 *un-normalized* estimate
 
 
 
-
+# Nov 24
+* indep component analysis -- go frar back in stat lit
 
 
 

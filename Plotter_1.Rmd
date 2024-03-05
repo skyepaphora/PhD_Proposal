@@ -225,14 +225,14 @@ dev.off()
 ## --- Load 
 # load("Data/AR2_B200___S.RData"); load("Data/AR2_B200___mini.RData"); gc()
 # load("Data/UMP_c1_B150___S.RData"); load("Data/UMP_c1_B150___mini.RData"); gc()
-# load("Data/UMP_c1_B200___S.RData"); load("Data/UMP_c1_B200___mini.RData"); gc()
+load("~/Research/PhD_Proposal/Data/UMP_c1_B200___S.RData"); load("~/Research/PhD_Proposal/Data/UMP_c1_B200___mini.RData"); gc()
 # load("Data/UMP_c1_B300___S.RData"); load("Data/UMP_c1_B300___mini.RData"); gc()
 # load("Data/UMP_c3_B200___S.RData"); load("Data/UMP_c3_B200___mini.RData"); gc()
 # load("Data/UMP_c3_B300___S.RData"); load("Data/UMP_c3_B300___mini.RData"); gc()
 
 ## --- BC Type
 poly <- 1
-poly <- 2
+# poly <- 2
 
     if(poly == 1){
       ag <- ag.1; ayf <- ayf.1
@@ -256,13 +256,14 @@ kable(data.frame(range(gt),range(sg),range(ag),range(normy(tru$yf)),range(syf),r
 ```{r}
 # --- Prep 2
 wid <- 8
-png(filename = paste0("FinalPlots/G-YF___",
+png(filename = paste0("stillPlots/G-YF___",
+  # filename = paste0("FinalPlots/G-YF___",
                       my.type,
                       if(my.type=="UMP"){paste0("_",cc)}else{NULL},
                       "_B",B,
                       "___",poly,"-BC.png"),
 width = wid, height = wid/2.25, units = "in", res = 400, pointsize = 9)
-par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
+par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5), bg = "#cfc2b4")
 # ---------------------------------------------------------------------------------
 
 
@@ -275,7 +276,7 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
           # ylim = c(0.5,1.5),                                    # AR(2); p=1
           # ylim = c(0,1.75),                                     # AR(2); p=2
           ylim = glim,
-          labs = 0, lwd = 2)
+          labs = 0, lwd = 2, colr = skrown$smoke)
 
     # --- My g
     sadd(t, normy(sg), type = "l", col = skaturate$blue, lwd = 2)
@@ -305,12 +306,12 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
                   "T(B) range"),
           col = c(skrown$B2, skaturate$red, skaturate$blue, skrown$B1),
           lwd = c(2,1,2,1), lty = c(1,1,1,2),
-        inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
+        inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9, bg = skrown$salt)
 
 
 ## --------- Sy(f) --------- ##
     # --- True sy
-    splot(Fs, normy(tru$yf), type = "l", ylim = flim, labs = 0, lwd = 2)
+    splot(Fs, normy(tru$yf), type = "l", ylim = flim, labs = 0, lwd = 2, colr = skrown$smoke)
     
     # --- Multitaper
     # sadd(Fs, yf.mtm, type = "l", col = skaturate$green, lwd = 1)
@@ -336,7 +337,7 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
                   bquote(hat(S)["Y, 2"])),#,
                   # bquote(hat(S)["Y, Multitaper"])),
           col = c(skrown$B2, skaturate$red, skaturate$blue),
-          lwd = c(2,1,2), inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
+          lwd = c(2,1,2), inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9, bg = skrown$salt)
 
 # ---------------------------------------------------------------------------------
 dev.off()
@@ -348,6 +349,7 @@ dev.off()
 
 ```{r}
 flim.1 <- range(normy(tru$yf), normy(syf.1), yf.mtm/4)
+flim.2 <- range(normy(tru$yf), normy(syf.2), yf.mtm/4)
 ```
 
 ```{r}
@@ -370,52 +372,45 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5))
     sadd(Fs, yf.mtm/4, type = "l", col = skaturate$green, lwd = 1)
 
     # --- My sy
-    sadd(Fs, normy(syf.1), type = "l", col = skaturate$blue, lwd = 2)
-    
-    # --- Azadeh's sy
-    # sadd(Fs, normy(ayf), type = "l", col = skaturate$red, lwd = 1)
+    sadd(Fs, normy(yf.samp.1), type = "l", col = skaturate$blue, lwd = 2)
     
     # Labels
     slab(
          bquote(bold("Normalized "~hat(S)[Y]*"(f) and Multitaper: Example A")),
-         bquote("Average over M ="~.(M)~"simulations;"~
+         bquote("Single simulation;"~
                   bold("B =")~bold(.(as.character(B)))*";"~
                   bold("p = 1")),
          "Frequency", bquote("Spectrum"~S[Y]*"(f)"), yline = 2.5, cex.factor = 1.2)
     legend("topright",
        legend = c(bquote(S[Y]*"(f)"),
-                  bquote(hat(S)["Y, 2"])),
-                  bquote(hat(S)["Y, Multitaper"]),
+                  bquote(hat(S)["Y, 2"]),
+                  bquote(hat(S)["Y, M"])),
           col = c(skrown$B2, skaturate$blue, skaturate$green),
-          lwd = c(2,2,1), inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
+          lwd = 2, inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
     
 ## --------- 2-BC --------- ##
     # --- True sy
-    splot(Fs, normy(tru$yf), type = "l", ylim = flim, labs = 0, lwd = 2)
+    splot(Fs, normy(tru$yf), type = "l", ylim = flim.2, labs = 0, lwd = 2)
     
     # --- Multitaper
-    # sadd(Fs, yf.mtm, type = "l", col = skaturate$green, lwd = 1)
+    sadd(Fs, yf.mtm/4, type = "l", col = skaturate$green, lwd = 1)
 
     # --- My sy
-    sadd(Fs, normy(syf), type = "l", col = skaturate$blue, lwd = 2)
-    
-    # --- Azadeh's sy
-    sadd(Fs, normy(ayf), type = "l", col = skaturate$red, lwd = 1)
+    sadd(Fs, normy(yf.samp.2), type = "l", col = skaturate$blue, lwd = 2)
     
     # Labels
     slab(
-         bquote(bold("Normalized Estimates of"~S[Y]*"(f): Example A")),
-         bquote("Average over M ="~.(M)~"simulations;"~
+         bquote(bold("Normalized "~hat(S)[Y]*"(f) and Multitaper: Example A")),
+         bquote("Single simulation;"~
                   bold("B =")~bold(.(as.character(B)))*";"~
                   bold("p = 2")),
          "Frequency", bquote("Spectrum"~S[Y]*"(f)"), yline = 2.5, cex.factor = 1.2)
     legend("topright",
        legend = c(bquote(S[Y]*"(f)"),
-                  bquote(hat(S)["Y, 1"]),
-                  bquote(hat(S)["Y, 2"])),#,
-                  # bquote(hat(S)["Y, Multitaper"])),
-          col = c(skrown$B2, skaturate$red, skaturate$blue),
-          lwd = c(2,1,2), inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
+                  bquote(hat(S)["Y, 2"]),
+                  bquote(hat(S)["Y, M"])),
+          col = c(skrown$B2, skaturate$blue, skaturate$green),
+          lwd = 2, inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9)
 # ---------------------------------------------------------------------------------
 dev.off()
 ```
@@ -429,98 +424,7 @@ dev.off()
 
 
 
-# Animations
 
-## Frequency-Domain Animations
-
-```{r}
-## --- Choose your series
-# load("C:/Users/skyep/Documents/Research/PhD_Proposal/Data/")
-```
-
-```{r ani_prep}
-## --- Plot Prep ---------------- ###
-
-# Confidence Intervals (if it were Gaussian... isn't it more chi^2?)
-bc1.low  <- pbc$bc1$mean - 2* pbc$bc1$se
-bc1.high <- pbc$bc1$mean + 2* pbc$bc1$se
-bc2.low  <- pbc$bc2$mean - 2* pbc$bc2$se
-bc2.high <- pbc$bc2$mean + 2* pbc$bc2$se
-
-# ylims
-ylim.tx <- range(bc1.low, bc2.low, bc1.high, bc2.high, tru$xtf)
-```
-
-```{r f_domain_gif}
-
-p <- 0
-pb <- txtProgressBar(style = 3)
-
-### --- Create GIF ------------------- ###
-
-saveGIF({  for (my.t in seq(1,N,by = 5)) {
-  
-  # --- True Plot
-  splot(Fs, tru$xtf[my.t,], type = "l", ylim = ylim.tx, lwd = 2, colr = "#FCF8F8"); gc()
-  
-  # --- Means
-  lines(Fs, pbc$bc1$mean[my.t,], col = "dodgerblue2", lwd = 2) # OLD bc
-  lines(Fs,pbc$bc2$mean[my.t,], col = "goldenrod"  , lwd = 2) # Cbc  
-  
-  # --- Standard Errors
-  lines(Fs, bc1.low [my.t,] , col = skol$blue  , lwd = 1)
-  lines(Fs, bc1.high[my.t,] , col = skol$blue  , lwd = 1)
-
-  lines(Fs, bc2.low [my.t,], col = skol$orange, lwd = 1)
-  lines(Fs, bc2.high[my.t,], col = skol$orange, lwd = 1)
-  
-  # --- Labels
-  slab(main = "Spectrogram Estimates: example D", # UMP: c(t)*AR(2)",
-       # subb = bquote(#"c(t) = exp{ (-t-500)"^2*"/(2(200"^2*")) }       "*
-                     # "Blockwidth B ="~.(B)),
-       xlab = "Frequency",
-       ylab = bquote(hat(S)[X]~"(t = "*.(my.t)*", f)")); gc()
-  
-  
-  ## --- Legends (& other graphics) --------------------------- ##
-  legend("topright",
-         legend = c("means",
-                    #"mean +/- 2se","",
-                    "True",
-                    "1-BC",
-                    "2-BC"),
-         lty = c( 1, 
-                  #1,NA,
-                  1,NA,NA),
-         lwd = c( 3, 
-                  #1,NA,
-                  NA,NA,NA),
-         pch = c(NA,
-                 #NA,NA,
-                 19,19,19),
-         
-         col = c(skol$brown4, 
-                 # skol$brown4, skol$brown4,
-                 skol$brown4,"dodgerblue2","goldenrod"),
-         bg  = "white",
-         inset = c(0.01,0.02)
-    )
-  legend("topleft", legend = bquote("Time t ="*.(my.t)*"  "),
-         inset = c(0.05,0.08), cex = 2.5,
-         bg = if((my.t >= tb[1]) & (my.t <= max(tb))) {skol$green} else {"#F4A4A8"})
-  ## ---------------------------------------------------------- ##  
-  
-  gc()
-    p <- p+1
-    setTxtProgressBar(pb, p/length(seq(1,N,by = 5)))
-
-    } },
-  
-  # --- GIF details
-  interval   = 0.1,
-  movie.name = paste0("~/Plots/",my.type,"_B",B,".gif"),
-  ani.height = 668, ani.width = 1080); gc()
-```
 
 
 
@@ -587,7 +491,15 @@ saveGIF({  for (my.t in seq(1,N,by = 5)) {
 
 
 
-
+```{r}
+png("Equations/grid.png", width=13.59,height=12.15,units="cm",res=400)
+par(mar=c(0,0,0,0))
+splot(0,0,xlim = c(-1,1),ylim=c(-1,1), skor=FALSE,labs=0,xaxt="n",yaxt="n")
+rekt("#cfc2b4")
+abline(v=seq(-1,1,length.out=7),h=seq(-1,1,length.out=7), col = "#544536",lwd=3)
+sox("#cfc2b4")
+dev.off()
+```
 
 
 
