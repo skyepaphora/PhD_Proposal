@@ -2,17 +2,17 @@
 
 ```{r}
 ## --- Packages ------------------------------------ ##
-# library(multitaper)
-# library(pbapply)
-# library(kableExtra)
-# library(itsmr)
-# library(animation)
-# library(fields, quietly = TRUE, warn.conflicts = FALSE)
+library(multitaper)
+library(pbapply)
+library(kableExtra)
+library(itsmr)
+library(animation)
+library(fields, quietly = TRUE, warn.conflicts = FALSE)
 ```
 
 ```{r}
 ## --- Splot + Spalette ---------------------------- ##
-# load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
+load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 ```
 
 
@@ -24,7 +24,7 @@
 ```{r setup_pbcGram}
 ## --- Load 
 # load(file = "Data/AR2_B200___mini.RData")
-load(file = "Data/UMP_c1_B100___mini.RData")
+# load(file = "Data/UMP_c1_B100___mini.RData")
 # load(file = "Data/UMP_c1_B150___mini.RData")
 # load(file = "Data/UMP_c1_B200___mini.RData")
 # load(file = "Data/UMP_c1_B300___mini.RData")
