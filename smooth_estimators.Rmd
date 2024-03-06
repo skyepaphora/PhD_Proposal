@@ -20,13 +20,14 @@ library(fields)       # Supplement for image plots: legends, better colour
 ```
 
 ```{r}
-load("Data/AR2_B200___trial.RData")
+# load("Data/AR2_B200___trial.RData")
 # load("Data/UMP_c1_B100___trial.RData")
 # load("Data/UMP_c1_B150___trial.RData")
 # load("Data/UMP_c1_B200___trial.RData")
 # load("Data/UMP_c1_B300___trial.RData")
+# load("Data/UMP_c3_B150___trial.RData")
 # load("Data/UMP_c3_B200___trial.RData")
-# load("Data/UMP_c3_B300___trial.RData")
+load("Data/UMP_c3_B300___trial.RData")
 sheck <- c(my.type, cc, B)
 ```
 
@@ -131,6 +132,9 @@ ayf.2 <- rowMeans(ayf.full.2)
 # GEST \& YEST Proposed Method
 
 ```{r}
+# N <- 1000
+# NF <- 1025
+
 gest <- function(sgram){
   N <- length(sgram[,1])
   A <- outer(1:N,1:N, function(l,j){rowSums(sgram)[l]/rowSums(sgram)[j]})

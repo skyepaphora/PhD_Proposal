@@ -2,17 +2,17 @@
 
 ```{r}
 ## --- Packages ------------------------------------ ##
-library(multitaper)
-library(pbapply)
-library(kableExtra)
-library(itsmr)
-library(animation)
-library(fields, quietly = TRUE, warn.conflicts = FALSE)
+# library(multitaper)
+# library(pbapply)
+# library(kableExtra)
+# library(itsmr)
+# library(animation)
+# library(fields, quietly = TRUE, warn.conflicts = FALSE)
 ```
 
 ```{r}
 ## --- Splot + Spalette ---------------------------- ##
-load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
+# load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 ```
 
 
@@ -24,10 +24,11 @@ load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
 ```{r setup_pbcGram}
 ## --- Load 
 # load(file = "Data/AR2_B200___mini.RData")
-# load(file = "Data/UMP_c1_B100___mini.RData")
-load(file = "Data/UMP_c1_B150___mini.RData")
+load(file = "Data/UMP_c1_B100___mini.RData")
+# load(file = "Data/UMP_c1_B150___mini.RData")
 # load(file = "Data/UMP_c1_B200___mini.RData")
 # load(file = "Data/UMP_c1_B300___mini.RData")
+# load(file = "Data/UMP_c3_B150___mini.RData")
 # load(file = "Data/UMP_c3_B200___mini.RData")
 # load(file = "Data/UMP_c3_B300___mini.RData")
 # load(file = "Data/UMP_c3_B400___mini.RData")
@@ -57,10 +58,10 @@ tix <- round(seq(zlim[1],zlim[2],length.out=7))   # legend ticks [range]
 ```{r pbcGram_GO}
 # # --- Prep 3 
 wid <- 8
-png(filename = paste0("FinalPlots/PBCs___",my.type,
+png(filename = paste0("Prospectus_Defense/Plots/PBCs___",my.type,
                       if(my.type=="UMP"){paste0("_",cc)}else{NULL},
                       "_B",B,".png"),
-width = wid, height = wid/3, units = "in", res = 400, pointsize = 9)
+width = wid, height = wid/3, units = "in", res = 400, pointsize = 9,bg = "transparent")
 par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
 # ---------------------------------------------------------------------------------
 
@@ -121,10 +122,11 @@ dev.off()
 ```{r setup_smooGram}
 ## --- Load 
 # load("Data/AR2_B200___S.RData"); load("Data/AR2_B200___mini.RData")
-# load("Data/UMP_c1_B100___S.RData"); load("Data/UMP_c1_B100___mini.RData"); gc()
+load("Data/UMP_c1_B100___S.RData"); load("Data/UMP_c1_B100___mini.RData"); gc()
 # load("Data/UMP_c1_B150___S.RData"); load("Data/UMP_c1_B150___mini.RData"); gc()
 # load("Data/UMP_c1_B200___S.RData"); load("Data/UMP_c1_B200___mini.RData"); gc()
 # load("Data/UMP_c1_B300___S.RData"); load("Data/UMP_c1_B300___mini.RData"); gc()
+# load("Data/UMP_c3_B150___S.RData"); load("Data/UMP_c3_B150___mini.RData"); gc()
 # load("Data/UMP_c3_B200___S.RData"); load("Data/UMP_c3_B200___mini.RData"); gc()
 # load("Data/UMP_c3_B300___S.RData"); load("Data/UMP_c3_B300___mini.RData"); gc()
 
@@ -141,16 +143,16 @@ poly <- 1
 poly <- 2
 
 simp <- 0
-simp <- 1
+# simp <- 1
 
     if(poly == 1){
       samp   <- bc1.samp
-      smooth <- bc1.smooth*(simp==0) + bc1.simp.smooth*(simp==1)
-      ssx    <- ssx.1*(simp==0) + ssx.simp.1*(simp==1)
+      smooth <- bc1.smooth*(simp==0) #+ bc1.simp.smooth*(simp==1) ## only took these off for c3_B150
+      ssx    <- ssx.1*(simp==0) #+ ssx.simp.1*(simp==1)
     } else {
       samp   <- bc2.samp
-      smooth <- bc2.smooth*(simp==0) + bc2.simp.smooth*(simp==1)
-      ssx    <- ssx.2*(simp==0) + ssx.simp.2*(simp==1)
+      smooth <- bc2.smooth*(simp==0) #+ bc2.simp.smooth*(simp==1)
+      ssx    <- ssx.2*(simp==0) #+ ssx.simp.2*(simp==1)
     }
 
 ## --- Common z-axis limits
@@ -166,12 +168,12 @@ kable(data.frame(range(samp),range(normy(smooth)),range(normy(ssx))), format = "
 ```{r smooGram_GO}
 # # --- Prep 3 
 wid <- 8
-png(filename = paste0("FinalPlots/Sx___",my.type,
+png(filename = paste0("Prospectus_Defense/Plots/Sx___",my.type,
                       if(my.type=="UMP"){paste0("_",cc)}else{NULL},
                       if(my.type=="AR2"){paste0("_simp-",simp)}else{NULL},
                       "_B",B,
                       "___",poly,"-BC.png"),
-width = wid, height = wid/3, units = "in", res = 400, pointsize = 9)
+width = wid, height = wid/3, units = "in", res = 400, pointsize = 9, bg = "transparent")
 par(mfrow = c(1,3), mar = c(4,0,3.5,1), oma = c(0,4,0,5.6))
 # ---------------------------------------------------------------------------------
 
@@ -225,14 +227,17 @@ dev.off()
 ## --- Load 
 # load("Data/AR2_B200___S.RData"); load("Data/AR2_B200___mini.RData"); gc()
 # load("Data/UMP_c1_B150___S.RData"); load("Data/UMP_c1_B150___mini.RData"); gc()
-load("~/Research/PhD_Proposal/Data/UMP_c1_B200___S.RData"); load("~/Research/PhD_Proposal/Data/UMP_c1_B200___mini.RData"); gc()
+# load("~/Research/PhD_Proposal/Data/UMP_c1_B200___S.RData"); 
+# load("~/Research/PhD_Proposal/Data/UMP_c1_B200___mini.RData"); gc()
+load("Data/UMP_c1_B100___S.RData"); load("Data/UMP_c1_B100___mini.RData"); gc()
+# load("Data/UMP_c1_B200___S.RData"); load("Data/UMP_c1_B200___mini.RData"); gc()
 # load("Data/UMP_c1_B300___S.RData"); load("Data/UMP_c1_B300___mini.RData"); gc()
 # load("Data/UMP_c3_B200___S.RData"); load("Data/UMP_c3_B200___mini.RData"); gc()
 # load("Data/UMP_c3_B300___S.RData"); load("Data/UMP_c3_B300___mini.RData"); gc()
 
 ## --- BC Type
 poly <- 1
-# poly <- 2
+poly <- 2
 
     if(poly == 1){
       ag <- ag.1; ayf <- ayf.1
@@ -255,15 +260,17 @@ kable(data.frame(range(gt),range(sg),range(ag),range(normy(tru$yf)),range(syf),r
 
 ```{r}
 # --- Prep 2
-wid <- 8
-png(filename = paste0("stillPlots/G-YF___",
+# wid <- 8
+png(filename = paste0("Prospectus_Defense/Plots/G-YF___",
   # filename = paste0("FinalPlots/G-YF___",
                       my.type,
                       if(my.type=="UMP"){paste0("_",cc)}else{NULL},
                       "_B",B,
                       "___",poly,"-BC.png"),
-width = wid, height = wid/2.25, units = "in", res = 400, pointsize = 9)
-par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5), bg = "#cfc2b4")
+# width = wid, height = wid/2.25, units = "in", res = 400, pointsize = 9)
+width = 17, height = 8*0.8, units = "in", res = 200, pointsize = 10, bg="transparent")
+par(mfrow = c(1,2), mar = c(4,6.5,3,2.5))
+# par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5), bg = "#cfc2b4")
 # ---------------------------------------------------------------------------------
 
 
@@ -298,8 +305,8 @@ par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5), bg = "#cfc2b4")
                   bold("p =")~bold(.(as.character(poly)))),
          "Time", "g(t)", yline = 2.5, mline = 2, cex.factor = 1.2)
     legend(
-           "topright",
-           # "top",                                             # for ex C only
+           # "topright",
+           "top",                                             # for ex C only
        legend = c("g(t)",
                   bquote(hat(g)[1]*"(t)"),
                   bquote(hat(g)[2]*"(t)"),
