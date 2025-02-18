@@ -13,6 +13,7 @@ library(fields, quietly = TRUE, warn.conflicts = FALSE)
 ```{r}
 ## --- Splot + Spalette ---------------------------- ##
 load("C:/Users/skyep/Documents/Research/Skyes_Toolbox/splot.RData")
+load("~/Research/Skyes_Toolbox/spalette.RData")
 ```
 
 
@@ -229,23 +230,23 @@ dev.off()
 # load("Data/UMP_c1_B150___S.RData"); load("Data/UMP_c1_B150___mini.RData"); gc()
 # load("~/Research/PhD_Proposal/Data/UMP_c1_B200___S.RData"); 
 # load("~/Research/PhD_Proposal/Data/UMP_c1_B200___mini.RData"); gc()
-load("Data/UMP_c1_B100___S.RData"); load("Data/UMP_c1_B100___mini.RData"); gc()
+# load("Data/UMP_c1_B100___S.RData"); load("Data/UMP_c1_B100___mini.RData"); gc()
 # load("Data/UMP_c1_B200___S.RData"); load("Data/UMP_c1_B200___mini.RData"); gc()
 # load("Data/UMP_c1_B300___S.RData"); load("Data/UMP_c1_B300___mini.RData"); gc()
-# load("Data/UMP_c3_B200___S.RData"); load("Data/UMP_c3_B200___mini.RData"); gc()
+load("Data/UMP_c3_B200___S.RData"); load("Data/UMP_c3_B200___mini.RData"); gc()
 # load("Data/UMP_c3_B300___S.RData"); load("Data/UMP_c3_B300___mini.RData"); gc()
 
 ## --- BC Type
-poly <- 1
-poly <- 2
-
-    if(poly == 1){
-      ag <- ag.1; ayf <- ayf.1
-      sg <- sg.1; syf <- syf.1
-    } else {
-      ag <- ag.2; ayf <- ayf.2
-      sg <- sg.2; syf <- syf.2
-    }
+# poly <- 1
+# poly <- 2
+# 
+#     if(poly == 1){
+#       ag <- ag.1; ayf <- ayf.1
+#       sg <- sg.1; syf <- syf.1
+#     } else {
+#       ag <- ag.2; ayf <- ayf.2
+#       sg <- sg.2; syf <- syf.2
+#     }
 
 ## --- Normalizing function
 normy <- function(x){abs(x/max(abs(x)))}
@@ -255,26 +256,28 @@ glim <- range(gt,  normy(sg), normy(ag) )
 flim <- range(normy(tru$yf), normy(syf), normy(ayf))
 
 # --- Check limits
-kable(data.frame(range(gt),range(sg),range(ag),range(normy(tru$yf)),range(syf),range(ayf)), format = "pipe")
+# kable(data.frame(range(gt),range(sg),range(ag),range(normy(tru$yf)),range(syf),range(ayf)), format = "pipe")
 ```
 
 ```{r}
 # --- Prep 2
 # wid <- 8
-png(filename = paste0("Prospectus_Defense/Plots/G-YF___",
+png(filename = paste0("3MT/G-YF___icassp___",
   # filename = paste0("FinalPlots/G-YF___",
                       my.type,
                       if(my.type=="UMP"){paste0("_",cc)}else{NULL},
                       "_B",B,
                       "___",poly,"-BC.png"),
 # width = wid, height = wid/2.25, units = "in", res = 400, pointsize = 9)
-width = 17, height = 8*0.8, units = "in", res = 200, pointsize = 10, bg="transparent")
+width = 18, height = 8*0.8, units = "in", res = 200, pointsize = 10, bg="transparent")
 par(mfrow = c(1,2), mar = c(4,6.5,3,2.5))
 # par(mfrow = c(1,2), mar = c(4,3.75,3.5,0.5), bg = "#cfc2b4")
 # ---------------------------------------------------------------------------------
 
 
-## --------- G --------- ##
+## --------- 1 --------- ##
+ag <- ag.1; ayf <- ayf.1
+sg <- sg.1; syf <- syf.1
     # --- True g
     splot(t,
             # rep(1,N),                                           # AR(2)
@@ -283,69 +286,77 @@ par(mfrow = c(1,2), mar = c(4,6.5,3,2.5))
           # ylim = c(0.5,1.5),                                    # AR(2); p=1
           # ylim = c(0,1.75),                                     # AR(2); p=2
           ylim = glim,
-          labs = 0, lwd = 2, colr = skrown$smoke)
+          labs = 0, lwd = 3, lty = 2, colr = "#F5F2EF",
+          xaxt = 'n', yaxt = 'n')
 
-    # --- My g
-    sadd(t, normy(sg), type = "l", col = skaturate$blue, lwd = 2)
-    
-    # --- Azadeh's g
-    sadd(t, normy(ag), type = "l", col = skaturate$red, lwd = 1)
+    # --- g
+    sadd(t, normy(ag), type = "l", col = skaturate$red, lwd = 3)
+    sadd(t, normy(sg), type = "l", col = "dodgerblue", lwd = 3)
 
     # Other lines
-    abline(v = range(tb), col = skrown$B1, lty = 2)
+    abline(v = range(tb), col = skrown$B1, lty = 2, lwd = 2)
     # abline(h = 0, col = skrown$B1, lty = 3)
 
     # Labels
-    slab(
-         # "Normalized Estimates of g(t): Example A",
-         "Normalized Estimates of g(t): Example B",
-         # "Normalized Estimates of g(t): Example C",
-         bquote("Average over M ="~.(M)~"simulations;"~
-                  bold("B =")~bold(.(as.character(B)))*";"~
-                  bold("p =")~bold(.(as.character(poly)))),
-         "Time", "g(t)", yline = 2.5, mline = 2, cex.factor = 1.2)
+    # slab(
+    #      # "Normalized Estimates of g(t): Example A",
+    #      "Normalized Estimates of g(t): Example B",
+    #      # "Normalized Estimates of g(t): Example C",
+    #      bquote("Average over M ="~.(M)~"simulations;"~
+    #               bold("B =")~bold(.(as.character(B)))*";"~
+    #               bold("p =")~bold(.(as.character(poly)))),
+    #      "Time", "g(t)", yline = 2.5, mline = 2, cex.factor = 1.2)
     legend(
            # "topright",
-           "top",                                             # for ex C only
+           "top",                                             # for ex C (c3) only
        legend = c("g(t)",
                   bquote(hat(g)[1]*"(t)"),
-                  bquote(hat(g)[2]*"(t)"),
-                  "T(B) range"),
-          col = c(skrown$B2, skaturate$red, skaturate$blue, skrown$B1),
-          lwd = c(2,1,2,1), lty = c(1,1,1,2),
-        inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9, bg = skrown$salt)
+                  bquote(hat(g)[2]*"(t)")),
+          col = c(skrown$B2, skaturate$red, "dodgerblue"),
+          lwd = c(3,3,3), lty = c(1,1,1),
+        inset = 0.01*c(1.5,2), y.intersp = 1.6, cex = 2, bg = skrown$salt)
 
+## --------- 2 --------- ##
+ag <- ag.2; ayf <- ayf.2
+sg <- sg.2; syf <- syf.2
+    # --- True g
+    splot(t,
+            # rep(1,N),                                           # AR(2)
+            gt ,
+          type = "l",
+          # ylim = c(0.5,1.5),                                    # AR(2); p=1
+          # ylim = c(0,1.75),                                     # AR(2); p=2
+          ylim = glim,
+          labs = 0, lwd = 3, lty = 2, colr = "#F5F2EF",
+          xaxt = 'n', yaxt = 'n')
 
-## --------- Sy(f) --------- ##
-    # --- True sy
-    splot(Fs, normy(tru$yf), type = "l", ylim = flim, labs = 0, lwd = 2, colr = skrown$smoke)
-    
-    # --- Multitaper
-    # sadd(Fs, yf.mtm, type = "l", col = skaturate$green, lwd = 1)
+    # --- g
+    sadd(t, normy(ag), type = "l", col = skaturate$red, lwd = 3)
+    sadd(t, normy(sg), type = "l", col = "dodgerblue", lwd = 3)
 
-    # --- My sy
-    sadd(Fs, normy(syf), type = "l", col = skaturate$blue, lwd = 2)
-    
-    # --- Azadeh's sy
-    sadd(Fs, normy(ayf), type = "l", col = skaturate$red, lwd = 1)
-    
+    # Other lines
+    abline(v = range(tb), col = skrown$B1, lty = 2, lwd = 2)
+    # abline(h = 0, col = skrown$B1, lty = 3)
+
     # Labels
-    slab(
-         # bquote(bold("Normalized Estimates of"~S[Y]*"(f): Example A")),
-         bquote(bold("Normalized Estimates of"~S[Y]*"(f): Example B")),
-         # bquote(bold("Normalized Estimates of"~S[Y]*"(f): Example C")),
-         bquote("Average over M ="~.(M)~"simulations;"~
-                  bold("B =")~bold(.(as.character(B)))*";"~
-                  bold("p =")~bold(.(as.character(poly)))),
-         "Frequency", bquote("Spectrum"~S[Y]*"(f)"), yline = 2.5, cex.factor = 1.2)
-    legend("topright",
-       legend = c(bquote(S[Y]*"(f)"),
-                  bquote(hat(S)["Y, 1"]),
-                  bquote(hat(S)["Y, 2"])),#,
-                  # bquote(hat(S)["Y, Multitaper"])),
-          col = c(skrown$B2, skaturate$red, skaturate$blue),
-          lwd = c(2,1,2), inset = 0.01*c(1.5,2), y.intersp = 1.25, cex = 0.9, bg = skrown$salt)
-
+    # slab(
+    #      # "Normalized Estimates of g(t): Example A",
+    #      "Normalized Estimates of g(t): Example B",
+    #      # "Normalized Estimates of g(t): Example C",
+    #      bquote("Average over M ="~.(M)~"simulations;"~
+    #               bold("B =")~bold(.(as.character(B)))*";"~
+    #               bold("p =")~bold(.(as.character(poly)))),
+    #      "Time", "g(t)", yline = 2.5, mline = 2, cex.factor = 1.2)
+    legend(
+           # "topright",
+           "top",                                             # for ex C (c3) only
+       legend = c("g(t)",
+                  bquote(hat(g)[1]*"(t)"),
+                  bquote(hat(g)[2]*"(t)")),
+          col = c(skrown$B2, skaturate$red, "dodgerblue"),
+          lwd = c(3,3,3), lty = c(1,1,1),
+        inset = 0.01*c(1.5,2), y.intersp = 1.6, cex = 2, bg = skrown$salt)
+    
 # ---------------------------------------------------------------------------------
 dev.off()
 ```

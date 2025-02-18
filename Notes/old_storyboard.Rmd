@@ -1,0 +1,129 @@
+In short, the goal of this prospectus is to demonstrate a base knowledge of evolutionary spectrum estimation techniques and the surrounding literature, t
+
+# Background
+
+## Stationary spectra
+#### Autocovariance
+The covariance kernel of a time series describes the distributional relationship between that time series and a version of itself that's been offset by some time-lag. In a stationary context, the kernel can be expressed as a time-independent function of lag only $-$ this function is known as \textit{autocovariance.}
+
+By highlighting correlated behaviours separated by various time-intervals, autocovariance provides insight into periodic structures underlying the series from the perspective of the time domain.
+
+#### Stationary spec rep
+These inferences can alternatively be made from the frequency domain by way of spectral representations, which decompose stationary series into sinusoids of varying amplitudes across a finite spectrum of frequencies. Spectral power describes the contribution of each frequency component to the variance of the series, and can be expressed in terms of frequency functions resembling probabilistic distributions.
+
+#### stationary spec est and multitaper
+Spectral distributions must, in practice, be estimated via statistical means $-$ this is most often done using Fourier transforms of the data, thanks to the theoretical relationship between spectra and autocovariance. The bias of such an estimate can be optimized by applying a taper (time-varying weights) to the data prior to transformation, and the consequential variance properties of the estimate can be wrangled by averaging results obtained using some variety of tapers. This method is known as the \textit{Multitaper method.}
+
+## Evo specs
+
+#### interpret non-stationary
+Non-stationarity complicates all this by ruining the previous notion of spectral densities being related to some time-independent autocovariance function: if patterns defined by time-lags are inconsistent over the progression of a series, the frequency structure of that series is forced to evolve over time. 
+#### EPS
+Thus, non-stationary series are said to have \textit{Evolutionary Power Spectra.} Expressions of the evolutionary spectrum can be derived by modifying the exponential function inside the spectral representation of an oscillatory process (as per Priestley's EPS), or more generally, from time-varying linear filter models (as in the case of the Wold-Cramer EPS).
+
+## UMPs
+A convenient sub-class of non-stationarity to examine is the \textit{Uniformly Modulated Process.} 
+
+#### definition and properties
+The EPS of a UMP is defined to maintain its distributional proportions over time, although the total power of the series is considered time-independent.
+#### decomposition
+In fact, an EPS of this form can be expressed as the outer product of some stationary power spectrum and a modulating function of time, and may theoretically be decomposed into its individual time-dependent and frequency-dependent components.
+#### detection
+These properties are potentially detectable, in practice, via singular value decomposition of the series' discretized time-frequency spectral matrix.
+
+## Estimating Evo specs
+
+#### NSQI
+#### EP
+A simple estimate for time-dependent spectra is the \textit{Evolutionary Periodogram,} given in chapter 2 by equation \eqref{eq:e-periodogram}.
+#### HRS
+Strategic use of data tapers can improve this estimate, as well. In particular, the \textit{High Resolution Spectrogram} uses the same set of tapers as those who minimized bias according to the multitaper method in the stationary case. The trade off is that these tapers cause the final estimate to, well, \textit{taper off} (decline to zero-power) towards its own time boundaries.  
+#### SWHRS
+The \textit{Sliding Window HRS} alleviates this by taking averages of overlapping time-truncated segments of the HRS, however, this effectively eliminates a portion of the estimate's time-boundary region altogether.
+#### MS
+Using linear Taylor approximations and \textit{Non-stationary Quadratic Inverse Theory,} an alternative EPS estimate can be constructed from the SWHRS. Moreover, the estimate's time-derivative is made available by this technique.
+#### 1-BC
+This modified SWHRS is also missing information in its time-boundary regions, but its time-derivative can correct for this via linear extrapolation from the estimate's time-endpoints.
+
+## BSS
+#### background
+#### using evospecs
+
+---
+
+# Current work
+
+## p-BCs
+The assumption of linear behaviour in the time-boundary regions of the EPS is limiting, and so we developed a method of generalizing NSQI-based spectrogram boundary correction to consider higher order polynomials. The resulting spectrogram is called the $p$-BC for a chosen order $p$, and we derived an explicit expression for $p=2$.
+#### construction
+#### performance
+* stationary
+* UMP x 2
+* non-stationary
+Moreover, we showed that the $2$-BC performs similarly to the $1$-BC $-$ even demonstrating slightly improved bias $-$ for a variety of simulated processes, including stationary, UMP, and non-stationary cases.
+
+## Estimating time/freq components of UMPs
+
+#### gest
+#### yest
+#### performance
+* stationary
+* UMP x 2
+
+## Smoothed UMP spectrograms
+#### Derivation 
+#### stationary case
+#### Performance
+* stationary
+* UMP x 2
+
+---
+
+# Proposal
+
+## Gumps
+#### gump-2 evo spec
+#### gump-2 detection
+#### estimating c1, c2 of gump-2
+#### Gump research proposal
+* hypothesis test for stationary, UMP based on azadeh. generalize to gummp
+* estimate c1, c2, and respective spectral components
+* smoothed estimates of ump component evo specs, extend to full gump?
+* simulation
+* extend to k>2
+
+## BSS
+* insert MS and p-BCs
+* smoothed HRS and p-BCs under assumption of UM
+
+#### Non-stationary data
+* eeg, ecg
+* earthquakes: may be an application for ump or gump-based techniques
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

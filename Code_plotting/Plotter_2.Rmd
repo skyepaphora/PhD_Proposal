@@ -10,6 +10,7 @@ library(fields, quietly = TRUE, warn.conflicts = FALSE)
 
 ## --- Splot + Spalette ---------------------------- ##
 load("~/Research/Skyes_Toolbox/splot.RData")
+load("~/Research/Skyes_Toolbox/spalette.RData")
 # load("~/Research/PhD_Proposal/FinalData/AR2_B200_full_yf.RData")
 
 ## --- Data ----------------------------- ##
@@ -24,18 +25,26 @@ zlim <- 0:1
 ## --- sgram legend placement
 leggo <- list(single = c(0.925,0.95,0.1,0.925),
               double.h = c(0.9,0.94,0.1,0.925))
+
+normy <- function(x){abs(x/max(abs(x)))}
 ```
 
 ```{r}
 # desperate
-sg <- 
+sg <- sg.1
+ag <- ag.1
+```
+
+```{r}
+sg <- sg.2
+ag <- ag.2
 ```
 
 # GEST \& YEST
 
 ```{r}
 # --- Prep 2
-png(filename = paste0("Prospectus_Defense/Plots/G-YF___",
+png(filename = paste0("DON'T DO IT/Plots/G-YF___",
                       my.type,
                       if(my.type=="UMP"){paste0("_",cc)}else{NULL},
                       "_B",B,".png"),
